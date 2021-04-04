@@ -36,7 +36,6 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-
 	implementation("io.springfox:springfox-boot-starter:3.0.0")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
