@@ -10,6 +10,8 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -20,10 +22,13 @@ public class PluginEntity {
     private int owner;
     private String packageId;
     private float rank;
-    private Object publishTime;
+    private Timestamp publishTime;
     private String desc;
     private boolean banned;
-    private Object updateTime;
+    private Timestamp updateTime;
+    private String postUrl;
+    private UserEntity userByOwner;
+    private Collection<PluginFileEntity> pluginFilesById;
 
     @Id
     @Column(name = "id")
@@ -77,11 +82,11 @@ public class PluginEntity {
 
     @Basic
     @Column(name = "publish_time")
-    public Object getPublishTime() {
+    public Timestamp getPublishTime() {
         return publishTime;
     }
 
-    public void setPublishTime(Object publishTime) {
+    public void setPublishTime(Timestamp publishTime) {
         this.publishTime = publishTime;
     }
 
@@ -107,12 +112,22 @@ public class PluginEntity {
 
     @Basic
     @Column(name = "update_time")
-    public Object getUpdateTime() {
+    public Timestamp getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(Object updateTime) {
+    public void setUpdateTime(Timestamp updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Basic
+    @Column(name = "post_url")
+    public String getPostUrl() {
+        return postUrl;
+    }
+
+    public void setPostUrl(String postUrl) {
+        this.postUrl = postUrl;
     }
 
     @Override
@@ -120,11 +135,30 @@ public class PluginEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginEntity that = (PluginEntity) o;
-        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && banned == that.banned && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime);
+        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && banned == that.banned && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, banned, updateTime);
+        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, banned, updateTime, postUrl);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    public UserEntity getUserByOwner() {
+        return userByOwner;
+    }
+
+    public void setUserByOwner(UserEntity userByOwner) {
+        this.userByOwner = userByOwner;
+    }
+
+    @OneToMany(mappedBy = "pluginByPluginId")
+    public Collection<PluginFileEntity> getPluginFilesById() {
+        return pluginFilesById;
+    }
+
+    public void setPluginFilesById(Collection<PluginFileEntity> pluginFilesById) {
+        this.pluginFilesById = pluginFilesById;
     }
 }

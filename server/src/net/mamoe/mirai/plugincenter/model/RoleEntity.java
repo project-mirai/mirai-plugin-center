@@ -10,6 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +20,7 @@ public class RoleEntity {
     private String name;
     private Integer parent;
     private String desc;
+    private Collection<UserRoleEntity> userRolesById;
 
     @Id
     @Column(name = "id")
@@ -71,5 +73,14 @@ public class RoleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, parent, desc);
+    }
+
+    @OneToMany(mappedBy = "roleByRoleId")
+    public Collection<UserRoleEntity> getUserRolesById() {
+        return userRolesById;
+    }
+
+    public void setUserRolesById(Collection<UserRoleEntity> userRolesById) {
+        this.userRolesById = userRolesById;
     }
 }

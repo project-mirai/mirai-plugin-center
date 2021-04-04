@@ -18,6 +18,7 @@ public class RolePermissionEntity {
     private int id;
     private int roleId;
     private int permissionId;
+    private PermissionEntity permissionByPermissionId;
 
     @Id
     @Column(name = "id")
@@ -60,5 +61,15 @@ public class RolePermissionEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, roleId, permissionId);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "permission_id", referencedColumnName = "id", nullable = false ,insertable = false ,updatable = false)
+    public PermissionEntity getPermissionByPermissionId() {
+        return permissionByPermissionId;
+    }
+
+    public void setPermissionByPermissionId(PermissionEntity permissionByPermissionId) {
+        this.permissionByPermissionId = permissionByPermissionId;
     }
 }

@@ -18,6 +18,8 @@ public class UserRoleEntity {
     private int id;
     private int uid;
     private int roleId;
+    private UserEntity userByUid;
+    private RoleEntity roleByRoleId;
 
     @Id
     @Column(name = "id")
@@ -60,5 +62,25 @@ public class UserRoleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, uid, roleId);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "uid", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    public UserEntity getUserByUid() {
+        return userByUid;
+    }
+
+    public void setUserByUid(UserEntity userByUid) {
+        this.userByUid = userByUid;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false,insertable = false ,updatable = false)
+    public RoleEntity getRoleByRoleId() {
+        return roleByRoleId;
+    }
+
+    public void setRoleByRoleId(RoleEntity roleByRoleId) {
+        this.roleByRoleId = roleByRoleId;
     }
 }

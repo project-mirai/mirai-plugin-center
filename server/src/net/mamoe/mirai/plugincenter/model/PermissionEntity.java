@@ -9,20 +9,19 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
+import javax.persistence.*;
+import java.util.Collection;
 import java.util.Objects;
 
-
-@Table( "permission")
+@Entity
+@Table(name = "permission", schema = "public", catalog = "plugins")
 public class PermissionEntity {
     private int id;
     private String name;
     private Integer parent;
     private String desc;
+    private Collection<RolePermissionEntity> rolePermissionsById;
+    private Collection<UserPermissionEntity> userPermissionsById;
 
     @Id
     @Column(name = "id")
@@ -75,5 +74,23 @@ public class PermissionEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, parent, desc);
+    }
+
+    @OneToMany(mappedBy = "permissionByPermissionId")
+    public Collection<RolePermissionEntity> getRolePermissionsById() {
+        return rolePermissionsById;
+    }
+
+    public void setRolePermissionsById(Collection<RolePermissionEntity> rolePermissionsById) {
+        this.rolePermissionsById = rolePermissionsById;
+    }
+
+    @OneToMany(mappedBy = "permissionByPermissionId")
+    public Collection<UserPermissionEntity> getUserPermissionsById() {
+        return userPermissionsById;
+    }
+
+    public void setUserPermissionsById(Collection<UserPermissionEntity> userPermissionsById) {
+        this.userPermissionsById = userPermissionsById;
     }
 }

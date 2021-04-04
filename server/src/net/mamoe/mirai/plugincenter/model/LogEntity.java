@@ -9,20 +9,17 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
+import javax.persistence.*;
 import java.util.Objects;
 
-
-@Table("log")
+@Entity
+@Table(name = "log", schema = "public", catalog = "plugins")
 public class LogEntity {
     private long id;
     private Integer opertor;
     private String msg;
-    private Object otherInfo;
+    private String otherInfo;  // 这是一个json
+    private UserEntity userByOpertor;
 
     @Id
     @Column(name = "id")
@@ -34,7 +31,7 @@ public class LogEntity {
         this.id = id;
     }
 
-
+    @Basic
     @Column(name = "opertor")
     public Integer getOpertor() {
         return opertor;
@@ -44,7 +41,7 @@ public class LogEntity {
         this.opertor = opertor;
     }
 
-
+    @Basic
     @Column(name = "msg")
     public String getMsg() {
         return msg;
@@ -54,13 +51,13 @@ public class LogEntity {
         this.msg = msg;
     }
 
-
+    @Basic
     @Column(name = "other_info")
-    public Object getOtherInfo() {
+    public String getOtherInfo() {
         return otherInfo;
     }
 
-    public void setOtherInfo(Object otherInfo) {
+    public void setOtherInfo(String otherInfo) {
         this.otherInfo = otherInfo;
     }
 
@@ -75,5 +72,15 @@ public class LogEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, opertor, msg, otherInfo);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "opertor", referencedColumnName = "uid",insertable = false ,updatable = false)
+    public UserEntity getUserByOpertor() {
+        return userByOpertor;
+    }
+
+    public void setUserByOpertor(UserEntity userByOpertor) {
+        this.userByOpertor = userByOpertor;
     }
 }

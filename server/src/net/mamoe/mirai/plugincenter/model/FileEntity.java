@@ -9,29 +9,25 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
+import javax.persistence.*;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Objects;
 
-
-@Table("file")
+@Entity
+@Table(name = "file", schema = "public", catalog = "plugins")
 public class FileEntity {
     private int id;
     private int owner;
     private String path;
-    @LastModifiedDate
     private Instant uploadTime;
     private String sha1;
     private String fileName;
+    private UserEntity userByOwner;
+    private Collection<PluginFileEntity> pluginFilesById;
 
     @Id
-    @Column( "id")
+    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -40,8 +36,8 @@ public class FileEntity {
         this.id = id;
     }
 
-
-    @Column("owner")
+    @Basic
+    @Column(name = "owner")
     public int getOwner() {
         return owner;
     }
@@ -50,8 +46,8 @@ public class FileEntity {
         this.owner = owner;
     }
 
-
-    @Column("path")
+    @Basic
+    @Column(name = "path")
     public String getPath() {
         return path;
     }
@@ -60,8 +56,8 @@ public class FileEntity {
         this.path = path;
     }
 
-
-    @Column("upload_time")
+    @Basic
+    @Column(name = "upload_time")
     public Instant getUploadTime() {
         return uploadTime;
     }
@@ -70,8 +66,8 @@ public class FileEntity {
         this.uploadTime = uploadTime;
     }
 
-
-    @Column("sha1")
+    @Basic
+    @Column(name = "sha1")
     public String getSha1() {
         return sha1;
     }
@@ -80,8 +76,8 @@ public class FileEntity {
         this.sha1 = sha1;
     }
 
-
-    @Column("file_name")
+    @Basic
+    @Column(name = "file_name")
     public String getFileName() {
         return fileName;
     }
@@ -101,5 +97,24 @@ public class FileEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, owner, path, uploadTime, sha1, fileName);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    public UserEntity getUserByOwner() {
+        return userByOwner;
+    }
+
+    public void setUserByOwner(UserEntity userByOwner) {
+        this.userByOwner = userByOwner;
+    }
+
+    @OneToMany(mappedBy = "fileByFileId")
+    public Collection<PluginFileEntity> getPluginFilesById() {
+        return pluginFilesById;
+    }
+
+    public void setPluginFilesById(Collection<PluginFileEntity> pluginFilesById) {
+        this.pluginFilesById = pluginFilesById;
     }
 }

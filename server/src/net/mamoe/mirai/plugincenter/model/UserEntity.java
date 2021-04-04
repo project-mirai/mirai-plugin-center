@@ -10,6 +10,8 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -19,11 +21,17 @@ public class UserEntity {
     private String nick;
     private String email;
     private String password;
-    private Object registerTime;
-    private Object lastLoginTime;
+    private Timestamp registerTime;
+    private Timestamp lastLoginTime;
     private String registerIp;
     private String lastLoginIp;
     private boolean banned;
+    private Collection<FileEntity> filesByUid;
+    private Collection<LogEntity> logsByUid;
+    private Collection<PluginEntity> pluginsByUid;
+    private Collection<TokenEntity> tokensByUid;
+    private Collection<UserPermissionEntity> userPermissionsByUid;
+    private Collection<UserRoleEntity> userRolesByUid;
 
     @Id
     @Column(name = "uid")
@@ -67,21 +75,21 @@ public class UserEntity {
 
     @Basic
     @Column(name = "register_time")
-    public Object getRegisterTime() {
+    public Timestamp getRegisterTime() {
         return registerTime;
     }
 
-    public void setRegisterTime(Object registerTime) {
+    public void setRegisterTime(Timestamp registerTime) {
         this.registerTime = registerTime;
     }
 
     @Basic
     @Column(name = "last_login_time")
-    public Object getLastLoginTime() {
+    public Timestamp getLastLoginTime() {
         return lastLoginTime;
     }
 
-    public void setLastLoginTime(Object lastLoginTime) {
+    public void setLastLoginTime(Timestamp lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
     }
 
@@ -126,5 +134,59 @@ public class UserEntity {
     @Override
     public int hashCode() {
         return Objects.hash(uid, nick, email, password, registerTime, lastLoginTime, registerIp, lastLoginIp, banned);
+    }
+
+    @OneToMany(mappedBy = "userByOwner")
+    public Collection<FileEntity> getFilesByUid() {
+        return filesByUid;
+    }
+
+    public void setFilesByUid(Collection<FileEntity> filesByUid) {
+        this.filesByUid = filesByUid;
+    }
+
+    @OneToMany(mappedBy = "userByOpertor")
+    public Collection<LogEntity> getLogsByUid() {
+        return logsByUid;
+    }
+
+    public void setLogsByUid(Collection<LogEntity> logsByUid) {
+        this.logsByUid = logsByUid;
+    }
+
+    @OneToMany(mappedBy = "userByOwner")
+    public Collection<PluginEntity> getPluginsByUid() {
+        return pluginsByUid;
+    }
+
+    public void setPluginsByUid(Collection<PluginEntity> pluginsByUid) {
+        this.pluginsByUid = pluginsByUid;
+    }
+
+    @OneToMany(mappedBy = "userByOwner")
+    public Collection<TokenEntity> getTokensByUid() {
+        return tokensByUid;
+    }
+
+    public void setTokensByUid(Collection<TokenEntity> tokensByUid) {
+        this.tokensByUid = tokensByUid;
+    }
+
+    @OneToMany(mappedBy = "userByUid")
+    public Collection<UserPermissionEntity> getUserPermissionsByUid() {
+        return userPermissionsByUid;
+    }
+
+    public void setUserPermissionsByUid(Collection<UserPermissionEntity> userPermissionsByUid) {
+        this.userPermissionsByUid = userPermissionsByUid;
+    }
+
+    @OneToMany(mappedBy = "userByUid")
+    public Collection<UserRoleEntity> getUserRolesByUid() {
+        return userRolesByUid;
+    }
+
+    public void setUserRolesByUid(Collection<UserRoleEntity> userRolesByUid) {
+        this.userRolesByUid = userRolesByUid;
     }
 }

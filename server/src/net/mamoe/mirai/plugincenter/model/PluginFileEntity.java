@@ -10,6 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -20,8 +21,10 @@ public class PluginFileEntity {
     private int versionCode;
     private int pluginId;
     private int fileId;
-    private Object publishTime;
+    private Timestamp publishTime;
     private String platform;
+    private PluginEntity pluginByPluginId;
+    private FileEntity fileByFileId;
 
     @Id
     @Column(name = "id")
@@ -75,11 +78,11 @@ public class PluginFileEntity {
 
     @Basic
     @Column(name = "publish_time")
-    public Object getPublishTime() {
+    public Timestamp getPublishTime() {
         return publishTime;
     }
 
-    public void setPublishTime(Object publishTime) {
+    public void setPublishTime(Timestamp publishTime) {
         this.publishTime = publishTime;
     }
 
@@ -104,5 +107,25 @@ public class PluginFileEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, version, versionCode, pluginId, fileId, publishTime, platform);
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "plugin_id", referencedColumnName = "id", nullable = false,insertable = false ,updatable = false)
+    public PluginEntity getPluginByPluginId() {
+        return pluginByPluginId;
+    }
+
+    public void setPluginByPluginId(PluginEntity pluginByPluginId) {
+        this.pluginByPluginId = pluginByPluginId;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false,insertable = false ,updatable = false)
+    public FileEntity getFileByFileId() {
+        return fileByFileId;
+    }
+
+    public void setFileByFileId(FileEntity fileByFileId) {
+        this.fileByFileId = fileByFileId;
     }
 }
