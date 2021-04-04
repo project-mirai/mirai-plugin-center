@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Api(tags = ["认证服务"])
-@RequestMapping("/api/v1/sso")
+@RequestMapping("/v1/sso")
 class SSOController {
     @ApiOperation("登录")
     @PostMapping("/login")
