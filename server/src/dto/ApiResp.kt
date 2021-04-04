@@ -17,19 +17,28 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
+import org.springframework.http.HttpStatus
 
 sealed interface Resp {
     fun writeTo(gen: JsonGenerator, provider: SerializerProvider)
 
     companion object {
-        val NOT_AUTHED = SerializedApiResp<Unit>(403,"Not authed")
-        val NOT_FOUND = SerializedApiResp<Unit>(404, "Resource not found")
+        val OK = SerializedApiResp<Unit>(HttpStatus.OK)
+        val BAD_REQUEST = SerializedApiResp<Unit>(HttpStatus.BAD_REQUEST)
+        val UNAUTHORIZED = SerializedApiResp<Unit>(HttpStatus.UNAUTHORIZED)
+        val FORBIDDEN = SerializedApiResp<Unit>(HttpStatus.FORBIDDEN)
+        val NOT_FOUND = SerializedApiResp<Unit>(HttpStatus.NOT_FOUND)
+        val METHOD_NOT_ALLOWED = SerializedApiResp<Unit>(HttpStatus.METHOD_NOT_ALLOWED)
+        val REQUEST_TIMEOUT = SerializedApiResp<Unit>(HttpStatus.REQUEST_TIMEOUT)
+        val INTERNAL_SERVER_ERROR = SerializedApiResp<Unit>(HttpStatus.INTERNAL_SERVER_ERROR)
+        val NOT_IMPLEMENTED = SerializedApiResp<Unit>(HttpStatus.NOT_IMPLEMENTED)
+        val SERVICE_UNAVAILABLE = SerializedApiResp<Unit>(HttpStatus.SERVICE_UNAVAILABLE)
     }
 }
 
 @ApiModel
-open class ApiResp <T>(
-    @ApiModelProperty("状态码")  val code: Int,
+open class ApiResp<T>(
+    @ApiModelProperty("状态码") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
     val trace: List<String>? = null,
@@ -66,6 +75,8 @@ class SerializedApiResp<T>(
     response: T? = null,
     trace: List<String>? = null,
 ) : ApiResp<T>(code, message, response, trace), Resp {
+    constructor(code: HttpStatus) : this(code.value(), code.reasonPhrase)
+
     private val rawString: String by lazy { ApiResp(code, message, response, trace).toJsonString() }
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) = gen.writeRaw(rawString)
 }
