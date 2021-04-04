@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 @Service
-class PluginCenterUserService :ReactiveUserDetailsService {
+class PluginCenterUserService : ReactiveUserDetailsService {
     override fun findByUsername(username: String?): Mono<UserDetails> {
         TODO("Not yet implemented")
     }
