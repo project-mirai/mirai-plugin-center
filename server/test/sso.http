@@ -1,5 +1,5 @@
 ### SSO Login
-POST localhost:8080/sso/login
+POST localhost:8080/v1/sso/login
 Content-Type: application/json
 
 {

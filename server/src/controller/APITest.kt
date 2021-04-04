@@ -12,15 +12,17 @@ package net.mamoe.mirai.plugincenter.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
 import net.mamoe.mirai.plugincenter.dto.ApiResp
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Api
-@RequestMapping("/api/v1")
+@RequestMapping("/v1")
 class APITest {
-    // api 文档地址 http://localhost:8080/api/swagger-ui/index.html
+    // api 文档地址 http://localhost:8080/swagger-ui/index.html
     @GetMapping("/aaa")
     @ApiOperation(value = "获取数据")
     suspend fun test(@RequestParam @ApiParam("这是说明信息",required = true) param :Int):ApiResp<Int>{
