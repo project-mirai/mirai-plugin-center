@@ -29,13 +29,18 @@ subprojects {
 
 		tasks.withType<KotlinCompile> {
 			kotlinOptions {
-				freeCompilerArgs = listOf("-Xjsr305=strict")
-				jvmTarget = "11"
-			}
-		}
+                freeCompilerArgs = listOf("-Xjsr305=strict")
+                jvmTarget = "11"
+            }
+        }
 
-		tasks.withType<Test> {
-			useJUnitPlatform()
-		}
-	}
+        tasks.withType<Test> {
+            useJUnitPlatform()
+        }
+    }
+}
+
+extensions.findByName("buildScan")?.withGroovyBuilder {
+    setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+    setProperty("termsOfServiceAgree", "yes")
 }
