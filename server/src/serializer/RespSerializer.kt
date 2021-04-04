@@ -22,6 +22,6 @@ class RespSerializer : StdSerializer<Resp>(Resp::class.java) {
         gen: JsonGenerator,
         provider: SerializerProvider
     ) {
-        gen.writeRaw(value.toJsonString())
+        value.writeTo(gen, provider)
     }
 }
