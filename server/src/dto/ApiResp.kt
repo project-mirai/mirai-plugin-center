@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 import org.springframework.http.HttpStatus
+import springfox.documentation.annotations.ApiIgnore
 
 inline fun resp(code: Int = 200, builderAction: RespBuilder.() -> Unit): Resp {
     return RespBuilder(code).apply(builderAction)
@@ -60,7 +61,7 @@ open class ApiResp<T>(
     @ApiModelProperty("状态码") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
-    val trace: List<String>? = null,
+    @ApiIgnore private val trace: List<String>? = null,
 ) : Resp {
     private companion object {
         val localMapper = JsonMapper().apply {
