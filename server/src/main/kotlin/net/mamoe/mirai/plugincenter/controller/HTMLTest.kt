@@ -2,12 +2,10 @@ package net.mamoe.mirai.plugincenter.controller
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.reactor.asFlux
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
-import reactor.core.publisher.Flux
 import springfox.documentation.annotations.ApiIgnore
 
 @Controller
