@@ -29,9 +29,11 @@ subprojects {
 
         kotlin.sourceSets.all {
             languageSettings.apply {
+                languageVersion = "1.5"
                 progressiveMode = true
                 val experimentalAnnotations = """
                     kotlin.OptIn
+                    kotlin.contracts.ExperimentalContracts
                 """.trimIndent().split("\n").filterNot(String::isBlank)
                 for (ann in experimentalAnnotations) {
                     useExperimentalAnnotation(ann)
@@ -45,6 +47,7 @@ subprojects {
             kotlinOptions {
                 freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
                 freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all"
+                freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
                 jvmTarget = "11"
             }
         }
