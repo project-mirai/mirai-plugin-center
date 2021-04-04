@@ -13,4 +13,4 @@ jobs:
       - run: chmod -R 777 *
       - run: ./gradlew clean --scan
       - run: ./gradlew assemble --scan
-      - run: ./gradlew check --scan
+#      - run: ./gradlew check --scan
