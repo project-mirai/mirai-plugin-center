@@ -9,9 +9,10 @@
 
 package net.mamoe.mirai.plugincenter.utils
 
+import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.result.view.RedirectView
 import org.springframework.web.reactive.result.view.View
 
-fun redirect(url: String): View {
-    return RedirectView(url)
-}
+fun redirect(url: String): View = RedirectView(url)
+fun redirect(url: String, status: HttpStatus): View = RedirectView(url, status)
+
