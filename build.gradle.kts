@@ -39,6 +39,8 @@ subprojects {
             }
         }
 
+        configureFlattenSourceSets()
+
         tasks.withType<KotlinCompile> {
             kotlinOptions {
                 freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
@@ -53,6 +55,19 @@ subprojects {
 
         tasks.withType<JavaCompile> {
             options.encoding = "UTF8"
+        }
+    }
+}
+
+fun Project.configureFlattenSourceSets() {
+    sourceSets {
+        findByName("main")?.apply {
+            resources.setSrcDirs(listOf(projectDir.resolve("resources")))
+            java.setSrcDirs(listOf(projectDir.resolve("src")))
+        }
+        findByName("test")?.apply {
+            resources.setSrcDirs(listOf(projectDir.resolve("resources")))
+            java.setSrcDirs(listOf(projectDir.resolve("test")))
         }
     }
 }
