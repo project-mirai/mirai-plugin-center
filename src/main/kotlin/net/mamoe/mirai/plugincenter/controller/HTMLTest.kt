@@ -8,8 +8,10 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Flux
+import springfox.documentation.annotations.ApiIgnore
 
 @Controller
+@ApiIgnore
 class HTMLTest {
 
     @GetMapping("/index")
