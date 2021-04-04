@@ -12,29 +12,16 @@ package net.mamoe.mirai.plugincenter.serializer
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import net.mamoe.mirai.plugincenter.dto.ApiResp
+import net.mamoe.mirai.plugincenter.dto.Resp
 import org.springframework.boot.jackson.JsonComponent
 
 @JsonComponent
-class ApiRespSerializer(
-    val fastResponse: Boolean = true
-) : StdSerializer<ApiResp>(ApiResp::class.java) {
+class RespSerializer : StdSerializer<Resp>(Resp::class.java) {
     override fun serialize(
-        value: ApiResp,
+        value: Resp,
         gen: JsonGenerator,
         provider: SerializerProvider
     ) {
-        if (fastResponse && value is ApiResp.Serialized) {
-            gen.writeRaw(value.rawString)
-            return
-        }
-        gen.writeStartObject()
-        gen.writeNumberField("code", value.code)
-        value.message?.let { gen.writeStringField("message", it) }
-        value.response?.let {
-            gen.writeFieldName("response")
-            provider.defaultSerializeValue(it, gen)
-        }
-        gen.writeEndObject()
+        value.writeTo(gen, provider)
     }
 }
