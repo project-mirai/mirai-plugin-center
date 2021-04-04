@@ -145,7 +145,7 @@ public class UserEntity {
         this.filesByUid = filesByUid;
     }
 
-    @OneToMany(mappedBy = "userByOpertor")
+    @OneToMany(mappedBy = "userByOperator")
     public Collection<LogEntity> getLogsByUid() {
         return logsByUid;
     }
