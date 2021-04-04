@@ -19,6 +19,25 @@ import io.swagger.annotations.ApiModelProperty
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 import org.springframework.http.HttpStatus
 
+inline fun resp(code: Int = 200, builderAction: RespBuilder.() -> Unit): Resp {
+    return RespBuilder(code).apply(builderAction)
+}
+
+class RespBuilder(
+    private val code: Int,
+) : Resp {
+    private val map = mutableMapOf<String, Any?>()
+
+    operator fun String.minus(any: Any?) {
+        map[this] = any
+    }
+
+    override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) {
+        ApiResp(code, message = "success", response = map).writeTo(gen, provider)
+    }
+}
+
+
 sealed interface Resp {
     fun writeTo(gen: JsonGenerator, provider: SerializerProvider)
 
