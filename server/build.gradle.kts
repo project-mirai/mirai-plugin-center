@@ -27,9 +27,9 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 //
-	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-	runtimeOnly("io.r2dbc:r2dbc-postgresql")
-	runtimeOnly("org.postgresql:postgresql")
+// 	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+// 	runtimeOnly("io.r2dbc:r2dbc-postgresql")
+// 	runtimeOnly("org.postgresql:postgresql")
 
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
