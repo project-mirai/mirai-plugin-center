@@ -16,10 +16,10 @@ import java.util.Objects;
 @Table(name = "log", schema = "public", catalog = "plugins")
 public class LogEntity {
     private long id;
-    private Integer opertor;
+    private Integer operator;
     private String msg;
     private String otherInfo;  // 这是一个json
-    private UserEntity userByOpertor;
+    private UserEntity userByOperator;
 
     @Id
     @Column(name = "id")
@@ -32,13 +32,13 @@ public class LogEntity {
     }
 
     @Basic
-    @Column(name = "opertor")
-    public Integer getOpertor() {
-        return opertor;
+    @Column(name = "operator")
+    public Integer getOperator() {
+        return operator;
     }
 
-    public void setOpertor(Integer opertor) {
-        this.opertor = opertor;
+    public void setOperator(Integer operator) {
+        this.operator = operator;
     }
 
     @Basic
@@ -66,21 +66,21 @@ public class LogEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LogEntity logEntity = (LogEntity) o;
-        return id == logEntity.id && Objects.equals(opertor, logEntity.opertor) && Objects.equals(msg, logEntity.msg) && Objects.equals(otherInfo, logEntity.otherInfo);
+        return id == logEntity.id && Objects.equals(operator, logEntity.operator) && Objects.equals(msg, logEntity.msg) && Objects.equals(otherInfo, logEntity.otherInfo);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, opertor, msg, otherInfo);
+        return Objects.hash(id, operator, msg, otherInfo);
     }
 
     @ManyToOne
-    @JoinColumn(name = "opertor", referencedColumnName = "uid",insertable = false ,updatable = false)
-    public UserEntity getUserByOpertor() {
-        return userByOpertor;
+    @JoinColumn(name = "operator", referencedColumnName = "uid",insertable = false ,updatable = false)
+    public UserEntity getUserByOperator() {
+        return userByOperator;
     }
 
-    public void setUserByOpertor(UserEntity userByOpertor) {
-        this.userByOpertor = userByOpertor;
+    public void setUserByOperator(UserEntity userByOperator) {
+        this.userByOperator = userByOperator;
     }
 }
