@@ -12,16 +12,16 @@ package net.mamoe.mirai.plugincenter.utils
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import net.mamoe.mirai.plugincenter.dto.ApiResp
-import net.mamoe.mirai.plugincenter.serializer.ApiRespSerializer
+import net.mamoe.mirai.plugincenter.serializer.RespSerializer
 
 val mpcJacksonModule = SimpleModule().also { module ->
-    module.addSerializer(ApiResp::class.java, ApiRespSerializer(false))
+    module.addSerializer(ApiResp::class.java, RespSerializer())
 }
 
 val jsonMapper = JsonMapper().also { mapper ->
     mapper.registerModule(mpcJacksonModule)
 }
 
-fun Any.toJsonUseJackson(): String {
-    return jsonMapper.writeValueAsString(this)
+fun Any.toJsonUseJackson(mapper: JsonMapper = jsonMapper): String {
+    return mapper.writeValueAsString(this)
 }
