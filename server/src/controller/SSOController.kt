@@ -11,19 +11,22 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
 import net.mamoe.mirai.plugincenter.dto.ApiResp
-import org.springframework.web.bind.annotation.*
+import net.mamoe.mirai.plugincenter.dto.LoginDTO
+import net.mamoe.mirai.plugincenter.dto.LoginSuccessDTO
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@Api
-@RequestMapping("/api/v1")
-class APITest {
-    // api 文档地址 http://localhost:8080/api/swagger-ui/index.html
-    @GetMapping("/aaa")
-    @ApiOperation(value = "获取数据")
-    suspend fun test(@RequestParam @ApiParam("这是说明信息",required = true) param :Int):ApiResp<Int>{
-       return ApiResp(param)
+@Api(tags = ["认证服务"])
+@RequestMapping("/api/v1/sso")
+class SSOController {
+    @ApiOperation("登录")
+    @PostMapping("/login")
+    fun login(@RequestBody login:LoginDTO):ApiResp<LoginSuccessDTO>{
+        TODO()
     }
+
 }

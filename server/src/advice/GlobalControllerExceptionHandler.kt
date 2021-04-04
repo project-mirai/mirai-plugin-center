@@ -22,14 +22,14 @@ class GlobalControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
-    fun handle(e: Exception): ApiResp {
+    fun handle(e: Exception): ApiResp<Unit> {
         return ApiResp(500, e.message ?: e.toString(), null, e.stackTrace.map { it.toString() })
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException::class)
-    fun handle(e: IllegalArgumentException): ApiResp {
+    fun handle(e: IllegalArgumentException): ApiResp<Unit> {
         return ApiResp(400, e.message ?: e.toString(), null)
     }
 }

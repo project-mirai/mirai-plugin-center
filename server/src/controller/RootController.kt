@@ -15,7 +15,7 @@ import springfox.documentation.annotations.ApiIgnore
 
 @RestController
 @ApiIgnore
-class HelloWorld {
+class RootController {
     @GetMapping("/")
     suspend fun hello(): Any {
         return object {

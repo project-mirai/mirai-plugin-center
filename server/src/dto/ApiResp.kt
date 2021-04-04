@@ -14,21 +14,24 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import io.swagger.annotations.ApiModel
+import io.swagger.annotations.ApiModelProperty
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 
 sealed interface Resp {
     fun writeTo(gen: JsonGenerator, provider: SerializerProvider)
 
     companion object {
-        val NOT_AUTHED = SerializedApiResp(403, "Not authed")
-        val NOT_FOUND = SerializedApiResp(404, "Resource not found")
+        val NOT_AUTHED = SerializedApiResp<Unit>(403,"Not authed")
+        val NOT_FOUND = SerializedApiResp<Unit>(404, "Resource not found")
     }
 }
 
-open class ApiResp(
-    val code: Int,
-    val message: String? = null,
-    val response: Any? = null,
+@ApiModel
+open class ApiResp <T>(
+    @ApiModelProperty("状态码")  val code: Int,
+    @ApiModelProperty("提示信息") val message: String? = null,
+    @ApiModelProperty("返回数据") val response: T? = null,
     val trace: List<String>? = null,
 ) : Resp {
     private companion object {
@@ -39,8 +42,8 @@ open class ApiResp(
         }
     }
 
-    private object ApiRespSerializer : StdSerializer<ApiResp>(ApiResp::class.java) {
-        override fun serialize(value: ApiResp, gen: JsonGenerator, provider: SerializerProvider) = value.writeTo(gen, provider)
+    private object ApiRespSerializer : StdSerializer<ApiResp<*>>(ApiResp::class.java) {
+        override fun serialize(value: ApiResp<*>, gen: JsonGenerator, provider: SerializerProvider) = value.writeTo(gen, provider)
     }
 
     fun toJsonString(): String = this.toJsonUseJackson(localMapper)
@@ -57,12 +60,12 @@ open class ApiResp(
     }
 }
 
-class SerializedApiResp(
+class SerializedApiResp<T>(
     code: Int,
     message: String? = null,
-    response: Any? = null,
+    response: T? = null,
     trace: List<String>? = null,
-) : ApiResp(code, message, response, trace), Resp {
+) : ApiResp<T>(code, message, response, trace), Resp {
     private val rawString: String by lazy { ApiResp(code, message, response, trace).toJsonString() }
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) = gen.writeRaw(rawString)
 }

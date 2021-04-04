@@ -40,7 +40,7 @@ internal class MPCWrappedHttpMessageWriter<T>(
         if (o is Mono<*>) {
             @Suppress("UNCHECKED_CAST")
             return o.map { value ->
-                if (value is ApiResp) {
+                if (value is ApiResp<*>) {
                     response.statusCode = HttpStatus.resolve(value.code)
                 }
                 value
