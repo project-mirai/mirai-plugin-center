@@ -1,0 +1,32 @@
+### SSO Login
+POST localhost:8080/sso/login
+Content-Type: application/json
+
+{
+  "account": "test",
+  "password": "password"
+}
+
+> {%
+client.test("SSO Login", function() {
+  client.assert(response.status === 200);
+  client.assert(response.body["response"]["token"] === "TEST_TOKEN");
+});
+%}
+
+### SSO Register
+POST /sso/register
+Content-Type: application/json
+
+{
+  "email": "test@test.test",
+  "username": "test",
+  "password": "password"
+}
+
+> {%
+client.test("SSO Register", function() {
+  client.assert(response.status === 200);
+  client.assert(response.body["response"]["token"] === "TEST_TOKEN");
+});
+%}
