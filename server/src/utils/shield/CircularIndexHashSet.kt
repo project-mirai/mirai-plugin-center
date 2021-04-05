@@ -9,6 +9,10 @@
 
 package net.mamoe.mirai.plugincenter.utils.shield
 
+import java.util.*
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.collections.ArrayList
+
 /**
  * CircularIndexHashSet should always be thread safe
  *
@@ -37,8 +41,46 @@ interface CircularIndexHashSet<T>{
 
 
 private class CircularIndexHashSetImpl<T>(override val capacity:Int):CircularIndexHashSet<T>{
-    override fun put(element: T): Boolean {
-        TODO("Not yet implemented")
+
+
+    /**
+     * Identify the current index
+     */
+    private val curr = AtomicLong(0)
+
+    /**
+     * Use a circular index array to implement pop and push
+     */
+    private val array = ArrayList<T?>(initialCapacity = capacity).apply {
+        repeat(capacity){
+            add(null)
+        }
     }
+
+    /**
+     * use a hash set with copied of data for o(1) contains check
+     */
+    private val set = Collections.synchronizedSet(HashSet<T>(initialCapacity = (this.capacity * 0.75 + 1).toInt()))//prevent rehash, 0.75 refers to load factor
+
+
+    override fun put(element: T): Boolean {
+
+        if(!set.add(element)){
+            return false
+        }
+
+        val slot = (curr.getAndIncrement() % this.capacity).toInt()
+
+        val bucket = array[slot]
+
+        if(bucket != null){
+            set.remove(bucket)
+        }
+
+        array[slot] = element
+
+        return true
+    }
+
 }
 
