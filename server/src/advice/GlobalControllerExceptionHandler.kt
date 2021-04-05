@@ -9,6 +9,7 @@
 
 package net.mamoe.mirai.plugincenter.advice
 
+import net.mamoe.mirai.plugincenter.PluginCenterApplication
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -23,6 +24,7 @@ class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ApiResp<Unit> {
+        PluginCenterApplication.logger.error(e.toString(), e)
         return ApiResp(500, e.message ?: e.toString(), null, e.stackTraceToString())
     }
 
@@ -30,6 +32,7 @@ class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException::class)
     fun handle(e: IllegalArgumentException): ApiResp<Unit> {
+        PluginCenterApplication.logger.trace(e.toString(), e)
         return ApiResp(400, e.message ?: e.toString(), null)
     }
 }
