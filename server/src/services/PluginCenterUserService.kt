@@ -24,19 +24,11 @@ import reactor.core.publisher.Mono
 import java.sql.Timestamp
 
 @Service
-class PluginCenterUserService(
-    private val userRepo: UserRepo,
-    private val bcrypt: BCryptPasswordEncoder
-) : ReactiveUserDetailsService,
-    ReactiveUserDetailsPasswordService {
+class PluginCenterUserService(private val userRepo: UserRepo) : ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
     override fun findByUsername(username: String): Mono<UserDetails> {
-//        return mono {
-////            userRepo.findUserEntityByEmail(username).run {
-////
-//////                User(username, password, listOf(SimpleGrantedAuthority(Roles.)))
-////            }
-//        }
-        TODO("ROLE 换成int存储")
+        return mono {
+            userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
+        }
     }
 
     override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {

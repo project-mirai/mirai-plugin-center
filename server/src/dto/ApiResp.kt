@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import net.mamoe.mirai.plugincenter.PluginCenterApplication
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 import org.springframework.http.HttpStatus
 import springfox.documentation.annotations.ApiIgnore
@@ -28,13 +29,18 @@ class RespBuilder(
     private val code: Int,
 ) : Resp {
     private val map = mutableMapOf<String, Any?>()
+    private var msg: String? = null
 
     operator fun String.minus(any: Any?) {
         map[this] = any
     }
 
+    fun msg(msg: String) {
+        this.msg = msg
+    }
+
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) {
-        ApiResp(code, message = "success", response = map).writeTo(gen, provider)
+        ApiResp(code, message = msg ?: "success", response = map).writeTo(gen, provider)
     }
 }
 
@@ -61,13 +67,17 @@ open class ApiResp<T>(
     @ApiModelProperty("状态码") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
-    @ApiIgnore private val trace: List<String>? = null,
+    @ApiIgnore private val trace: Trace? = null,
 ) : Resp {
-    private companion object {
-        val localMapper = JsonMapper().apply {
+    companion object {
+        private val localMapper = JsonMapper().apply {
             registerModule(SimpleModule().apply {
                 addSerializer(ApiResp::class.java, ApiRespSerializer)
             })
+        }
+
+        fun <T> success(response: T, code: Int = 200, message: String? = "success"): ApiResp<T> {
+            return ApiResp(code, message, response)
         }
     }
 
@@ -84,7 +94,9 @@ open class ApiResp<T>(
             gen.writeFieldName("response")
             provider.defaultSerializeValue(it, gen)
         }
-        trace?.let { gen.writeObjectField("trace", it) }
+        if (PluginCenterApplication.SHOW_TRACE) {
+            trace?.let { trace -> gen.writeStringField("trace", trace) }
+        }
         gen.writeEndObject()
     }
 }
@@ -93,7 +105,7 @@ class SerializedApiResp<T>(
     code: Int,
     message: String? = null,
     response: T? = null,
-    trace: List<String>? = null,
+    trace: Trace? = null,
 ) : ApiResp<T>(code, message, response, trace), Resp {
     constructor(code: HttpStatus) : this(code.value(), code.reasonPhrase)
 
@@ -102,3 +114,7 @@ class SerializedApiResp<T>(
 }
 
 fun <T> respOk(content: T) = ApiResp(0, "", content)
+
+
+typealias Trace = String
+typealias TraceElement = StackTraceElement

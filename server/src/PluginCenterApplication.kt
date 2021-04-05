@@ -15,7 +15,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
 @EnableJpaAuditing
 @SpringBootApplication
-class PluginCenterApplication
+class PluginCenterApplication {
+    companion object {
+        val DEBUGGING: Boolean = System.getenv("idea.active") != null
+        val SHOW_TRACE: Boolean = DEBUGGING
+    }
+}
 
 fun main(args: Array<String>) {
     runApplication<PluginCenterApplication>(*args)
