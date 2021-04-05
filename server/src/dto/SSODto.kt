@@ -15,7 +15,11 @@ import io.swagger.annotations.ApiModelProperty
 @ApiModel
 data class LoginDTO(@ApiModelProperty("邮箱") val account: String, @ApiModelProperty("密码") val password: String)
 
-data class RegisterDTO(val email: String, val username: String, val password: String)
+data class RegisterDTO(
+    @ApiModelProperty("邮箱") val email: String,
+    @ApiModelProperty("用户名") val username: String,
+    @ApiModelProperty("密码") val password: String
+)
 
 @ApiModel
-data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token:String)
+data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token: String)
