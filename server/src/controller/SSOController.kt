@@ -35,8 +35,7 @@ class SSOController(private val userService: PluginCenterUserService) {
     @ApiOperation("注册")
     @PostMapping("/register")
     suspend fun register(@RequestBody @Valid register: RegisterDTO): ApiResp<Int> {
-
-        return respOk( userService.registerUser(register))
+        return respOk(  userService.registerUser(register))
     }
 
 }
