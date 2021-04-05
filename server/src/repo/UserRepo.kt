@@ -13,5 +13,5 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import org.springframework.data.repository.Repository
 
 interface UserRepo : Repository<UserEntity, Int> {
-     fun findUserEntityByEmail(email: String): UserEntity
+    fun findUserEntityByEmail(email: String): UserEntity
 }
