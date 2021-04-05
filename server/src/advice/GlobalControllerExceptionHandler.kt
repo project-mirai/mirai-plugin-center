@@ -28,11 +28,11 @@ class GlobalControllerExceptionHandler {
 
 
         when (e) {
-            is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null, e.stackTraceToString())
-            is BeansException -> return ApiResp(400, e.message ?: e.toString(), null, e.stackTraceToString())
+            is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null, { e.stackTraceToString() })
+            is BeansException -> return ApiResp(400, e.message ?: e.toString(), null, { e.stackTraceToString() })
         }
 
-        return ApiResp(500, e.message ?: e.toString(), null, e.stackTraceToString())
+        return ApiResp(500, e.message ?: e.toString(), null, { e.stackTraceToString() })
     }
 
     @ResponseBody
