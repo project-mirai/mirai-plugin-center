@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
-import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.validation.annotation.Validated
 import reactor.core.publisher.Mono
 import java.sql.Timestamp
 
@@ -40,7 +38,7 @@ class PluginCenterUserService(private val userRepo: UserRepo,private val bcrypt:
     suspend fun registerUser( user: RegisterDTO): Int {
         val encodedPwd = bcrypt.encode(user.password)
         return withContext(Dispatchers.IO) {
-            userRepo.registerUser(user.username,user.email,encodedPwd,"fuck",1, Timestamp(System.currentTimeMillis()))
+            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
         }
 
     }

@@ -11,13 +11,20 @@ package net.mamoe.mirai.plugincenter.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
-import javax.validation.constraints.Email
+import net.mamoe.mirai.plugincenter.model.PluginEntity
 
+/**
+ * PluginDescription
+ */
 @ApiModel
-data class LoginDTO(@ApiModelProperty("邮箱") @Email val email: String, @ApiModelProperty("密码") val password: String)
+data class PluginDesc(
+    @ApiModelProperty("编号") val id: Int,
+    @ApiModelProperty("插件 ID") val pluginId: String,
+    @ApiModelProperty("名称") val name: String,
+    @ApiModelProperty("描述") val info: String,
+    @ApiModelProperty("上传者") val owner: UserDto,
+)
 
-data class RegisterDTO(@Email val email: String, val username: String, val password: String)
-
-@ApiModel
-data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token:String)
+fun PluginEntity.toDto(): PluginDesc {
+    return PluginDesc(id, pluginId, name, info, userByOwner.toDto())
+}

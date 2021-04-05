@@ -12,6 +12,7 @@ package net.mamoe.mirai.plugincenter
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
 @EnableJpaAuditing
@@ -27,6 +28,10 @@ class PluginCenterApplication {
     }
 }
 
+private lateinit var _context: ConfigurableApplicationContext
+
+val context: ConfigurableApplicationContext get() = _context
+
 fun main(args: Array<String>) {
-    runApplication<PluginCenterApplication>(*args)
+    _context = runApplication<PluginCenterApplication>(*args)
 }
