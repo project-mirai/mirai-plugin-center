@@ -10,7 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -20,9 +20,9 @@ public class FileEntity {
     private int id;
     private int owner;
     private String path;
-    private Instant uploadTime;
     private String sha1;
     private String fileName;
+    private Timestamp uploadTime;
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
 
@@ -57,16 +57,6 @@ public class FileEntity {
     }
 
     @Basic
-    @Column(name = "upload_time")
-    public Instant getUploadTime() {
-        return uploadTime;
-    }
-
-    public void setUploadTime(Instant uploadTime) {
-        this.uploadTime = uploadTime;
-    }
-
-    @Basic
     @Column(name = "sha1")
     public String getSha1() {
         return sha1;
@@ -86,21 +76,31 @@ public class FileEntity {
         this.fileName = fileName;
     }
 
+    @Basic
+    @Column(name = "upload_time")
+    public Timestamp getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setUploadTime(Timestamp uploadTime) {
+        this.uploadTime = uploadTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FileEntity that = (FileEntity) o;
-        return id == that.id && owner == that.owner && Objects.equals(path, that.path) && Objects.equals(uploadTime, that.uploadTime) && Objects.equals(sha1, that.sha1) && Objects.equals(fileName, that.fileName);
+        return id == that.id && owner == that.owner && Objects.equals(path, that.path) && Objects.equals(sha1, that.sha1) && Objects.equals(fileName, that.fileName) && Objects.equals(uploadTime, that.uploadTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, owner, path, uploadTime, sha1, fileName);
+        return Objects.hash(id, owner, path, sha1, fileName, uploadTime);
     }
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false, insertable = false,updatable = false)
     public UserEntity getUserByOwner() {
         return userByOwner;
     }

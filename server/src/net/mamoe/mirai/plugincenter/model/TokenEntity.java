@@ -10,7 +10,6 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import javax.persistence.*;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Objects;
 
@@ -88,7 +87,7 @@ public class TokenEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false,updatable = false)
     public UserEntity getUserByOwner() {
         return userByOwner;
     }

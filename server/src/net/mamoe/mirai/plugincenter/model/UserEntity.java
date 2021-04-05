@@ -26,12 +26,11 @@ public class UserEntity {
     private String registerIp;
     private String lastLoginIp;
     private boolean banned;
+    private int role;
     private Collection<FileEntity> filesByUid;
     private Collection<LogEntity> logsByUid;
     private Collection<PluginEntity> pluginsByUid;
     private Collection<TokenEntity> tokensByUid;
-    private Collection<UserPermissionEntity> userPermissionsByUid;
-    private Collection<UserRoleEntity> userRolesByUid;
 
     @Id
     @Column(name = "uid")
@@ -123,17 +122,27 @@ public class UserEntity {
         this.banned = banned;
     }
 
+    @Basic
+    @Column(name = "role")
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserEntity that = (UserEntity) o;
-        return uid == that.uid && banned == that.banned && Objects.equals(nick, that.nick) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(registerTime, that.registerTime) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(registerIp, that.registerIp) && Objects.equals(lastLoginIp, that.lastLoginIp);
+        return uid == that.uid && banned == that.banned && role == that.role && Objects.equals(nick, that.nick) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(registerTime, that.registerTime) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(registerIp, that.registerIp) && Objects.equals(lastLoginIp, that.lastLoginIp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, nick, email, password, registerTime, lastLoginTime, registerIp, lastLoginIp, banned);
+        return Objects.hash(uid, nick, email, password, registerTime, lastLoginTime, registerIp, lastLoginIp, banned, role);
     }
 
     @OneToMany(mappedBy = "userByOwner")
@@ -145,7 +154,7 @@ public class UserEntity {
         this.filesByUid = filesByUid;
     }
 
-    @OneToMany(mappedBy = "userByOpertor")
+    @OneToMany(mappedBy = "userByOperator")
     public Collection<LogEntity> getLogsByUid() {
         return logsByUid;
     }
@@ -170,23 +179,5 @@ public class UserEntity {
 
     public void setTokensByUid(Collection<TokenEntity> tokensByUid) {
         this.tokensByUid = tokensByUid;
-    }
-
-    @OneToMany(mappedBy = "userByUid")
-    public Collection<UserPermissionEntity> getUserPermissionsByUid() {
-        return userPermissionsByUid;
-    }
-
-    public void setUserPermissionsByUid(Collection<UserPermissionEntity> userPermissionsByUid) {
-        this.userPermissionsByUid = userPermissionsByUid;
-    }
-
-    @OneToMany(mappedBy = "userByUid")
-    public Collection<UserRoleEntity> getUserRolesByUid() {
-        return userRolesByUid;
-    }
-
-    public void setUserRolesByUid(Collection<UserRoleEntity> userRolesByUid) {
-        this.userRolesByUid = userRolesByUid;
     }
 }
