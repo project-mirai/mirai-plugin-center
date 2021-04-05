@@ -23,7 +23,7 @@ class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ApiResp<Unit> {
-        return ApiResp(500, e.message ?: e.toString(), null, e.stackTrace.map { it.toString() })
+        return ApiResp(500, e.message ?: e.toString(), null, e.stackTraceToString())
     }
 
     @ResponseBody
