@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import net.mamoe.mirai.plugincenter.advice.NeedEmailException
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
@@ -38,6 +39,7 @@ class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt
     }
 
     suspend fun registerUser(user: RegisterDTO): Int {
+        if (!decide.isEmail(user.email)) throw NeedEmailException()
         val encodedPwd = bcrypt.encode(user.password)
         return runInterruptible {
             userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
