@@ -76,7 +76,15 @@ open class ApiResp<T>(
             })
         }
 
-        fun <T> success(response: T, code: Int = 200, message: String? = "success"): ApiResp<T> {
+        fun <T> ok(response: T, code: Int = 200, message: String? = HttpStatus.OK.reasonPhrase): ApiResp<T> {
+            return ApiResp(code, message, response)
+        }
+
+        fun <T : Any> notFound(response: T, code: Int = 404, message: String? = HttpStatus.NOT_FOUND.reasonPhrase): ApiResp<T> {
+            return ApiResp(code, message, response)
+        }
+
+        fun <T : Any> notFound(response: Nothing? = null, code: Int = 404, message: String? = HttpStatus.NOT_FOUND.reasonPhrase): ApiResp<T?> {
             return ApiResp(code, message, response)
         }
     }
@@ -116,4 +124,4 @@ class SerializedApiResp<T>(
 typealias Trace = String
 typealias TraceElement = StackTraceElement
 
-fun <T> respOk(content: T) = ApiResp(0, "", content)
+fun <T> respOk(content: T) = ApiResp(200, "", content)

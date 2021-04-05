@@ -1,0 +1,28 @@
+### Plugins list
+GET localhost:8080/v1/plugins/
+
+> {%
+client.test("Plugins list", function() {
+  client.assert(response.status === 200);
+  client.assert(response.body["response"] instanceof []);
+});
+%}
+
+### Plugins list with page
+GET localhost:8080/v1/plugins/?page=0
+
+> {%
+client.test("Plugins list", function() {
+  client.assert(response.status === 200);
+  client.assert(response.body["response"] instanceof []);
+});
+%}
+
+### Plugin desc not found
+GET localhost:8080/v1/plugins/99999
+
+> {%
+client.test("Plugin desc", function() {
+  client.assert(response.status === 404);
+});
+%}

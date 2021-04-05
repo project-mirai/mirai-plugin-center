@@ -14,28 +14,29 @@ import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.PluginDesc
 import net.mamoe.mirai.plugincenter.dto.toDto
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.core.annotation.Order
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/plugins")
+@RequestMapping("/v1/plugins")
 @Api
 class PluginsController(
     val repo: PluginRepo
 ) {
-    @GetMapping("/{id}")
-    fun get(@PathVariable id: Int): ApiResp<PluginDesc> {
-        val plugin = repo.findPluginEntityById(id)
-        return ApiResp.success(plugin.toDto())
-    }
-
-    @GetMapping("/list/{page}")
-    fun list(@PathVariable(required = false) page: Int = 0): ApiResp<List<PluginDesc>> {
+    @Order(0)
+    @GetMapping("/")
+    fun list(@RequestParam("page", required = false) page0: Int? = 0): ApiResp<List<PluginDesc>> {
+        val page = page0 ?: 0
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
         val plugin = repo.findPluginEntitiesByIdBetween(page * 20 + 1, (page + 1) * 20)
-        return ApiResp.success(plugin.map { it.toDto() })
+        return ApiResp.ok(plugin.map { it.toDto() })
+    }
+
+    @Order(1)
+    @GetMapping("/{id}/")
+    fun get(@PathVariable id: Int): ApiResp<PluginDesc?> {
+        val plugin = repo.findPluginEntityById(id) ?: return ApiResp.notFound(null)
+        return ApiResp.ok(plugin.toDto())
     }
 }
