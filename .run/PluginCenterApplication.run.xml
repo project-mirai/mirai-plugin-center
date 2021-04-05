@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="PluginCenterApplication" type="SpringBootApplicationConfigurationType"
+                   factoryName="Spring Boot">
+        <module name="plugin-center.server.main"/>
+        <option name="SPRING_BOOT_MAIN_CLASS" value="net.mamoe.mirai.plugincenter.PluginCenterApplication"/>
+        <option name="ALTERNATIVE_JRE_PATH"/>
+        <envs>
+            <env name="idea.active" value="true"/>
+        </envs>
+        <method v="2">
+            <option name="Make" enabled="true"/>
+        </method>
+    </configuration>
+</component>
