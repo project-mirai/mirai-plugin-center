@@ -9,23 +9,37 @@
 
 package net.mamoe.mirai.plugincenter.services
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
+import kotlinx.coroutines.withContext
+import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.repo.UserRepo
+import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.sql.Timestamp
 
 @Service
-class PluginCenterUserService(private val userRepo: UserRepo) : ReactiveUserDetailsService {
+class PluginCenterUserService(private val userRepo: UserRepo,private val bcrypt: BCryptPasswordEncoder) : ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
     override fun findByUsername(username: String): Mono<UserDetails> {
         return mono {
             userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
         }
     }
 
-    // override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {
-    //     TODO("Not yet implemented")
-    // }
+    override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {
+        TODO("Not yet implemented")
+    }
+
+    suspend fun registerUser( user: RegisterDTO): Int {
+        val encodedPwd = bcrypt.encode(user.password)
+        return withContext(Dispatchers.IO) {
+            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
+        }
+
+    }
 }

@@ -11,25 +11,21 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import net.mamoe.mirai.plugincenter.dto.ApiResp
-import net.mamoe.mirai.plugincenter.dto.LoginDTO
-import net.mamoe.mirai.plugincenter.dto.LoginSuccessDTO
-import net.mamoe.mirai.plugincenter.dto.RegisterDTO
-import net.mamoe.mirai.plugincenter.services.DecideService
-import org.springframework.beans.factory.annotation.Autowired
+import net.mamoe.mirai.plugincenter.dto.*
+import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.services.PluginCenterUserService
+import org.springframework.validation.BindingResult
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 @Api(tags = ["认证服务"])
 @RequestMapping("/v1/sso")
-class SSOController(
-    @Autowired
-    val decideService: DecideService
-) {
-
+class SSOController(private val userService: PluginCenterUserService) {
     @ApiOperation("登录")
     @PostMapping("/login")
     fun login(@RequestBody login: LoginDTO): ApiResp<LoginSuccessDTO> {
@@ -38,12 +34,8 @@ class SSOController(
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    fun register(@RequestBody register: RegisterDTO): ApiResp<String> {
-        if (!decideService.isEmail(register.email)) return ApiResp(403, "不是邮箱类型", null)
-
-        if (register.password.length < 8 || register.password.length > 20) return ApiResp(403, "密码小于8位或大于20", null)
-
-        return ApiResp(403, register.email, null)
+    suspend fun register(@RequestBody @Valid register: RegisterDTO): ApiResp<Int> {
+        return respOk(  userService.registerUser(register))
     }
 
 }

@@ -113,6 +113,7 @@ class SerializedApiResp<T>(
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) = gen.writeRaw(rawString)
 }
 
-
 typealias Trace = String
 typealias TraceElement = StackTraceElement
+
+fun <T> respOk(content: T) = ApiResp(0, "", content)

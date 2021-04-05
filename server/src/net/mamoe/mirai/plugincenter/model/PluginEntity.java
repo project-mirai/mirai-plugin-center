@@ -19,11 +19,10 @@ import java.util.Objects;
 public class PluginEntity {
     private int id;
     private String name;
-    private int owner;
-    private String packageId;
+    private String pluginId;
     private float rank;
     private Timestamp publishTime;
-    private String desc;
+    private String info;
     private Timestamp updateTime;
     private String postUrl;
     private int status;
@@ -51,23 +50,13 @@ public class PluginEntity {
     }
 
     @Basic
-    @Column(name = "owner")
-    public int getOwner() {
-        return owner;
+    @Column(name = "plugin_id")
+    public String getPluginId() {
+        return pluginId;
     }
 
-    public void setOwner(int owner) {
-        this.owner = owner;
-    }
-
-    @Basic
-    @Column(name = "package_id")
-    public String getPackageId() {
-        return packageId;
-    }
-
-    public void setPackageId(String packageId) {
-        this.packageId = packageId;
+    public void setPluginId(String packageId) {
+        this.pluginId = packageId;
     }
 
     @Basic
@@ -91,13 +80,13 @@ public class PluginEntity {
     }
 
     @Basic
-    @Column(name = "desc")
-    public String getDesc() {
-        return desc;
+    @Column(name = "info")
+    public String getInfo() {
+        return info;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setInfo(String desc) {
+        this.info = desc;
     }
 
     @Basic
@@ -135,13 +124,14 @@ public class PluginEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginEntity that = (PluginEntity) o;
-        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
+        return id == that.id && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(pluginId, that.pluginId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(info, that.info) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, updateTime, postUrl, status);
+        return Objects.hash(id, name, pluginId, rank, publishTime, info, updateTime, postUrl, status);
     }
+
 
     @ManyToOne
     @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false,updatable = false)

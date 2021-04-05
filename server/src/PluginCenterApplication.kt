@@ -9,17 +9,29 @@
 
 package net.mamoe.mirai.plugincenter
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
+@EnableJpaAuditing
 @SpringBootApplication
 class PluginCenterApplication {
     companion object {
-        val DEBUGGING: Boolean = System.getenv("idea.active") != null
-        val SHOW_TRACE: Boolean = DEBUGGING
+        val logger by lazy {
+            LoggerFactory.getLogger("net.mamoe.mirai.plugincenter")
+        }
+
+        val DEBUGGING: Boolean by lazy { logger.isDebugEnabled }
+        val SHOW_TRACE: Boolean by lazy { logger.isTraceEnabled }
     }
 }
 
+private lateinit var _context: ConfigurableApplicationContext
+
+val context: ConfigurableApplicationContext get() = _context
+
 fun main(args: Array<String>) {
-    runApplication<PluginCenterApplication>(*args)
+    _context = runApplication<PluginCenterApplication>(*args)
 }
