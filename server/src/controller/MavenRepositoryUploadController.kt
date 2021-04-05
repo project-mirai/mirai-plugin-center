@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 
+/**
+ * Fake Maven repository
+ */
 @RestController
 @RequestMapping("/staging")
 @Api
-class GradleTaskUploadController {
+class MavenRepositoryUploadController {
     private data class PublishArtifact(
         val group: String,
         val artifact: String,
