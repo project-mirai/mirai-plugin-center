@@ -11,6 +11,7 @@ package net.mamoe.mirai.plugincenter.services
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.repo.UserRepo
@@ -24,8 +25,6 @@ import reactor.core.publisher.Mono
 import java.sql.Timestamp
 
 @Service
-class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder) : ReactiveUserDetailsService,
-    ReactiveUserDetailsPasswordService {
 class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder, private val decide: DecideService) :
     ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
     override fun findByUsername(username: String): Mono<UserDetails> {
