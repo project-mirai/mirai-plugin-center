@@ -9,7 +9,6 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
-import io.swagger.annotations.Api
 import net.mamoe.mirai.plugincenter.dto.Resp
 import net.mamoe.mirai.plugincenter.dto.resp
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,8 +21,7 @@ import org.springframework.web.server.ServerWebExchange
  * Fake Maven repository
  */
 @RestController
-@RequestMapping("/staging")
-@Api
+@RequestMapping("/v1/publish")
 class MavenRepositoryUploadController {
     private data class PublishArtifact(
         val group: String,
