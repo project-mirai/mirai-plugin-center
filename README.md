@@ -2,4 +2,3 @@
 Center of plugins for Mirai Console
 
 
-.
