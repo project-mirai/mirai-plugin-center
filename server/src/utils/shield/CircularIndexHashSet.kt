@@ -26,7 +26,7 @@ interface CircularIndexHashSet<T>{
      * 2: add the element into the container
      * 3: If the amount of data exceed [capacity], remove the <b>oldest</b> element that have being added
      *
-     * This operation should be O(N)
+     * This operation should be O(1)
      */
     fun put(element: T):Boolean
 
