@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.services.PluginCenterUserService
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.validation.BindingResult
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
@@ -28,14 +29,14 @@ import javax.validation.Valid
 class SSOController(private val userService: PluginCenterUserService) {
     @ApiOperation("登录")
     @PostMapping("/login")
-    fun login(@RequestBody login: LoginDTO): ApiResp<LoginSuccessDTO> {
-        TODO()
+    suspend fun login(@Valid @RequestBody  login: LoginDTO): ApiResp<LoginDTO> {
+        return respOk(login) // TODO 登录逻辑
     }
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    suspend fun register(@RequestBody @Valid register: RegisterDTO): ApiResp<Int> {
-        return respOk(  userService.registerUser(register))
+    suspend fun register(@Valid @RequestBody register: RegisterDTO): ApiResp<Int> {
+        return respOk( userService.registerUser(register))
     }
 
 }

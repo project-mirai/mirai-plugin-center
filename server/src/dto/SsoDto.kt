@@ -16,13 +16,13 @@ import javax.validation.constraints.Email
 
 @ApiModel
 data class LoginDTO(
-    @ApiModelProperty("邮箱") @Email val email: String,
+    @ApiModelProperty("邮箱") @field:Email val email: String,
     @ApiModelProperty("密码") val password: String
 )
 
 @ApiModel
 data class RegisterDTO(
-    @ApiModelProperty("邮箱") @Email val email: String,
+    @ApiModelProperty("邮箱") @field:Email val email: String,
     @ApiModelProperty("昵称") val nick: String,
     @ApiModelProperty("密码") val password: String
 )
@@ -32,7 +32,7 @@ data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token: String)
 
 @ApiModel
 data class UserDto(
-    @ApiModelProperty("邮箱") @Email val email: String,
+    @ApiModelProperty("邮箱") @field:Email val email: String,
     @ApiModelProperty("昵称") val nick: String,
 )
 
