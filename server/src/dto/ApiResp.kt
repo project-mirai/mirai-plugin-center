@@ -28,13 +28,18 @@ class RespBuilder(
     private val code: Int,
 ) : Resp {
     private val map = mutableMapOf<String, Any?>()
+    private var msg: String? = null
 
     operator fun String.minus(any: Any?) {
         map[this] = any
     }
 
+    fun msg(msg: String) {
+        this.msg = msg
+    }
+
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) {
-        ApiResp(code, message = "success", response = map).writeTo(gen, provider)
+        ApiResp(code, message = msg ?: "success", response = map).writeTo(gen, provider)
     }
 }
 
