@@ -110,7 +110,7 @@ public class PluginFileEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "plugin_id", referencedColumnName = "id", nullable = false,insertable = false ,updatable = false)
+    @JoinColumn(name = "plugin_id", referencedColumnName = "id", nullable = false,insertable = false,updatable = false)
     public PluginEntity getPluginByPluginId() {
         return pluginByPluginId;
     }
@@ -120,7 +120,7 @@ public class PluginFileEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false,insertable = false ,updatable = false)
+    @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false,insertable = false,updatable = false)
     public FileEntity getFileByFileId() {
         return fileByFileId;
     }

@@ -18,7 +18,7 @@ public class LogEntity {
     private long id;
     private Integer operator;
     private String msg;
-    private String otherInfo;  // 这是一个json
+    private String otherInfo;
     private UserEntity userByOperator;
 
     @Id
@@ -75,7 +75,7 @@ public class LogEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "operator", referencedColumnName = "uid",insertable = false ,updatable = false)
+    @JoinColumn(name = "operator", referencedColumnName = "uid",insertable = false,updatable = false)
     public UserEntity getUserByOperator() {
         return userByOperator;
     }

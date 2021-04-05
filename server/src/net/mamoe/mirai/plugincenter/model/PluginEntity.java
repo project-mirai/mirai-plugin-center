@@ -24,9 +24,9 @@ public class PluginEntity {
     private float rank;
     private Timestamp publishTime;
     private String desc;
-    private boolean banned;
     private Timestamp updateTime;
     private String postUrl;
+    private int status;
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
 
@@ -101,16 +101,6 @@ public class PluginEntity {
     }
 
     @Basic
-    @Column(name = "banned")
-    public boolean isBanned() {
-        return banned;
-    }
-
-    public void setBanned(boolean banned) {
-        this.banned = banned;
-    }
-
-    @Basic
     @Column(name = "update_time")
     public Timestamp getUpdateTime() {
         return updateTime;
@@ -130,21 +120,31 @@ public class PluginEntity {
         this.postUrl = postUrl;
     }
 
+    @Basic
+    @Column(name = "status")
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginEntity that = (PluginEntity) o;
-        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && banned == that.banned && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
+        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, banned, updateTime, postUrl);
+        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, updateTime, postUrl, status);
     }
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false ,updatable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false,updatable = false)
     public UserEntity getUserByOwner() {
         return userByOwner;
     }
