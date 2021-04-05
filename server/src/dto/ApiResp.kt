@@ -102,9 +102,9 @@ open class ApiResp<T>(
             gen.writeFieldName("response")
             provider.defaultSerializeValue(it, gen)
         }
-        if (PluginCenterApplication.SHOW_TRACE) {
-            trace?.let { trace -> gen.writeStringField("trace", trace()) }
-        }
+//        if (PluginCenterApplication.SHOW_TRACE) {
+//            trace?.let { trace -> gen.writeStringField("trace", trace()) }
+//        }
         gen.writeEndObject()
     }
 }

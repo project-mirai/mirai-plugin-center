@@ -11,22 +11,29 @@ package net.mamoe.mirai.plugincenter.advice
 
 import net.mamoe.mirai.plugincenter.PluginCenterApplication
 import net.mamoe.mirai.plugincenter.dto.ApiResp
+import org.slf4j.Logger
 import org.springframework.beans.BeansException
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.NestedRuntimeException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.support.WebExchangeBindException
+
 
 @ControllerAdvice
-class GlobalControllerExceptionHandler {
+class GlobalControllerExceptionHandler() {
+
+    @Autowired
+    private lateinit var logger: Logger
+
+
     @ResponseBody
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ApiResp<Unit> {
-        PluginCenterApplication.logger.error(e.toString(), e)
-
-
+        logger.error(e.toString(), e)
         when (e) {
             is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null, { e.stackTraceToString() })
             is BeansException -> return ApiResp(400, e.message ?: e.toString(), null, { e.stackTraceToString() })
@@ -39,7 +46,16 @@ class GlobalControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException::class)
     fun handle(e: IllegalArgumentException): ApiResp<Unit> {
-        PluginCenterApplication.logger.trace(e.toString(), e)
+        logger.debug(e.toString(), e)
         return ApiResp(400, e.message ?: e.toString(), null)
     }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(WebExchangeBindException::class)
+    fun handleBadRequest(e: WebExchangeBindException): ApiResp<Unit> {
+        logger.debug(e.toString(), e)
+        return ApiResp(400, e.bindingResult.allErrors.joinToString { "${it.objectName}: ${it.defaultMessage}" } ?: e.toString(), null)
+    }
+
 }
