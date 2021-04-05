@@ -11,8 +11,6 @@ package net.mamoe.mirai.plugincenter.services
 
 import kotlinx.coroutines.reactor.mono
 import net.mamoe.mirai.plugincenter.repo.UserRepo
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
@@ -20,16 +18,14 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 @Service
-class PluginCenterUserService(private val userRepo: UserRepo) : ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
+class PluginCenterUserService(private val userRepo: UserRepo) : ReactiveUserDetailsService {
     override fun findByUsername(username: String): Mono<UserDetails> {
         return mono {
-            userRepo.findUserEntityByEmail(username).run {
-                User(username, password, userRolesByUid.map { SimpleGrantedAuthority(it.roleId.toString()) })
-            }
+            userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
         }
     }
 
-    override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {
-        TODO("Not yet implemented")
-    }
+    // override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {
+    //     TODO("Not yet implemented")
+    // }
 }
