@@ -10,8 +10,23 @@
 package net.mamoe.mirai.plugincenter.repo
 
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import org.hibernate.annotations.SQLInsert
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.Repository
+import org.springframework.data.repository.query.Param
+import org.springframework.validation.annotation.Validated
+import java.sql.Timestamp
+import javax.transaction.Transactional
+import javax.validation.constraints.Email
 
-interface UserRepo : Repository<UserEntity, Int> {
-     fun findUserEntityByEmail(email: String): UserEntity
+interface UserRepo : JpaRepository<UserEntity, Int> {
+    fun findUserEntityByEmail(email: String): UserEntity
+
+    @Modifying
+    @Transactional
+    @Query("""INSERT INTO public."user"(nick, email, password, register_ip, role,register_time) VALUES (?1,?2,?3,?4,?5,?6)""",nativeQuery = true)
+    fun registerUser(nick: String, email: String, password: String, registerIp: String, role: Int, registerTime:Timestamp):Int
 }

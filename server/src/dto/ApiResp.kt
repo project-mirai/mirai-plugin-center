@@ -100,3 +100,5 @@ class SerializedApiResp<T>(
     private val rawString: String by lazy { ApiResp(code, message, response, trace).toJsonString() }
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) = gen.writeRaw(rawString)
 }
+
+fun <T> respOk(content: T) = ApiResp(0, "", content)

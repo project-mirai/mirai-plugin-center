@@ -9,6 +9,10 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -74,6 +78,7 @@ public class UserEntity {
 
     @Basic
     @Column(name = "register_time")
+    @CreationTimestamp
     public Timestamp getRegisterTime() {
         return registerTime;
     }

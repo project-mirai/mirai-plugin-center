@@ -19,7 +19,6 @@ import java.util.Objects;
 public class PluginEntity {
     private int id;
     private String name;
-    private int owner;
     private String packageId;
     private float rank;
     private Timestamp publishTime;
@@ -51,17 +50,7 @@ public class PluginEntity {
     }
 
     @Basic
-    @Column(name = "owner")
-    public int getOwner() {
-        return owner;
-    }
-
-    public void setOwner(int owner) {
-        this.owner = owner;
-    }
-
-    @Basic
-    @Column(name = "package_id")
+    @Column(name = "plugin_id")
     public String getPackageId() {
         return packageId;
     }
@@ -91,7 +80,7 @@ public class PluginEntity {
     }
 
     @Basic
-    @Column(name = "desc")
+    @Column(name = "info")
     public String getDesc() {
         return desc;
     }
@@ -135,13 +124,14 @@ public class PluginEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginEntity that = (PluginEntity) o;
-        return id == that.id && owner == that.owner && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
+        return id == that.id && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(packageId, that.packageId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(desc, that.desc) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, owner, packageId, rank, publishTime, desc, updateTime, postUrl, status);
+        return Objects.hash(id, name, packageId, rank, publishTime, desc, updateTime, postUrl, status);
     }
+
 
     @ManyToOne
     @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false,updatable = false)
