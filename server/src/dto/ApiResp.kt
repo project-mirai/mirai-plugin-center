@@ -103,7 +103,7 @@ open class ApiResp<T>(
             provider.defaultSerializeValue(it, gen)
         }
         if (PluginCenterApplication.SHOW_TRACE) {
-            trace?.let { trace -> gen.writeStringField("trace", trace) }
+            trace?.let { trace -> gen.writeStringField("trace", trace()) }
         }
         gen.writeEndObject()
     }
@@ -121,7 +121,7 @@ class SerializedApiResp<T>(
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) = gen.writeRaw(rawString)
 }
 
-typealias Trace = String
+typealias Trace = () -> String
 typealias TraceElement = StackTraceElement
 
 fun <T> respOk(content: T) = ApiResp(200, "", content)
