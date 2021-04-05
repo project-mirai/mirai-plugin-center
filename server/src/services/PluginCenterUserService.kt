@@ -9,11 +9,10 @@
 
 package net.mamoe.mirai.plugincenter.services
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runInterruptible
-import kotlinx.coroutines.withContext
-import net.mamoe.mirai.plugincenter.advice.NeedEmailException
+import net.mamoe.mirai.plugincenter.advice.EmailError
+import net.mamoe.mirai.plugincenter.advice.EmailException
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
@@ -30,7 +29,7 @@ class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt
     ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
     override fun findByUsername(username: String): Mono<UserDetails> {
         return mono {
-            userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
+            userRepo.findUserEntityByEmail(username)?.run { User(username, password, listOf()) }
         }
     }
 
@@ -39,7 +38,8 @@ class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt
     }
 
     suspend fun registerUser(user: RegisterDTO): Int {
-        if (!decide.isEmail(user.email)) throw NeedEmailException()
+        if (!decide.isEmail(user.email)) throw EmailException(EmailError.NeedEmail)
+        if (userRepo.findUserEntityByEmail(user.email) != null) throw EmailException(EmailError.EmailConflict)
         val encodedPwd = bcrypt.encode(user.password)
         return runInterruptible {
             userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))

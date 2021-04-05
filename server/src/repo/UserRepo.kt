@@ -23,7 +23,7 @@ import javax.transaction.Transactional
 import javax.validation.constraints.Email
 
 interface UserRepo : JpaRepository<UserEntity, Int> {
-    fun findUserEntityByEmail(email: String): UserEntity
+    fun findUserEntityByEmail(email: String): UserEntity?
 
     @Modifying
     @Transactional

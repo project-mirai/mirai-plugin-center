@@ -44,10 +44,17 @@ class GlobalControllerExceptionHandler {
     }
 }
 
-class NeedEmailException(message: String?) : Exception(message) {
-    constructor() : this("请输入正确的邮箱")
+class EmailException(message: String?) : Exception(message) {
+    constructor(emailError: EmailError) : this(emailError.error)
+
     override val message: String?
         get() = super.message
+}
+
+enum class EmailError(val error: String) {
+    NeedEmail("请输入正确的邮箱"),
+    EmailConflict("邮箱已被注册");
+
 }
 
 
