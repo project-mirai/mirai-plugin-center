@@ -36,3 +36,11 @@ class GlobalControllerExceptionHandler {
         return ApiResp(400, e.message ?: e.toString(), null)
     }
 }
+
+class NeedEmailException(message: String?) : Exception(message) {
+    constructor() : this("请输入正确的邮箱")
+    override val message: String?
+        get() = super.message
+}
+
+

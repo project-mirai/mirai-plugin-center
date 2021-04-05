@@ -10,7 +10,6 @@
 package net.mamoe.mirai.plugincenter.services
 
 import org.springframework.stereotype.Service
-import java.util.regex.Pattern
 
 @Service
 class DecideService {
