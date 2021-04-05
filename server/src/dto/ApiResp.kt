@@ -95,7 +95,7 @@ open class ApiResp<T>(
             provider.defaultSerializeValue(it, gen)
         }
         if (PluginCenterApplication.SHOW_TRACE) {
-            trace?.let { trace -> gen.writeObjectField("trace", trace.map { it.toString() }) }
+            trace?.let { trace -> gen.writeStringField("trace", trace) }
         }
         gen.writeEndObject()
     }
@@ -114,5 +114,5 @@ class SerializedApiResp<T>(
 }
 
 
-typealias Trace = Array<out StackTraceElement>
+typealias Trace = String
 typealias TraceElement = StackTraceElement
