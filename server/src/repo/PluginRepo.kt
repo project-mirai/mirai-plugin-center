@@ -13,6 +13,6 @@ import net.mamoe.mirai.plugincenter.model.PluginEntity
 import org.springframework.data.repository.Repository
 
 interface PluginRepo : Repository<PluginEntity, Int> {
-    fun findPluginEntityById(id: Int): PluginEntity
+    fun findPluginEntityById(id: Int): PluginEntity?
     fun findPluginEntitiesByIdBetween(start: Int, end: Int): List<PluginEntity>
 }

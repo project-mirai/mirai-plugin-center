@@ -15,12 +15,12 @@ client.test("SSO Login", function() {
 %}
 
 ### SSO Register
-POST /sso/register
+POST localhost:8080/v1/sso/register
 Content-Type: application/json
 
 {
   "email": "test@test.test",
-  "username": "test",
+  "nick": "test",
   "password": "password"
 }
 

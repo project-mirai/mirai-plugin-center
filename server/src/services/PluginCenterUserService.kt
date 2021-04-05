@@ -9,9 +9,8 @@
 
 package net.mamoe.mirai.plugincenter.services
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.mono
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runInterruptible
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
@@ -24,7 +23,8 @@ import reactor.core.publisher.Mono
 import java.sql.Timestamp
 
 @Service
-class PluginCenterUserService(private val userRepo: UserRepo,private val bcrypt: BCryptPasswordEncoder) : ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
+class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder) : ReactiveUserDetailsService,
+    ReactiveUserDetailsPasswordService {
     override fun findByUsername(username: String): Mono<UserDetails> {
         return mono {
             userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
@@ -35,9 +35,9 @@ class PluginCenterUserService(private val userRepo: UserRepo,private val bcrypt:
         TODO("Not yet implemented")
     }
 
-    suspend fun registerUser( user: RegisterDTO): Int {
+    suspend fun registerUser(user: RegisterDTO): Int {
         val encodedPwd = bcrypt.encode(user.password)
-        return withContext(Dispatchers.IO) {
+        return runInterruptible {
             userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
         }
 

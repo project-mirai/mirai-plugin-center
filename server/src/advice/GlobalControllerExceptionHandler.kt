@@ -11,6 +11,8 @@ package net.mamoe.mirai.plugincenter.advice
 
 import net.mamoe.mirai.plugincenter.PluginCenterApplication
 import net.mamoe.mirai.plugincenter.dto.ApiResp
+import org.springframework.beans.BeansException
+import org.springframework.core.NestedRuntimeException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -19,12 +21,17 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
-
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ApiResp<Unit> {
         PluginCenterApplication.logger.error(e.toString(), e)
+
+
+        when (e) {
+            is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null, e.stackTraceToString())
+            is BeansException -> return ApiResp(400, e.message ?: e.toString(), null, e.stackTraceToString())
+        }
+
         return ApiResp(500, e.message ?: e.toString(), null, e.stackTraceToString())
     }
 
