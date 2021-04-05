@@ -27,6 +27,7 @@ class SecurityConfig {
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http.authorizeExchange().pathMatchers("/**").permitAll()  //暂时授权所有请求
         http.formLogin().disable()
+        http.csrf().disable()
         return http.build()
     }
 }
