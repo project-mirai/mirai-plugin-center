@@ -67,7 +67,7 @@ open class ApiResp<T>(
     @ApiModelProperty("状态码") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
-    @ApiIgnore private val trace: Array<out TraceElement>? = null,
+    @ApiIgnore private val trace: Trace? = null,
 ) : Resp {
     companion object {
         private val localMapper = JsonMapper().apply {
@@ -105,7 +105,7 @@ class SerializedApiResp<T>(
     code: Int,
     message: String? = null,
     response: T? = null,
-    trace: Array<out TraceElement>? = null,
+    trace: Trace? = null,
 ) : ApiResp<T>(code, message, response, trace), Resp {
     constructor(code: HttpStatus) : this(code.value(), code.reasonPhrase)
 
@@ -114,4 +114,5 @@ class SerializedApiResp<T>(
 }
 
 
+typealias Trace = Array<out StackTraceElement>
 typealias TraceElement = StackTraceElement
