@@ -22,14 +22,33 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import java.util.*
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache
+import java.lang.Exception
+
 
 @EnableWebFluxSecurity
-class SecurityConfig {
+class SecurityConfig{
+
+//    override fun configure(http: HttpSecurity) {
+//        http.sessionManagement().  sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//    }
+
     object MPCAuthMgr : ReactiveAuthorizationManager<AuthorizationContext> {
         fun needAuthed(exchange: ServerWebExchange): Boolean {
             // TODO:
             return false
         }
+
 
         override fun check(authentication: Mono<Authentication>, context: AuthorizationContext): Mono<AuthorizationDecision> {
             /*context.exchange.session.map { session->
@@ -56,10 +75,13 @@ class SecurityConfig {
 
     @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
+        http.requestCache().requestCache(NoOpServerRequestCache.getInstance())  // 关闭session
         http.authorizeExchange().pathMatchers("/**").access(MPCAuthMgr)
         http.authorizeExchange().pathMatchers("/**").permitAll()  //暂时授权所有请求
         http.formLogin().disable()
+        http.httpBasic().disable()
         http.csrf().disable()
         return http.build()
     }
 }
+
