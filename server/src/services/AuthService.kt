@@ -34,12 +34,33 @@ class AuthService(
     val userRepo: UserRepo,
 ) : ReactiveAuthorizationManager<AuthorizationContext>,
     ServerAuthenticationEntryPoint {
+    private fun fastComplete(context: AuthorizationContext): Boolean {
+        // Website JavaScript/CSS/.... resources.
+        if (context.exchange.request.uri.path.startsWith("/assets/")) {
+            return true
+        }
+        when (context.exchange.request.uri.path) {
+            "/favicon.ico",
+            "/robots.txt",  // SEO
+            "/sitemap.xml", // SEO
+            -> {
+                return true
+            }
+        }
+        return false
+    }
+
     fun needAuthed(exchange: ServerWebExchange): Boolean {
         // TODO:
         return false
     }
 
     override fun check(authentication: Mono<Authentication>, context: AuthorizationContext): Mono<AuthorizationDecision> {
+        if (fastComplete(context)) {
+            context.exchange.attributes["AuthFailedReason"] = AuthFailedReason.GUEST
+            return Mono.just(AuthorizationDecision(true))
+        }
+
         fun completeAuth(user: UserEntity): Mono<AuthorizationDecision> {
             context.exchange.attributes["User"] = user
             val trust = AuthorizationDecision(true)
