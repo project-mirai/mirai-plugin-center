@@ -51,7 +51,7 @@ private class CircularIndexHashSetImpl<T>(override val capacity:Int):CircularInd
     /**
      * Use a circular index array to implement pop and push
      */
-    private val array = ArrayList<T?>(initialCapacity = capacity).apply {
+    private val array = ArrayList<T?>(capacity).apply {
         repeat(capacity){
             add(null)
         }
@@ -60,7 +60,7 @@ private class CircularIndexHashSetImpl<T>(override val capacity:Int):CircularInd
     /**
      * use a hash set with copied of data for o(1) contains check
      */
-    private val set = Collections.synchronizedSet(HashSet<T>(initialCapacity = (this.capacity * 0.75 + 1).toInt()))//prevent rehash, 0.75 refers to load factor
+    private val set = Collections.synchronizedSet(HashSet<T>((this.capacity * 0.75 + 1).toInt()))//prevent rehash, 0.75 refers to load factor
 
 
     override fun put(element: T): Boolean {

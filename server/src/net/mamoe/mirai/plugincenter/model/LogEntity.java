@@ -22,6 +22,7 @@ public class LogEntity {
     private UserEntity userByOperator;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
     @Column(name = "id")
     public long getId() {
         return id;
