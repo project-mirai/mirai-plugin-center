@@ -16,12 +16,22 @@ import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache
+import org.springframework.web.server.adapter.WebHttpHandlerBuilder
+import org.springframework.web.server.session.WebSessionManager
+import reactor.core.publisher.Mono
 
 @EnableWebFluxSecurity
 class SecurityConfig {
     @Bean
     fun bcryptPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
+    }
+
+    // 虽然不知道为啥要 disable session 但是先 disable 了
+    // TODO: Browser session auth
+    @Bean(WebHttpHandlerBuilder.WEB_SESSION_MANAGER_BEAN_NAME)
+    fun webSessionManager(): WebSessionManager {
+        return WebSessionManager { Mono.empty() }
     }
 
     @Bean
