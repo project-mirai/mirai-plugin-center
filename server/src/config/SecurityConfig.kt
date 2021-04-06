@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache
 
 @EnableWebFluxSecurity
 class SecurityConfig {
@@ -28,6 +29,7 @@ class SecurityConfig {
         http: ServerHttpSecurity,
         auth: AuthService,
     ): SecurityWebFilterChain {
+        http.requestCache().requestCache(NoOpServerRequestCache.getInstance())  // 关闭session
         http.authorizeExchange().pathMatchers("/**").access(auth)
         http.exceptionHandling().authenticationEntryPoint(auth)
         http.httpBasic().disable()
