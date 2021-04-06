@@ -11,12 +11,11 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import net.mamoe.mirai.plugincenter.dto.*
-import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.dto.ApiResp
+import net.mamoe.mirai.plugincenter.dto.LoginDTO
+import net.mamoe.mirai.plugincenter.dto.RegisterDTO
+import net.mamoe.mirai.plugincenter.dto.respOk
 import net.mamoe.mirai.plugincenter.services.PluginCenterUserService
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.validation.BindingResult
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,7 +24,7 @@ import org.springframework.web.server.ServerWebExchange
 import javax.validation.Valid
 
 @RestController
-@Api(tags = ["认证服务"])
+@Api(tags = ["认证服务"], position = 0)
 @RequestMapping("/v1/sso")
 class SSOController(private val userService: PluginCenterUserService) {
     @ApiOperation("登录")

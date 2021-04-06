@@ -9,31 +9,34 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.*
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
+import springfox.documentation.annotations.ApiIgnore
 import java.sql.Timestamp
 
 
 @RestController
 @RequestMapping("/v1/plugins")
-@Api
+@Api(tags = ["插件服务"], position = 2)
 class PluginsController(
     val repo: PluginRepo
 ) {
+    @ApiOperation("获取插件列表")
     @Order(0)
     @GetMapping("/")
     fun list(
-        @RequestParam("page", required = false) page0: Int? = 0
+        @ApiParam("页码", allowableValues = "range[0, infinity]", required = false, defaultValue = "0")
+        @RequestParam("page", required = false)
+        page0: Int? = 0,
     ): ApiResp<List<PluginDesc>> {
         val page = page0 ?: 0
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
@@ -41,19 +44,72 @@ class PluginsController(
         return r.ok(plugin.map { it.toDto() })
     }
 
+
+    @ApiOperation("获取插件信息")
     @Order(1)
     @GetMapping("/{id}")
     fun get(
-        @PathVariable id: String,
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
     ): ApiResp<PluginDesc?> {
         val plugin = repo.findPluginEntityByPluginId(id) ?: return r.notFound(null)
         return r.ok(plugin.toDto())
     }
 
-    @DeleteMapping("/{id}")
-    fun delete(
+
+    @Order(2)
+    @ApiOperation("上传插件或更新插件信息")
+    @ApiResponses(
+        ApiResponse(code = 409, message = "Id conflicted with an existing plugin owned by {plugin.owner}", response = ApiResp::class),
+    )
+    @RequestMapping("/{id}", method = [RequestMethod.PUT, RequestMethod.PATCH])
+    fun put(
+        @ApiIgnore
         exchange: ServerWebExchange,
-        @PathVariable id: String,
+
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @RequestBody
+        desc: PluginDescUpdate,
+    ): ApiResp<Void?> {
+        val user = exchange.loginUserOrReject
+
+        val plugin = repo.findPluginEntityByPluginId(id)
+        if (plugin == null && exchange.request.method == HttpMethod.PATCH) {
+            return r.notFound(message = "Id $id not found. Use method PUT to create a new plugin.")
+        }
+        if (plugin != null && plugin.userByOwner.uid != user.uid) {
+            return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
+        }
+
+        repo.save((plugin ?: PluginEntity()).apply {
+            desc.info?.let { info = it }
+            desc.name?.let { name = it }
+            userByOwner = user
+            updateTime = Timestamp(System.currentTimeMillis())
+        })
+
+        return if (plugin == null) r(HttpStatus.CREATED)
+        else r.ok()
+    }
+
+
+    @Order(3)
+    @ApiOperation("删除插件")
+    @DeleteMapping("/{id}")
+    @ApiResponses(
+        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
+    )
+    fun delete(
+        @ApiIgnore
+        exchange: ServerWebExchange,
+
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
     ): ApiResp<Void?> {
         val user = exchange.loginUserOrReject
         val plugin = repo.findPluginEntityByPluginId(id) ?: return r.notFound(null)
@@ -62,31 +118,4 @@ class PluginsController(
         return r.ok()
     }
 
-    @ApiResponses(
-        ApiResponse(code = 200, message = "OK", response = ApiResp::class),
-        ApiResponse(code = 409, message = "Id conflicted with an existing plugin owned by {plugin.owner.", response = ApiResp::class),
-    )
-    @PutMapping("/{id}")
-    fun put(
-        exchange: ServerWebExchange,
-        @PathVariable id: String,
-        @RequestBody desc: PluginDesc,
-    ): ApiResp<Void?> {
-        require(desc.pluginId == id) { "body.id must == path.id" }
-
-        val user = exchange.loginUserOrReject
-
-        val plugin = repo.findPluginEntityByPluginId(id)
-        if (plugin != null && plugin.userByOwner.uid != user.uid) {
-            return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
-        }
-
-        repo.save(PluginEntity().copyFrom(desc).apply {
-            userByOwner = user
-            updateTime = Timestamp(System.currentTimeMillis())
-        })
-
-        return if (plugin == null) r(HttpStatus.CREATED)
-        else r.ok()
-    }
 }

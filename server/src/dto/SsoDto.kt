@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import org.springframework.core.annotation.Order
 import javax.validation.constraints.Email
 
 @ApiModel
@@ -34,8 +35,14 @@ data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token: String)
 @Serializable
 @ApiModel
 data class UserDto(
-    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
-    @ApiModelProperty("昵称") val nick: String,
+    @Order(0)
+    @ApiModelProperty("邮箱", example = "foo@example.com")
+    @field:Email
+    val email: String,
+
+    @Order(1)
+    @ApiModelProperty("昵称", example = "Tester")
+    val nick: String,
 )
 
 fun UserEntity.toDto(): UserDto = UserDto(email, nick)

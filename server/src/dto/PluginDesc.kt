@@ -11,21 +11,57 @@ package net.mamoe.mirai.plugincenter.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import io.swagger.annotations.ApiModelProperty.AccessMode.READ_ONLY
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import net.mamoe.mirai.plugincenter.dto.PluginDesc.Companion.INFO_EXAMPLE
+import net.mamoe.mirai.plugincenter.dto.PluginDesc.Companion.NAME_EXAMPLE
 import net.mamoe.mirai.plugincenter.model.PluginEntity
+import org.springframework.core.annotation.Order
 
 /**
  * PluginDescription
  */
 @Serializable
-@ApiModel
+@ApiModel("插件信息")
 data class PluginDesc(
-    @SerialName("id") @ApiModelProperty("插件 ID", name = "id", example = "org.example.mirai.test-plugin") val pluginId: String,
-    @ApiModelProperty("名称", example = "A Simple Test Plugin") val name: String,
-    @ApiModelProperty("描述", allowEmptyValue = true) val info: String = "",
-    @ApiModelProperty("上传者", accessMode = READ_ONLY) val owner: UserDto? = null,
+    @Order(1)
+    @SerialName("id")
+    @ApiModelProperty("插件 ID", name = "id", example = ID_EXAMPLE)
+    @get:JvmName("getId")
+    val pluginId: String,
+
+    @Order(2)
+    @ApiModelProperty("名称", example = NAME_EXAMPLE)
+    val name: String,
+
+    @Order(3)
+    @ApiModelProperty("描述", allowEmptyValue = true)
+    val info: String = "",
+
+    @Order(4)
+    @ApiModelProperty("上传者", accessMode = READ_ONLY)
+    val owner: UserDto? = null,
+) {
+    companion object {
+        const val ID_EXAMPLE = "org.example.mirai.test-plugin"
+        const val NAME_EXAMPLE = "A Simple Test Plugin"
+        const val INFO_EXAMPLE = "This is a sample plugin providing some features."
+    }
+}
+
+/**
+ * 在更新时使用
+ */
+@Serializable
+@ApiModel("插件信息")
+data class PluginDescUpdate(
+    @Order(1)
+    @ApiModelProperty("名称", example = NAME_EXAMPLE)
+    val name: String? = null,
+
+    @Order(2)
+    @ApiModelProperty("描述", allowEmptyValue = true, example = INFO_EXAMPLE)
+    val info: String? = null,
 )
 
 fun PluginEntity.toDto(): PluginDesc {

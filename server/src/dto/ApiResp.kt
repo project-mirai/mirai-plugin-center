@@ -63,9 +63,9 @@ sealed interface Resp {
 
 typealias r<T> = ApiResp<T>
 
-@ApiModel
+@ApiModel("通用返回")
 open class ApiResp<T>(
-    @ApiModelProperty("状态码") val code: Int,
+    @ApiModelProperty("状态码", example = "200") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
     @ApiIgnore private val trace: Trace? = null,
