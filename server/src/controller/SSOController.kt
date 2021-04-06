@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ServerWebExchange
 import javax.validation.Valid
 
 @RestController
@@ -29,14 +30,14 @@ import javax.validation.Valid
 class SSOController(private val userService: PluginCenterUserService) {
     @ApiOperation("登录")
     @PostMapping("/login")
-    suspend fun login(@Valid @RequestBody  login: LoginDTO): ApiResp<LoginDTO> {
+    suspend fun login(@Valid @RequestBody login: LoginDTO): ApiResp<LoginDTO> {
         return respOk(login) // TODO 登录逻辑
     }
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    suspend fun register(@Valid @RequestBody register: RegisterDTO): ApiResp<Int> {
-        return respOk( userService.registerUser(register))
+    suspend fun register(@Valid @RequestBody register: RegisterDTO, req: ServerWebExchange): ApiResp<Int> {
+        return respOk(userService.registerUser(register, req.request.remoteAddress.toString()))
     }
 
 }

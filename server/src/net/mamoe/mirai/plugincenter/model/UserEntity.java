@@ -37,6 +37,7 @@ public class UserEntity {
     private Collection<TokenEntity> tokensByUid;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
     @Column(name = "uid")
     public int getUid() {
         return uid;

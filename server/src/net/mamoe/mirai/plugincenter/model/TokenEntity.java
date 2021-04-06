@@ -24,6 +24,7 @@ public class TokenEntity {
     private UserEntity userByOwner;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
     @Column(name = "id")
     public int getId() {
         return id;

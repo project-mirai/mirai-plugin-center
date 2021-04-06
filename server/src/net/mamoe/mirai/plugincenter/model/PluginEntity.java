@@ -30,6 +30,7 @@ public class PluginEntity {
     private Collection<PluginFileEntity> pluginFilesById;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
     @Column(name = "id")
     public int getId() {
         return id;

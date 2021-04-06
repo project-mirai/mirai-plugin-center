@@ -12,6 +12,7 @@ package net.mamoe.mirai.plugincenter.services
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runInterruptible
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
@@ -35,10 +36,19 @@ class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt
         TODO("Not yet implemented")
     }
 
-    suspend fun registerUser(user: RegisterDTO): Int {
+    suspend fun registerUser(user: RegisterDTO, ip: String): Int {
         val encodedPwd = bcrypt.encode(user.password)
         return runInterruptible {
-            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
+//            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
+            userRepo.save(UserEntity().apply {
+                email = user.email
+                password = encodedPwd
+                nick = user.nick
+                registerIp = ip
+                role = 1
+
+            })
+            1
         }
 
     }
