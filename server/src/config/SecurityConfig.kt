@@ -9,79 +9,29 @@
 
 package net.mamoe.mirai.plugincenter.config
 
+import net.mamoe.mirai.plugincenter.services.AuthService
 import org.springframework.context.annotation.Bean
-import org.springframework.security.authorization.AuthorizationDecision
-import org.springframework.security.authorization.ReactiveAuthorizationManager
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
-import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.security.web.server.authorization.AuthorizationContext
-import org.springframework.web.server.ServerWebExchange
-import reactor.core.publisher.Mono
-import java.util.*
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache
-import java.lang.Exception
-
 
 @EnableWebFluxSecurity
-class SecurityConfig{
-
-//    override fun configure(http: HttpSecurity) {
-//        http.sessionManagement().  sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//    }
-
-    object MPCAuthMgr : ReactiveAuthorizationManager<AuthorizationContext> {
-        fun needAuthed(exchange: ServerWebExchange): Boolean {
-            // TODO:
-            return false
-        }
-
-
-        override fun check(authentication: Mono<Authentication>, context: AuthorizationContext): Mono<AuthorizationDecision> {
-            /*context.exchange.session.map { session->
-            }*/
-            // TODO: Session Auth
-            context.exchange.request.headers["Authorization"]?.firstOrNull()?.let { authorization ->
-                if (authorization == "token TEST_TOKEN") {
-                    context.exchange.attributes["User"] = "Hso188moe" // TODO: Change to User Model
-                    return authentication.map {
-                        it.isAuthenticated = true
-                        AuthorizationDecision(true)
-                    }
-                }
-            }
-            return Mono.just(AuthorizationDecision(!needAuthed(context.exchange)))
-        }
-
-    }
-
+class SecurityConfig {
     @Bean
     fun bcryptPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
     @Bean
-    fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.requestCache().requestCache(NoOpServerRequestCache.getInstance())  // 关闭session
-        http.authorizeExchange().pathMatchers("/**").access(MPCAuthMgr)
-        http.authorizeExchange().pathMatchers("/**").permitAll()  //暂时授权所有请求
-        http.formLogin().disable()
+    fun springSecurityFilterChain(
+        http: ServerHttpSecurity,
+        auth: AuthService,
+    ): SecurityWebFilterChain {
+        http.authorizeExchange().pathMatchers("/**").access(auth)
+        http.exceptionHandling().authenticationEntryPoint(auth)
         http.httpBasic().disable()
         http.csrf().disable()
         return http.build()
     }
 }
-

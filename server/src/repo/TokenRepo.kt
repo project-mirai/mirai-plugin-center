@@ -9,19 +9,20 @@
 
 package net.mamoe.mirai.plugincenter.repo
 
-import net.mamoe.mirai.plugincenter.model.UserEntity
-import org.springframework.data.jpa.repository.JpaRepository
+import net.mamoe.mirai.plugincenter.model.TokenEntity
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.Repository
 import java.sql.Timestamp
 import javax.transaction.Transactional
 
-interface UserRepo : JpaRepository<UserEntity, Int> {
-    fun findUserEntityByEmail(email: String): UserEntity
-    fun findUserEntityByUid(uid: Int): UserEntity?
+interface TokenRepo : Repository<TokenEntity, Int> {
+    fun findTokenEntityById(id: Int): TokenEntity?
+    fun findTokenEntityByToken(token: String): TokenEntity?
 
     @Modifying
     @Transactional
-    @Query("""INSERT INTO public."user"(nick, email, password, register_ip, role,register_time) VALUES (?1,?2,?3,?4,?5,?6)""", nativeQuery = true)
-    fun registerUser(nick: String, email: String, password: String, registerIp: String, role: Int, registerTime: Timestamp): Int
+    @Query("""INSERT INTO "public"."token"(token, owner, add_time, expire_time) VALUES (?1, ?2, ?3, ?4)""", nativeQuery = true)
+    fun newToken(token: String, owner: Int, addTime: Timestamp, expireTime: Timestamp): Int
+
 }
