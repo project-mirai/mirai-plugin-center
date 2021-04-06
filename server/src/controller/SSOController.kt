@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
+import springfox.documentation.annotations.ApiIgnore
 import javax.validation.Valid
 
 @RestController
@@ -35,7 +36,7 @@ class SSOController(private val userService: PluginCenterUserService) {
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    suspend fun register(@Valid @RequestBody register: RegisterDTO, req: ServerWebExchange): ApiResp<Int> {
+    suspend fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<Int> {
         return respOk(userService.registerUser(register, req.request.remoteAddress.toString()))
     }
 
