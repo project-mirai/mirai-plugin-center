@@ -25,3 +25,5 @@ interface UserRepo : JpaRepository<UserEntity, Int> {
     @Query("""INSERT INTO public."user"(nick, email, password, register_ip, role,register_time) VALUES (?1,?2,?3,?4,?5,?6)""", nativeQuery = true)
     fun registerUser(nick: String, email: String, password: String, registerIp: String, role: Int, registerTime: Timestamp): Int
 }
+
+fun UserEntity.toStringGitLike() = "$nick <$email>"

@@ -9,6 +9,8 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -72,6 +74,7 @@ public class PluginEntity {
 
     @Basic
     @Column(name = "publish_time")
+    @CreationTimestamp
     public Timestamp getPublishTime() {
         return publishTime;
     }
@@ -135,7 +138,7 @@ public class PluginEntity {
 
 
     @ManyToOne
-    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false,insertable = false,updatable = false)
+    @JoinColumn(name = "owner", referencedColumnName = "uid", nullable = false, insertable = true, updatable = true)
     public UserEntity getUserByOwner() {
         return userByOwner;
     }

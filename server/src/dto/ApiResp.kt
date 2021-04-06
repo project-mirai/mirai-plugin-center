@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
-import net.mamoe.mirai.plugincenter.PluginCenterApplication
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 import org.springframework.http.HttpStatus
 import springfox.documentation.annotations.ApiIgnore
@@ -62,6 +61,8 @@ sealed interface Resp {
     }
 }
 
+typealias r<T> = ApiResp<T>
+
 @ApiModel
 open class ApiResp<T>(
     @ApiModelProperty("状态码") val code: Int,
@@ -76,8 +77,24 @@ open class ApiResp<T>(
             })
         }
 
+        operator fun <T> invoke(response: T, code: HttpStatus, message: String? = code.reasonPhrase): ApiResp<T> {
+            return ApiResp(code.value(), message, response)
+        }
+
+        operator fun <T> invoke(code: HttpStatus, message: String? = code.reasonPhrase): ApiResp<T> {
+            return ApiResp(code.value(), message)
+        }
+
         fun <T> ok(response: T, code: Int = 200, message: String? = HttpStatus.OK.reasonPhrase): ApiResp<T> {
             return ApiResp(code, message, response)
+        }
+
+        fun <T> ok(): ApiResp<T?> {
+            return ok(null)
+        }
+
+        fun okOrNotFound(response: Boolean): ApiResp<Unit> {
+            return if (response) ok(Unit) else notFound(Unit)
         }
 
         fun <T : Any> notFound(response: T, code: Int = 404, message: String? = HttpStatus.NOT_FOUND.reasonPhrase): ApiResp<T> {

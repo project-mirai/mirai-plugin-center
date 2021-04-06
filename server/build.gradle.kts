@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management")
     kotlin("jvm")
     kotlin("plugin.spring")
+    kotlin("plugin.serialization")
     java
 }
 
@@ -10,7 +11,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-security")
- //   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
+    //   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
 
 //    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -19,6 +20,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

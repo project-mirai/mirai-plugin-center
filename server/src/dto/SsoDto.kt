@@ -11,18 +11,19 @@ package net.mamoe.mirai.plugincenter.dto
 
 import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
+import kotlinx.serialization.Serializable
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import javax.validation.constraints.Email
 
 @ApiModel
 data class LoginDTO(
-    @ApiModelProperty("邮箱") @field:Email val email: String,
+    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("密码") val password: String
 )
 
 @ApiModel
 data class RegisterDTO(
-    @ApiModelProperty("邮箱") @field:Email val email: String,
+    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("昵称") val nick: String,
     @ApiModelProperty("密码") val password: String
 )
@@ -30,9 +31,10 @@ data class RegisterDTO(
 @ApiModel
 data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token: String)
 
+@Serializable
 @ApiModel
 data class UserDto(
-    @ApiModelProperty("邮箱") @field:Email val email: String,
+    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("昵称") val nick: String,
 )
 

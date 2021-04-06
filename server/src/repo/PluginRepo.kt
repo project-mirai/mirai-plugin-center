@@ -10,9 +10,12 @@
 package net.mamoe.mirai.plugincenter.repo
 
 import net.mamoe.mirai.plugincenter.model.PluginEntity
-import org.springframework.data.repository.Repository
+import org.springframework.data.repository.CrudRepository
 
-interface PluginRepo : Repository<PluginEntity, Int> {
-    fun findPluginEntityById(id: Int): PluginEntity?
+interface PluginRepo : CrudRepository<PluginEntity, Int> {
+    fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
     fun findPluginEntitiesByIdBetween(start: Int, end: Int): List<PluginEntity>
+
+    fun deletePluginEntityByPluginId(pluginId: String)
+    fun deletePluginEntityById(id: Int)
 }

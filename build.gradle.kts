@@ -1,10 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    val kt = "1.4.31"
     id("org.springframework.boot") version "2.4.4" apply false
     id("io.spring.dependency-management") version "1.0.11.RELEASE" apply false
-    kotlin("jvm") version "1.4.31"
-    kotlin("plugin.spring") version "1.4.31" apply false
+    kotlin("jvm") version kt
+    kotlin("plugin.spring") version kt apply false
+    kotlin("plugin.serialization") version kt apply false
     java
 }
 
@@ -45,6 +47,7 @@ subprojects {
 
         tasks.withType<KotlinCompile> {
             kotlinOptions {
+                useOldBackend = true // serialization fails on IR
                 freeCompilerArgs = freeCompilerArgs + "-Xjsr305=strict"
                 freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all"
                 freeCompilerArgs = freeCompilerArgs + "-Xinline-classes"
