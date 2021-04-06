@@ -90,10 +90,8 @@ class AuthService(
                         return authFailed(AuthFailedReason.TOKEN_EXPIRED)
                     }
 
-                    val usr = userRepo.findUserEntityByUid(token.owner)
-                        ?: return authFailed(AuthFailedReason.UNKNOWN_USER)
 
-                    return completeAuth(usr)
+                    return completeAuth(token.userByOwner)
                 }
                 else -> Unit
             }
