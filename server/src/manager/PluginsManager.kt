@@ -25,7 +25,6 @@ interface PluginFile {
     val exists: Boolean
 
     /**
-     * This method will [InputStream.close] the stream
      * [upload] will create a new file if current file does not exists
      */
     fun upload(`in`: MultipartFile)
