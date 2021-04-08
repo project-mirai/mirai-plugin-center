@@ -39,3 +39,4 @@ out/
 
 ### Spring ###
 application.properties
+/server/plugins
