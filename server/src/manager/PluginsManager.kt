@@ -82,21 +82,22 @@ data class PluginFileImpl(override val version: PluginVersion, override val file
 
     override fun upload(`in`: MultipartFile) {
         uploadFromStream(`in`.inputStream)
+        // TODO will use `in`.transferTo in release version
     }
 
     // TODO: TEST ONLY
     fun uploadFromStream(`in`: InputStream) {
         if (! exists) {
-            if (! file.parentFile.mkdirs()) {
-                throw IOException("Failed to creating parent directories.")
-            }
+            file.parentFile.mkdirs()
 
             if (! file.createNewFile()) {
                 throw IOException("Failed to creating plugin file.")
             }
         }
 
-        `in`.transferTo(file.outputStream())
+        `in`.use {
+            it.transferTo(file.outputStream())
+        }
     }
 
     override fun download(): FileSystemResource? {
@@ -124,18 +125,8 @@ data class PluginVersionImpl(override val plugin: Plugin, override val versionCo
         return PluginFile(this, fileName)
     }
 
-    /**
-     * buggy code?
-     * It require that only File under this directory
-     */
     override fun deleteVersion() {
-        dir.listFiles()?.forEach {
-            it.delete()
-        }
-
-        dir.delete()
-
-        TODO()
+        dir.deleteRecursively()
     }
 }
 
@@ -145,7 +136,7 @@ data class PluginImpl(override val pluginId: PluginId) : Plugin {
     }
 
     override fun deletePlugin() {
-        TODO("Not yet implemented")
+        realDir.deleteRecursively()
     }
 }
 
