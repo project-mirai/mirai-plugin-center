@@ -5,10 +5,7 @@ on:
     paths-ignore:
       - README.md
       - LICENSE
-  pull_request:
-    paths-ignore:
-      - LICENSE
-      - README.md
+
 
 jobs:
   build-test:
