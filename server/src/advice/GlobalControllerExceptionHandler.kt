@@ -11,7 +11,6 @@ package net.mamoe.mirai.plugincenter.advice
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.Resp
-import net.mamoe.mirai.plugincenter.utils.AuthFailedReason
 import net.mamoe.mirai.plugincenter.utils.authFailedReason
 import org.slf4j.Logger
 import org.springframework.beans.BeansException
@@ -27,12 +26,20 @@ import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebExchange
 import javax.naming.AuthenticationException
 
+class ExceptionResponse(
+    val code: Int,
+    override val message: String,
+    override val cause: Throwable? = null,
+) : Exception() {
+    constructor(code: HttpStatus, message: String, cause: Throwable? = null) : this(code.value(), message, cause)
+}
 
 @ControllerAdvice
-class GlobalControllerExceptionHandler() {
+class GlobalControllerExceptionHandler {
 
     @Autowired
     private lateinit var logger: Logger
+
 
     @ResponseBody
     @ExceptionHandler(AccessDeniedException::class)
@@ -43,9 +50,8 @@ class GlobalControllerExceptionHandler() {
         return ApiResp(
             code = Resp.FORBIDDEN.code,
             message = exchange.authFailedReason.msg,
-            null,
-            { e.stackTraceToString() }
-        )
+            null
+        ) { e.stackTraceToString() }
     }
 
     @ResponseBody
@@ -56,11 +62,12 @@ class GlobalControllerExceptionHandler() {
         }
 
         when (e) {
-            is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null, { e.stackTraceToString() })
-            is BeansException -> return ApiResp(400, e.message ?: e.toString(), null, { e.stackTraceToString() })
+            is ExceptionResponse -> return ApiResp(e.code, e.message, null) { e.stackTraceToString() }
+            is NestedRuntimeException -> return ApiResp(400, e.mostSpecificCause.toString(), null) { e.stackTraceToString() }
+            is BeansException -> return ApiResp(400, e.message ?: e.toString(), null) { e.stackTraceToString() }
         }
 
-        return ApiResp(500, e.message ?: e.toString(), null, { e.stackTraceToString() })
+        return ApiResp(500, e.message ?: e.toString(), null) { e.stackTraceToString() }
     }
 
     @ResponseBody
@@ -80,7 +87,7 @@ class GlobalControllerExceptionHandler() {
         if (logger.isDebugEnabled) {
             logger.debug(e.toString(), e)
         }
-        return ApiResp(400, e.bindingResult.allErrors.joinToString { "${it.objectName}: ${it.defaultMessage}" } ?: e.toString(), null)
+        return ApiResp(400, e.bindingResult.allErrors.joinToString { "${it.objectName}: ${it.defaultMessage}" }, null)
     }
 
 

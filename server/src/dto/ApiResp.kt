@@ -93,6 +93,22 @@ open class ApiResp<T>(
             return ok(null)
         }
 
+        fun <T> created(response: T, code: Int = 201, message: String? = HttpStatus.CREATED.reasonPhrase): ApiResp<T> {
+            return ApiResp(code, message, response)
+        }
+
+        fun <T> created(): ApiResp<T?> {
+            return created(null)
+        }
+
+        fun <T> conflict(response: T, code: Int = 409, message: String? = HttpStatus.CONFLICT.reasonPhrase): ApiResp<T> {
+            return ApiResp(code, message, response)
+        }
+
+        fun <T> conflict(): ApiResp<T?> {
+            return conflict(null)
+        }
+
         fun okOrNotFound(response: Boolean): ApiResp<Unit> {
             return if (response) ok(Unit) else notFound(Unit)
         }
