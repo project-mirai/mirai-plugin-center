@@ -81,23 +81,15 @@ data class PluginFileImpl(override val version: PluginVersion, override val file
         get() = file.exists()
 
     override fun upload(`in`: MultipartFile) {
-        uploadFromStream(`in`.inputStream)
-        // TODO will use `in`.transferTo in release version
-    }
-
-    // TODO: TEST ONLY
-    fun uploadFromStream(`in`: InputStream) {
-        if (! exists) {
+        if (!exists) {
             file.parentFile.mkdirs()
 
-            if (! file.createNewFile()) {
+            if (!file.createNewFile()) {
                 throw IOException("Failed to creating plugin file.")
             }
         }
 
-        `in`.use {
-            it.transferTo(file.outputStream())
-        }
+        `in`.transferTo(file)
     }
 
     override fun download(): FileSystemResource? {
