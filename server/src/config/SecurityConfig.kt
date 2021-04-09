@@ -10,18 +10,20 @@
 package net.mamoe.mirai.plugincenter.config
 
 import net.mamoe.mirai.plugincenter.services.AuthService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
-import org.springframework.security.web.server.savedrequest.NoOpServerRequestCache
-import org.springframework.web.server.adapter.WebHttpHandlerBuilder
-import org.springframework.web.server.session.WebSessionManager
-import reactor.core.publisher.Mono
 
 @EnableWebFluxSecurity
 class SecurityConfig {
+
+    @Autowired
+    private lateinit var auth: AuthService
+
+
     @Bean
     fun bcryptPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
@@ -31,9 +33,10 @@ class SecurityConfig {
     @Bean
     fun springSecurityFilterChain(
         http: ServerHttpSecurity,
-        auth: AuthService,
-    ): SecurityWebFilterChain {
-        http.requestCache().requestCache(NoOpServerRequestCache.getInstance())  // 关闭session
+
+        ): SecurityWebFilterChain {
+//        http.requestCache().requestCache(NoOpServerRequestCache.getInstance())  // 关闭session
+
         http.authorizeExchange().pathMatchers("/**").access(auth)
         http.exceptionHandling().authenticationEntryPoint(auth)
         http.httpBasic().disable()

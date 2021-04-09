@@ -11,6 +11,7 @@ package net.mamoe.mirai.plugincenter.advice
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.Resp
+import net.mamoe.mirai.plugincenter.utils.AuthFailedReason
 import net.mamoe.mirai.plugincenter.utils.authFailedReason
 import org.slf4j.Logger
 import org.springframework.beans.BeansException
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.server.ServerWebExchange
+import javax.naming.AuthenticationException
 
 
 @ControllerAdvice
@@ -79,6 +81,17 @@ class GlobalControllerExceptionHandler() {
             logger.debug(e.toString(), e)
         }
         return ApiResp(400, e.bindingResult.allErrors.joinToString { "${it.objectName}: ${it.defaultMessage}" } ?: e.toString(), null)
+    }
+
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AuthenticationException::class)
+    fun handleBadRequest(e: AuthenticationException): ApiResp<Unit> {
+        if (logger.isDebugEnabled) {
+            logger.debug(e.toString(), e)
+        }
+        return ApiResp(403,e.message )
     }
 
 }

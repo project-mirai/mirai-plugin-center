@@ -11,32 +11,40 @@ package net.mamoe.mirai.plugincenter.services
 
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runInterruptible
+import net.mamoe.mirai.plugincenter.dto.LoginDTO
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
+import net.mamoe.mirai.plugincenter.dto.UserDto
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContext
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.*
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.sql.Timestamp
+import javax.naming.AuthenticationException
+
 
 @Service
-class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder) : ReactiveUserDetailsService,
-    ReactiveUserDetailsPasswordService {
-    override fun findByUsername(username: String): Mono<UserDetails> {
-        return mono {
-            userRepo.findUserEntityByEmail(username).run { User(username, password, listOf()) }
-        }
+class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder) {
+    fun loadUserByUsername(username: String):UserEntity?{
+
+        // todo 用户角色判断
+        return userRepo.findUserEntityByEmail(username)
+
     }
 
-    override fun updatePassword(user: UserDetails?, newPassword: String?): Mono<UserDetails> {
+    fun updatePassword(user: UserDetails?, newPassword: String?): UserEntity {
         TODO("Not yet implemented")
     }
 
-    suspend fun registerUser(user: RegisterDTO, ip: String): Int {
+    @Throws(AuthenticationException::class)
+    suspend fun registerUser(user: RegisterDTO, ip: String): UserEntity {
+        if (userRepo.existsByEmail(user.email)) {
+            throw AuthenticationException("邮箱已被使用")
+        }
         val encodedPwd = bcrypt.encode(user.password)
         return runInterruptible {
 //            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
@@ -46,10 +54,19 @@ class PluginCenterUserService(private val userRepo: UserRepo, private val bcrypt
                 nick = user.nick
                 registerIp = ip
                 role = 1
-
             })
-            1
-        }
 
+        }
     }
+
+    suspend fun login(user: LoginDTO): UserEntity? {
+        val sqlUser = loadUserByUsername(user.email) ?: return null
+        if (bcrypt.matches(user.password, sqlUser.password)) {
+
+            return sqlUser
+        }
+        return null
+    }
+
+
 }

@@ -11,33 +11,40 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import net.mamoe.mirai.plugincenter.dto.ApiResp
-import net.mamoe.mirai.plugincenter.dto.LoginDTO
-import net.mamoe.mirai.plugincenter.dto.RegisterDTO
-import net.mamoe.mirai.plugincenter.dto.respOk
-import net.mamoe.mirai.plugincenter.services.PluginCenterUserService
+import net.mamoe.mirai.plugincenter.dto.*
+import net.mamoe.mirai.plugincenter.services.UserService
+import net.mamoe.mirai.plugincenter.utils.setSessionAccount
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
+import javax.naming.AuthenticationException
 import javax.validation.Valid
 
 @RestController
 @Api(tags = ["认证服务"], position = 0)
 @RequestMapping("/v1/sso")
-class SSOController(private val userService: PluginCenterUserService) {
+class SSOController(private val userService: UserService) {
     @ApiOperation("登录")
     @PostMapping("/login")
-    suspend fun login(@Valid @RequestBody login: LoginDTO): ApiResp<LoginDTO> {
-        return respOk(login) // TODO 登录逻辑
+    suspend fun login(@Valid @RequestBody login: LoginDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
+        val result = userService.login(login)
+        if (result != null) {
+            req.setSessionAccount(result)
+            return respOk(result.toDto())
+        } else {
+            throw AuthenticationException("登录失败")
+        }
     }
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    suspend fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<Int> {
-        return respOk(userService.registerUser(register, req.request.remoteAddress.toString()))
+    suspend fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
+        val result = userService.registerUser(register, req.request.remoteAddress.toString())
+        req.setSessionAccount(result)
+        return respOk(result.toDto())
     }
 
 }

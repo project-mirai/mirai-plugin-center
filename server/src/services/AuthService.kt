@@ -16,6 +16,7 @@ import net.mamoe.mirai.plugincenter.repo.TokenRepo
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import net.mamoe.mirai.plugincenter.utils.AuthFailedReason
 import net.mamoe.mirai.plugincenter.utils.authFailedReason
+import net.mamoe.mirai.plugincenter.utils.setSessionAccount
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authorization.AuthorizationDecision
@@ -37,6 +38,7 @@ class AuthService(
     ServerAuthenticationEntryPoint {
     private fun fastComplete(context: AuthorizationContext): Boolean {
         // Website JavaScript/CSS/.... resources.
+
         if (context.exchange.request.uri.path.startsWith("/assets/")) {
             return true
         }

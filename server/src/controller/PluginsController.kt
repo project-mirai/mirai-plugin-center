@@ -86,6 +86,7 @@ class PluginsController(
         }
 
         repo.save((plugin ?: PluginEntity()).apply {
+            pluginId = id
             desc.info?.let { info = it }
             desc.name?.let { name = it }
             userByOwner = user

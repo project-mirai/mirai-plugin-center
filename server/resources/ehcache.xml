@@ -11,6 +11,12 @@
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xmlns='http://www.ehcache.org/v3'
         xmlns:jsr107='http://www.ehcache.org/v3/jsr107'>
+
+    <cache alias="plugin">
+        <resources>
+           <heap unit="entries">2000</heap>
+        </resources>
+    </cache>
     <cache-template name="heap-cache">
         <resources>
             <heap unit="entries">2000</heap>

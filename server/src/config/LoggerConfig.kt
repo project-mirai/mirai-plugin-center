@@ -7,7 +7,7 @@
  * https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
  */
 
-package net.mamoe.mirai.plugincenter.services
+package net.mamoe.mirai.plugincenter.config
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component
 
 @Component
 
-class LoggerService() {
+class LoggerConfig() {
 
     @Bean
     @Scope("prototype")
