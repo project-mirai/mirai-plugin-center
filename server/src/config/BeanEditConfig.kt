@@ -10,7 +10,6 @@
 package net.mamoe.mirai.plugincenter.config
 
 import net.mamoe.mirai.plugincenter.interceptor.MPCWrappedHttpMessageWriter
-import org.springframework.beans.BeansException
 import org.springframework.beans.factory.config.BeanPostProcessor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

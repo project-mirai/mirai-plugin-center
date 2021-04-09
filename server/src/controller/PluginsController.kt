@@ -10,16 +10,21 @@
 package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.*
+import kotlinx.coroutines.reactor.mono
+import net.mamoe.mirai.plugincenter.advice.ExceptionResponse
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.model.PluginEntity
-import net.mamoe.mirai.plugincenter.repo.PluginRepo
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.toStringGitLike
+import net.mamoe.mirai.plugincenter.services.PluginDescService
+import net.mamoe.mirai.plugincenter.services.PluginStorageService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Mono
 import springfox.documentation.annotations.ApiIgnore
 import java.sql.Timestamp
 
@@ -28,7 +33,8 @@ import java.sql.Timestamp
 @RequestMapping("/v1/plugins")
 @Api(tags = ["插件服务"], position = 2)
 class PluginsController(
-    val repo: PluginRepo
+    val desc: PluginDescService,
+    val storage: PluginStorageService,
 ) {
     @ApiOperation("获取插件列表")
     @Order(0)
@@ -40,10 +46,12 @@ class PluginsController(
     ): ApiResp<List<PluginDesc>> {
         val page = page0 ?: 0
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        val plugin = repo.findPluginEntitiesByIdBetween(page * 20 + 1, (page + 1) * 20)
-        return r.ok(plugin.map { it.toDto() })
+        return r.ok(desc.getList(page).map { it.toDto() })
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Desc
+    ///////////////////////////////////////////////////////////////////////////
 
     @ApiOperation("获取插件信息")
     @Order(1)
@@ -53,21 +61,18 @@ class PluginsController(
         @PathVariable
         id: String,
     ): ApiResp<PluginDesc?> {
-        val plugin = repo.findPluginEntityByPluginId(id) ?: return r.notFound(null)
+        val plugin = desc.get(id) ?: return r.notFound(null)
         return r.ok(plugin.toDto())
     }
 
 
     @Order(2)
-    @ApiOperation("上传插件或更新插件信息")
+    @ApiOperation("创建新插件或更新插件信息")
     @ApiResponses(
         ApiResponse(code = 409, message = "Id conflicted with an existing plugin owned by {plugin.owner}", response = ApiResp::class),
     )
     @RequestMapping("/{id}", method = [RequestMethod.PUT, RequestMethod.PATCH])
-    fun put(
-        @ApiIgnore
-        exchange: ServerWebExchange,
-
+    fun (@receiver:ApiIgnore ServerWebExchange).put(
         @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
         @PathVariable
         id: String,
@@ -75,23 +80,23 @@ class PluginsController(
         @RequestBody
         desc: PluginDescUpdate,
     ): ApiResp<Void?> {
-        val user = exchange.loginUserOrReject
+        val user = loginUserOrReject
 
-        val plugin = repo.findPluginEntityByPluginId(id)
-        if (plugin == null && exchange.request.method == HttpMethod.PATCH) {
+        val plugin = this@PluginsController.desc.get(id)
+        if (plugin == null && request.method == HttpMethod.PATCH) {
             return r.notFound(message = "Id $id not found. Use method PUT to create a new plugin.")
         }
-        if (plugin != null && plugin.userByOwner.uid != user.uid) {
+        if (plugin?.isOwnedBy(user) == false) {
             return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
         }
 
-        repo.save((plugin ?: PluginEntity()).apply {
+        this@PluginsController.desc.update(id) {
             pluginId = id
             desc.info?.let { info = it }
             desc.name?.let { name = it }
             userByOwner = user
             updateTime = Timestamp(System.currentTimeMillis())
-        })
+        }
 
         return if (plugin == null) r(HttpStatus.CREATED)
         else r.ok()
@@ -104,19 +109,107 @@ class PluginsController(
     @ApiResponses(
         ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
     )
-    fun delete(
-        @ApiIgnore
-        exchange: ServerWebExchange,
-
+    fun (@receiver:ApiIgnore ServerWebExchange).delete(
         @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
         @PathVariable
         id: String,
     ): ApiResp<Void?> {
-        val user = exchange.loginUserOrReject
-        val plugin = repo.findPluginEntityByPluginId(id) ?: return r.notFound(null)
-        if (plugin.userByOwner.uid != user.uid) return r(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
-        repo.delete(plugin)
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return r.notFound(null)
+        plugin.checkOwnedBy(user)
+        desc.delete(plugin.pluginId)
         return r.ok()
     }
 
+    private fun PluginEntity.checkOwnedBy(user: UserEntity) {
+        if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
+    }
+
+    private fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
+        return this.userByOwner.uid != user.uid
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Versions
+    ///////////////////////////////////////////////////////////////////////////
+
+    // @ApiOperation("下载一个文件")
+    // @GetMapping("/{id}/{version}/{filename}")
+    // @ApiResponses(
+    //     ApiResponse(code = 404, message = "File not found.", response = ApiResp::class),
+    // )
+    // fun getFile(
+    //     @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+    //     @PathVariable
+    //     id: String,
+    //
+    //     @ApiParam("插件版本号")
+    //     @PathVariable
+    //     version: String,
+    //
+    //     @ApiParam("文件名")
+    //     @PathVariable
+    //     filename: String,
+    // ): FileSystemResource {
+    //     val resource = storage.get(id, version, filename)
+    //     if (!resource.exists()) throw ExceptionResponse(404, "File not found")
+    //     return resource
+    // }
+
+    @ApiOperation("上传一个文件")
+    @PutMapping("/{id}/{version}/{filename}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Plugin not found", response = ApiResp::class),
+        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
+        ApiResponse(code = 201, message = "Uploaded", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).putFile(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+
+        @ApiParam("文件名")
+        @PathVariable
+        filename: String,
+    ): Mono<ApiResp<Void?>> = mono {
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return@mono r.notFound(null)
+        plugin.checkOwnedBy(user)
+        if (!storage.hasVersion(plugin.pluginId, version)) return@mono r.notFound(message = "Version not found")
+        val file = storage.get(plugin.pluginId, version, filename)
+        if (file.exists()) return@mono r.conflict(null, message = "File already exists")
+
+        storage.write(plugin.pluginId, version, filename, request.body.map { it.asByteBuffer() })
+        r.created()
+    }
+
+    @ApiOperation("删除一个版本及该版本下的所有文件")
+    @DeleteMapping("/{id}/{version}")
+    @ApiResponses(
+        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
+        ApiResponse(code = 404, message = "Version not found", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).deleteVersion(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+    ): ApiResp<Void?> {
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return r.notFound(null)
+        plugin.checkOwnedBy(user)
+        if (!storage.hasVersion(plugin.pluginId, version)) return r.notFound(message = "Version not found")
+        if (!storage.delete(plugin.pluginId, version)) {
+            return r(500, message = "Failed to delete files due to internal error")
+        }
+        return r.ok()
+    }
 }

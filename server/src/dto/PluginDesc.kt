@@ -39,7 +39,7 @@ data class PluginDesc(
     val info: String = "",
 
     @Order(4)
-    @ApiModelProperty("上传者", accessMode = READ_ONLY)
+    @ApiModelProperty("上传者", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     val owner: UserDto? = null,
 ) {
     companion object {
@@ -60,7 +60,7 @@ data class PluginDescUpdate(
     val name: String? = null,
 
     @Order(2)
-    @ApiModelProperty("描述", allowEmptyValue = true, example = INFO_EXAMPLE)
+    @ApiModelProperty("描述", example = INFO_EXAMPLE)
     val info: String? = null,
 )
 
