@@ -27,12 +27,6 @@ class SecurityConfig {
         return BCryptPasswordEncoder()
     }
 
-    // 虽然不知道为啥要 disable session 但是先 disable 了
-    // TODO: Browser session auth
-    @Bean(WebHttpHandlerBuilder.WEB_SESSION_MANAGER_BEAN_NAME)
-    fun webSessionManager(): WebSessionManager {
-        return WebSessionManager { Mono.empty() }
-    }
 
     @Bean
     fun springSecurityFilterChain(

@@ -22,6 +22,12 @@ val ServerWebExchange.loginUserOrReject: UserEntity
 val ServerWebExchange.authFailedReason: AuthFailedReason
     get() = attributes["AuthFailedReason"] as? AuthFailedReason ?: AuthFailedReason.UNKNOWN
 
+fun ServerWebExchange.setSessionAccount(user: UserEntity) {
+    session.subscribe { session ->
+        session.attributes["User"] = user
+    }
+}
+
 enum class AuthFailedReason(val msg: String) {
     UNKNOWN("Unknown"),
     GUEST("Unauthorized"),
