@@ -24,6 +24,7 @@ jobs:
     #   - run: ./gradlew check --scan
 
   deploy:
+    needs: build-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
