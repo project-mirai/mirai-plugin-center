@@ -7,6 +7,11 @@ plugins {
     java
 }
 
+tasks.named("jar") {
+    (this as Jar).archiveClassifier.set("original")
+}
+tasks.getByName("jar").enabled = true
+
 dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-mail")
