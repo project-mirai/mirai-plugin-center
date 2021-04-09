@@ -7,6 +7,11 @@ plugins {
     java
 }
 
+tasks.register("copyDependencies", Copy::class.java) {
+    from(project.configurations["runtimeClasspath"])
+    destinationDir = project.buildDir.resolve("dependencies")
+}
+
 tasks.named("jar") {
     (this as Jar).archiveClassifier.set("original")
 }
