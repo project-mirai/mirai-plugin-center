@@ -23,7 +23,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
-
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.ehcache:ehcache:3.9.2")
+    implementation("javax.cache:cache-api")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")

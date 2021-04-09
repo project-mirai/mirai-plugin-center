@@ -10,10 +10,13 @@
 package net.mamoe.mirai.plugincenter.repo
 
 import net.mamoe.mirai.plugincenter.model.PluginEntity
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.CrudRepository
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
+    @Cacheable("plugin",key = "#pluginId")
     fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
+
     fun findPluginEntitiesByIdBetween(start: Int, end: Int): List<PluginEntity>
 
     fun deletePluginEntityByPluginId(pluginId: String)
