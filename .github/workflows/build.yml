@@ -1,9 +1,14 @@
-name: Build
+name: Build-deploy
 
-on: [ push, pull_request ]
+on:
+  push:
+    paths-ignore:
+      - README.md
+      - LICENSE
+
 
 jobs:
-  build-server:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -13,4 +18,18 @@ jobs:
       - run: chmod -R 777 *
       - run: ./gradlew clean --scan
       - run: ./gradlew assemble --scan
-#      - run: ./gradlew check --scan
+    #   - run: ./gradlew check --scan
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.TEST_SERVER_SSH_KEY }}
+          script: |
+            /home/git.sh
