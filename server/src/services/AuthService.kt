@@ -27,6 +27,7 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 
 @Component
 class AuthService(
@@ -74,30 +75,35 @@ class AuthService(
             context.exchange.attributes["AuthFailedReason"] = reason
             return Mono.just(AuthorizationDecision(!needAuthed(context.exchange)))
         }
-        /*context.exchange.session.map { session->
-        }*/
-        // TODO: Session Auth
-        context.exchange.request.headers["Authorization"]?.firstOrNull()?.let { authorization ->
-            val type = authorization.substringBefore(' ')
-            val value = authorization.substringAfter(' ')
-            when (type) {
-                "token" -> {
-                    val token = tokenRepo.findTokenEntityByToken(value)
-                        ?: return authFailed(AuthFailedReason.TOKEN_NOT_FOUND)
-
-                    val expireTime = token.expireTime.time
-                    if (expireTime != 0L && expireTime < System.currentTimeMillis()) {
-                        return authFailed(AuthFailedReason.TOKEN_EXPIRED)
-                    }
-
-
-                    return completeAuth(token.userByOwner)
-                }
-                else -> Unit
+        @Suppress("RemoveExplicitTypeArguments")
+        return context.exchange.session.flatMap<AuthorizationDecision> { session ->
+            (session.attributes["User"] as? UserEntity)?.let { ue ->
+                return@flatMap completeAuth(ue)
             }
-        }
+            return@flatMap Mono.empty()
+        }.switchIfEmpty {
+            context.exchange.request.headers["Authorization"]?.firstOrNull()?.let { authorization ->
+                val type = authorization.substringBefore(' ')
+                val value = authorization.substringAfter(' ')
+                when (type) {
+                    "token" -> {
+                        val token = tokenRepo.findTokenEntityByToken(value)
+                            ?: return@switchIfEmpty authFailed(AuthFailedReason.TOKEN_NOT_FOUND)
 
-        return authFailed(AuthFailedReason.GUEST)
+                        val expireTime = token.expireTime.time
+                        if (expireTime != 0L && expireTime < System.currentTimeMillis()) {
+                            return@switchIfEmpty authFailed(AuthFailedReason.TOKEN_EXPIRED)
+                        }
+
+                        return@switchIfEmpty completeAuth(token.userByOwner)
+                    }
+                    else -> Unit
+                }
+            }
+            return@switchIfEmpty Mono.empty()
+        }.switchIfEmpty {
+            authFailed(AuthFailedReason.GUEST)
+        }
     }
 
     override fun commence(exchange: ServerWebExchange, ex: AuthenticationException?): Mono<Void> {
