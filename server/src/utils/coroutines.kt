@@ -11,5 +11,12 @@ package net.mamoe.mirai.plugincenter.utils
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runInterruptible
+import java.io.Closeable
 
-suspend fun <R> runBIO(block: () -> R): R = runInterruptible(Dispatchers.IO, block)
+suspend inline fun <R> runBIO(noinline block: () -> R): R = runInterruptible(Dispatchers.IO, block)
+
+suspend inline fun <T : Closeable?, R> T.useBIO(crossinline block: (T) -> R): R {
+    return use { t ->
+        runBIO { block(t) }
+    }
+}

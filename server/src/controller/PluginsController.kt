@@ -184,7 +184,7 @@ class PluginsController(
         val file = storage.get(plugin.pluginId, version, filename)
         if (file.exists()) return@mono r.conflict(null, message = "File already exists")
 
-        storage.write(plugin.pluginId, version, filename, request.body.map { it.asByteBuffer() })
+        storage.write(plugin.pluginId, version, filename, request.body)
         r.created()
     }
 

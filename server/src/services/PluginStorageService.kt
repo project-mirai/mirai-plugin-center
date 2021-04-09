@@ -14,12 +14,15 @@ import kotlinx.coroutines.reactive.asFlow
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.utils.runBIO
+import net.mamoe.mirai.plugincenter.utils.useBIO
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import java.io.File
-import java.nio.ByteBuffer
+import java.io.InputStream
+import java.io.OutputStream
 
 @Service
 class PluginDescService(
@@ -53,13 +56,16 @@ class PluginStorageService {
     fun get(plugin: PluginEntity, version: String, filename: String) = FileSystemResource(resolveFile(plugin.pluginId, version, filename))
     fun get(pid: String, version: String, filename: String) = FileSystemResource(resolveFile(pid, version, filename))
 
-    suspend fun write(pid: String, version: String, filename: String, data: Flux<ByteBuffer>) {
+    suspend fun write(pid: String, version: String, filename: String, data: Flux<DataBuffer>) {
         val file = get(pid, version, filename)
         file.file.parentFile?.mkdirs()
         try {
-            runBIO { file.writableChannel() }.use { channel ->
-                data.asFlow().collect { buffer ->
-                    runBIO { channel.write(buffer) }
+            runBIO { file.outputStream.buffered() }.use { output ->
+                val bufferByteArray = ByteArray(DEFAULT_BUFFER_SIZE)
+                data.asFlow().collect { data ->
+                    data.asInputStream().useBIO { input ->
+                        input.copyToBuffered(output, bufferByteArray)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -76,5 +82,16 @@ class PluginStorageService {
         val dir = resolveVersionDir(pid, version)
         if (!dir.exists()) return false
         return dir.deleteRecursively()
+    }
+
+    private fun InputStream.copyToBuffered(out: OutputStream, buffer: ByteArray): Long {
+        var bytesCopied: Long = 0
+        var bytes = read(buffer)
+        while (bytes >= 0) {
+            out.write(buffer, 0, bytes)
+            bytesCopied += bytes
+            bytes = read(buffer)
+        }
+        return bytesCopied
     }
 }
