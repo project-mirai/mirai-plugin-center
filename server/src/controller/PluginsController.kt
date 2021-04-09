@@ -15,11 +15,11 @@ import net.mamoe.mirai.plugincenter.advice.ExceptionResponse
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
-import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
+import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -86,7 +86,7 @@ class PluginsController(
         if (plugin == null && request.method == HttpMethod.PATCH) {
             return r.notFound(message = "Id $id not found. Use method PUT to create a new plugin.")
         }
-        if (plugin?.isOwnedBy(user) == false) {
+        if (plugin.isOwnedBy(user) == false) {
             return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
         }
 
@@ -134,28 +134,31 @@ class PluginsController(
     // Versions
     ///////////////////////////////////////////////////////////////////////////
 
-    // @ApiOperation("下载一个文件")
-    // @GetMapping("/{id}/{version}/{filename}")
-    // @ApiResponses(
-    //     ApiResponse(code = 404, message = "File not found.", response = ApiResp::class),
-    // )
-    // fun getFile(
-    //     @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
-    //     @PathVariable
-    //     id: String,
-    //
-    //     @ApiParam("插件版本号")
-    //     @PathVariable
-    //     version: String,
-    //
-    //     @ApiParam("文件名")
-    //     @PathVariable
-    //     filename: String,
-    // ): FileSystemResource {
-    //     val resource = storage.get(id, version, filename)
-    //     if (!resource.exists()) throw ExceptionResponse(404, "File not found")
-    //     return resource
-    // }
+    @ApiOperation("下载一个文件")
+    @GetMapping("/{id}/{version}/{filename}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "File not found.", response = ApiResp::class),
+    )
+    fun getFile(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+
+        @ApiParam("文件名")
+        @PathVariable
+        filename: String,
+    ): FileSystemResource {
+        // This should be handled by the upstream Nginx server.
+        //  Spring sed as a fallback.
+
+        val resource = storage.get(id, version, filename)
+        if (!resource.exists()) throw ExceptionResponse(404, "File not found")
+        return resource
+    }
 
     @ApiOperation("上传一个文件")
     @PutMapping("/{id}/{version}/{filename}")
