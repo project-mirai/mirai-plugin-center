@@ -15,6 +15,7 @@ import net.mamoe.mirai.plugincenter.advice.ExceptionResponse
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
@@ -86,7 +87,7 @@ class PluginsController(
         if (plugin == null && request.method == HttpMethod.PATCH) {
             return r.notFound(message = "Id $id not found. Use method PUT to create a new plugin.")
         }
-        if (plugin.isOwnedBy(user) == false) {
+        if (plugin?.isOwnedBy(user) == false) {
             return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
         }
 
