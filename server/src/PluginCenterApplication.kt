@@ -16,6 +16,7 @@ import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
+import java.text.SimpleDateFormat
 
 @EnableJpaAuditing
 @SpringBootApplication
@@ -29,6 +30,12 @@ class PluginCenterApplication {
 //        val DEBUGGING: Boolean by lazy { logger.isDebugEnabled }
 //        val SHOW_TRACE: Boolean by lazy { logger.isTraceEnabled }
 //    }
+    companion object{
+        val buildTime by lazy {
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(BuildConfig.BUILD_TIME)
+        }
+    }
+
 }
 
 private lateinit var _context: ConfigurableApplicationContext

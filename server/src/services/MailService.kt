@@ -9,6 +9,7 @@
 
 package net.mamoe.mirai.plugincenter.services
 
+import net.mamoe.mirai.plugincenter.BuildConfig
 import net.mamoe.mirai.plugincenter.utils.setonly
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -72,8 +73,8 @@ class MailService {
         }
     }
 
-    @Value("\${mail.footer}")
-    var stdFooter = "Footer"
+    //@Value("\${mail.footer}")
+    var stdFooter = "Mirai Plugin Center ${BuildConfig.VERSION}"
 
     fun mailTemplate(action: MailTemplate.() -> Unit): String {
         val variables = mutableMapOf<String, Any>(

@@ -18,7 +18,7 @@ tasks.named("jar") {
 tasks.getByName("jar").enabled = true
 
 dependencies {
-
+    implementation(project(":"))
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-security")
     //   implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")

@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version kt
     kotlin("plugin.spring") version kt apply false
     kotlin("plugin.serialization") version kt apply false
+    id("com.github.gmazzo.buildconfig") version "3.0.0"
     java
 }
 
@@ -18,6 +19,14 @@ allprojects {
         mavenCentral()
     }
 }
+
+buildConfig {
+    packageName("net.mamoe.mirai.plugincenter")
+    useKotlinOutput()
+    buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
+    buildConfigField("String", "VERSION", "\"${version}\"")
+}
+
 
 subprojects {
     afterEvaluate {

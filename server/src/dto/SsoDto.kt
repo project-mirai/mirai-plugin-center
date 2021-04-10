@@ -29,9 +29,6 @@ data class RegisterDTO(
     @ApiModelProperty("密码") val password: String
 )
 
-@ApiModel
-data class LoginSuccessDTO(@ApiModelProperty("登录令牌") val token: String)
-
 @Serializable
 @ApiModel
 data class UserDto(
