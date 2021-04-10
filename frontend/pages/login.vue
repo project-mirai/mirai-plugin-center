@@ -3,8 +3,8 @@
   <v-row justify="center" align="center">
     <v-col cols="12" sm="9">
       <v-card class="d-flex">
-        <v-col align-self="center">
-            <p> 这里可以写一些废话</p>
+        <v-col align-self="center" justify="center">
+    <p>dsadas</p>
         </v-col>
         <v-col >
           <v-card-title>登录</v-card-title>

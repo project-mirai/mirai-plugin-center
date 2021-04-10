@@ -41,14 +41,13 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
     }
 
     @Throws(AuthenticationException::class)
-    suspend fun registerUser(user: RegisterDTO, ip: String): UserEntity {
+     fun registerUser(user: RegisterDTO, ip: String): UserEntity {
         if (userRepo.existsByEmail(user.email)) {
             throw AuthenticationException("邮箱已被使用")
         }
         val encodedPwd = bcrypt.encode(user.password)
-        return runInterruptible {
 //            userRepo.registerUser(user.nick, user.email, encodedPwd, "fuck", 1, Timestamp(System.currentTimeMillis()))
-            userRepo.save(UserEntity().apply {
+        return userRepo.save(UserEntity().apply {
                 email = user.email
                 password = encodedPwd
                 nick = user.nick
@@ -56,10 +55,10 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
                 role = 1
             })
 
-        }
+
     }
 
-    suspend fun login(user: LoginDTO): UserEntity? {
+     fun login(user: LoginDTO): UserEntity? {
         val sqlUser = loadUserByUsername(user.email) ?: return null
         if (bcrypt.matches(user.password, sqlUser.password)) {
 

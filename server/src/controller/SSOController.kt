@@ -11,6 +11,7 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiResponse
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.services.UserService
 import net.mamoe.mirai.plugincenter.utils.setSessionAccount
@@ -29,7 +30,7 @@ import javax.validation.Valid
 class SSOController(private val userService: UserService) {
     @ApiOperation("登录")
     @PostMapping("/login")
-    suspend fun login(@Valid @RequestBody login: LoginDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
+    fun login(@Valid @RequestBody login: LoginDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
         val result = userService.login(login)
         if (result != null) {
             req.setSessionAccount(result)
@@ -41,7 +42,7 @@ class SSOController(private val userService: UserService) {
 
     @ApiOperation("注册")
     @PostMapping("/register")
-    suspend fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
+    fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
         val result = userService.registerUser(register, req.request.remoteAddress.toString())
         req.setSessionAccount(result)
         return respOk(result.toDto())
