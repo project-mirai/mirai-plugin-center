@@ -29,6 +29,13 @@ data class RegisterDTO(
     @ApiModelProperty("密码") val password: String
 )
 
+@ApiModel
+data class ResetPasswordDTO(
+    @ApiModelProperty("Token") val token: String,
+    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
+    @ApiModelProperty("密码") val password: String
+)
+
 @Serializable
 @ApiModel
 data class UserDto(
