@@ -36,8 +36,17 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
 
     }
 
-    fun updatePassword(user: UserDetails?, newPassword: String?): UserEntity {
-        TODO("Not yet implemented")
+    suspend fun updatePassword(user: UserEntity, newPassword: String): UserEntity {
+        // TODO: Should we check newPassword?
+
+        return runInterruptible {
+            val newEncodedPwd = bcrypt.encode(newPassword)
+
+            // TODO: Should we save ip and date of password updating?
+            userRepo.save(user.apply {
+                this.password = newEncodedPwd
+            })
+        }
     }
 
     @Throws(AuthenticationException::class)
