@@ -15,9 +15,16 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.stereotype.Component
+import org.thymeleaf.context.Context
+import org.thymeleaf.spring5.SpringTemplateEngine
+import java.util.*
 
 @Component
 class MailService {
+
+    @Autowired
+    lateinit var template: SpringTemplateEngine
+
     @Autowired
     lateinit var sender: JavaMailSender
 
@@ -35,6 +42,52 @@ class MailService {
         fun send() {
             sender.send(msg.mimeMessage)
         }
+    }
+
+    class MailTemplate(
+        val variables: MutableMap<String, Any>
+    ) {
+        fun greetingWithName(value: String) {
+            variables["greeting_with_name"] = value
+        }
+
+        fun subject(value: String) {
+            variables["header"] = value
+        }
+
+        fun header(value: String) {
+            variables["line0"] = value
+        }
+
+        fun content(value: String) {
+            variables["line1"] = value
+        }
+
+        fun extContent(value: String) {
+            variables["line2"] = value
+        }
+
+        fun footer(value: String) {
+            variables["footer"] = value
+        }
+    }
+
+    @Value("\${mail.footer}")
+    var stdFooter = "Footer"
+
+    fun mailTemplate(action: MailTemplate.() -> Unit): String {
+        val variables = mutableMapOf<String, Any>(
+            "greeting_with_name" to "",
+            "header" to "",
+            "line0" to "",
+            "line1" to "",
+            "line2" to "",
+            "footer" to stdFooter,
+            "site_title" to "Mirai Plugin Center",
+        )
+        MailTemplate(variables).action()
+        val context = Context(Locale.getDefault(), variables)
+        return template.process("mail.html", context)
     }
 
     fun newMsg() = NewMail(sender.createMimeMessage().let { msg ->
