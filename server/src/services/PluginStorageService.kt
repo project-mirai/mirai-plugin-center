@@ -18,6 +18,8 @@ import net.mamoe.mirai.plugincenter.utils.useBIO
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import java.io.File
@@ -30,7 +32,7 @@ class PluginDescService(
 ) {
     fun getList(page: Int): List<PluginEntity> {
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        return repo.findPluginEntitiesByIdBetween(page * 20 + 1, (page + 1) * 20)
+        return repo.findAll(PageRequest.of(page,20)).toList()
     }
 
     fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)

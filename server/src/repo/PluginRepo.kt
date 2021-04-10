@@ -11,14 +11,18 @@ package net.mamoe.mirai.plugincenter.repo
 
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
     @Cacheable("plugin",key = "#pluginId")
     fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
 
-    fun findPluginEntitiesByIdBetween(start: Int, end: Int): List<PluginEntity>
+    fun findAll(page:Pageable):Page<PluginEntity>
 
     fun deletePluginEntityByPluginId(pluginId: String)
+
     fun deletePluginEntityById(id: Int)
 }
