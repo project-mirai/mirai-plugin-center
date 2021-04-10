@@ -26,6 +26,7 @@ buildConfig {
     buildConfigField("long", "BUILD_TIME", "${System.currentTimeMillis()}L")
     buildConfigField("String", "VERSION", "\"${version}\"")
 }
+java.sourceCompatibility = JavaVersion.VERSION_11
 
 
 subprojects {
