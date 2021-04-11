@@ -116,9 +116,9 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
         return tokens
     }
 
-    fun resetPassword(reset: ResetPasswordByPasswordDTO) {
+    fun resetPassword(reset: ResetPasswordByPasswordDTO, user: UserEntity) {
+        if (user.email != reset.email) throw AuthenticationException("你只能改你自己的密码")
         if (reset.password == reset.newPassword) throw AuthenticationException("你在改啥???")
-        val user = loadUserByUsername(reset.email) ?: throw AuthenticationException("用户不存在")
         if (bcrypt.matches(reset.newPassword, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
         if (!bcrypt.matches(reset.password, user.password)) throw AuthenticationException("密码不正确")
         else mono { updatePassword(user, reset.newPassword) }

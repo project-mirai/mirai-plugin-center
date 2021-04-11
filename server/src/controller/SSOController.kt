@@ -16,6 +16,7 @@ import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.services.MailService
 import net.mamoe.mirai.plugincenter.services.UserService
+import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.setSessionAccount
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -59,8 +60,11 @@ class SSOController(private val userService: UserService, private val mailServic
     @OptIn(ExperimentalTime::class)
     @ApiOperation("修改密码")
     @PatchMapping("/resetPassword")
-    fun resetPassword(@RequestBody resetPassword: ResetPasswordByPasswordDTO): ApiResp<String> {
-        userService.resetPassword(resetPassword)
+    fun (@receiver:ApiIgnore ServerWebExchange).resetPassword(
+        @RequestBody resetPassword: ResetPasswordByPasswordDTO
+    ): ApiResp<String> {
+        val user = loginUserOrReject
+        userService.resetPassword(resetPassword, user)
         return respOk("ok")
     }
 
