@@ -11,18 +11,17 @@ package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import kotlinx.coroutines.reactor.mono
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.services.MailService
 import net.mamoe.mirai.plugincenter.services.UserService
+import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.setSessionAccount
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.naming.AuthenticationException
 import javax.validation.Valid
@@ -35,7 +34,7 @@ import kotlin.time.ExperimentalTime
 @RequestMapping("/v1/sso")
 class SSOController(private val userService: UserService, private val mailService: MailService) {
 
-     private var  tokenMap = ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>()
+    private var tokenMap = ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>()
 
 
     @ApiOperation("登录")
@@ -59,14 +58,13 @@ class SSOController(private val userService: UserService, private val mailServic
     }
 
     @OptIn(ExperimentalTime::class)
-    @ApiOperation("找回密码")
-    @PostMapping("/resetPassword")
-    fun resetPassword(@RequestBody resetPasswordDTO: ResetPasswordDTO): ApiResp<String> {
-        tokenMap = userService.clearResetToken(tokenMap)
-        val user = userService.loadUserByUsername(resetPasswordDTO.email) ?: throw AuthenticationException("用户不存在")
-        if (tokenMap[user] == null) throw AuthenticationException("重置失败")
-        mono { userService.updatePassword(user, resetPasswordDTO.password) }
-        tokenMap.remove(user)
+    @ApiOperation("修改密码")
+    @PatchMapping("/resetPassword")
+    fun (@receiver:ApiIgnore ServerWebExchange).resetPassword(
+        @RequestBody resetPassword: ResetPasswordByPasswordDTO
+    ): ApiResp<String> {
+        val user = loginUserOrReject
+        userService.resetPassword(resetPassword, user)
         return respOk("ok")
     }
 
@@ -74,17 +72,17 @@ class SSOController(private val userService: UserService, private val mailServic
     @ApiOperation("发送找回密码邮件")
     @GetMapping("/resetPassword")
     fun resetPassword(@RequestParam(name = "email") @Email email: String): ApiResp<String> {
-        tokenMap = userService.clearResetToken(tokenMap)
-        val uuid = UUID.randomUUID()
-        val user = userService.loadUserByUsername(email) ?: throw AuthenticationException("用户不存在")
-        if (tokenMap[user] != null) tokenMap.remove(user)
-        tokenMap[user] = ResetPasswordTokenAndTime(uuid)
-
-        //TODO 发送找回密码邮件 localhost/v1/sso/resetPassword [POST]
-
-        println(uuid)
-
+        tokenMap = userService.resetPassword(email, tokenMap)
         return respOk("ok")
     }
+
+    @OptIn(ExperimentalTime::class)
+    @ApiOperation("找回密码")
+    @PostMapping("/resetPassword")
+    fun resetPassword(@RequestBody resetPassword: ResetPasswordByEmailDTO): ApiResp<String> {
+        tokenMap = userService.resetPassword(resetPassword, tokenMap)
+        return respOk("ok")
+    }
+
 
 }
