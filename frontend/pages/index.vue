@@ -1,15 +1,13 @@
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="9">
-      <v-card>
-        <v-card-title class="headline">
-          欢迎来到Mirai插件中心
-        </v-card-title>
-        <v-card-text>
-          <p>插件中心仍在建设中</p>
-        </v-card-text>
-      </v-card>
+    <v-col cols="12" sm="10" md="9">
+      <plugin-list-view></plugin-list-view>
     </v-col>
+    <v-pagination
+      v-model="pageInfo.nowPage"
+      :length="pageInfo.total"
+      total-visible="7"
+    ></v-pagination>
   </v-row>
 
 
@@ -17,7 +15,17 @@
 
 <script>
 
+import PluginListView from "../components/Plugin/PluginListView";
 export default {
-  layout:"basic"
+  components: {PluginListView},
+  layout:"basic",
+  data() {
+    return {
+      pageInfo: {
+        total: 15,
+        nowPage:1
+      }
+    }
+  }
 }
 </script>
