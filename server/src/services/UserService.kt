@@ -9,8 +9,6 @@
 
 package net.mamoe.mirai.plugincenter.services
 
-import kotlinx.coroutines.reactor.mono
-import kotlinx.coroutines.runInterruptible
 import net.mamoe.mirai.plugincenter.dto.LoginDTO
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByEmailDTO
@@ -36,17 +34,13 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
 
     }
 
-    suspend fun updatePassword(user: UserEntity, newPassword: String): UserEntity {
+    fun updatePassword(user: UserEntity, newPassword: String): UserEntity {
         // TODO: Should we check newPassword?
+        if (bcrypt.matches(newPassword, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
+        val newEncodedPwd = bcrypt.encode(newPassword)
+        // TODO: Should we save ip and date of password updating?
+        return userRepo.save(user.apply { this.password = newEncodedPwd })
 
-        return runInterruptible {
-            val newEncodedPwd = bcrypt.encode(newPassword)
-
-            // TODO: Should we save ip and date of password updating?
-            userRepo.save(user.apply {
-                this.password = newEncodedPwd
-            })
-        }
     }
 
     @Throws(AuthenticationException::class)
@@ -110,8 +104,7 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
         val tokens = clearResetToken(tokenMap)
         val user = loadUserByUsername(reset.email) ?: throw AuthenticationException("用户不存在")
         if (tokens[user] == null) throw AuthenticationException("重置失败")
-        if (bcrypt.matches(reset.password, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
-        mono { updatePassword(user, reset.password) }
+        updatePassword(user, reset.password)
         tokens.remove(user)
         return tokens
     }
@@ -119,9 +112,8 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
     fun resetPassword(reset: ResetPasswordByPasswordDTO, user: UserEntity) {
         if (user.email != reset.email) throw AuthenticationException("你只能改你自己的密码")
         if (reset.password == reset.newPassword) throw AuthenticationException("你在改啥???")
-        if (bcrypt.matches(reset.newPassword, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
         if (!bcrypt.matches(reset.password, user.password)) throw AuthenticationException("密码不正确")
-        else mono { updatePassword(user, reset.newPassword) }
+        updatePassword(user, reset.newPassword)
     }
 
 
