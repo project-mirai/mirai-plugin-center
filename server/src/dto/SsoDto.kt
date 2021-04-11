@@ -16,28 +16,35 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import org.springframework.core.annotation.Order
 import javax.validation.constraints.Email
 
-@ApiModel
+@ApiModel("登录信息")
 data class LoginDTO(
     @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("密码") val password: String
 )
 
-@ApiModel
+@ApiModel("注册信息")
 data class RegisterDTO(
     @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("昵称") val nick: String,
     @ApiModelProperty("密码") val password: String
 )
 
-@ApiModel
-data class ResetPasswordDTO(
+@ApiModel("用邮箱密码重置信息")
+data class ResetPasswordByEmailDTO(
     @ApiModelProperty("Token") val token: String,
     @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
     @ApiModelProperty("密码") val password: String
 )
 
+@ApiModel("修改密码信息")
+data class ResetPasswordByPasswordDTO(
+    @ApiModelProperty("邮箱", example = "foo@example.com") @field:Email val email: String,
+    @ApiModelProperty("密码(旧)") val password: String,
+    @ApiModelProperty("密码(新)") val newPassword: String
+)
+
 @Serializable
-@ApiModel
+@ApiModel("用户信息")
 data class UserDto(
     @Order(0)
     @ApiModelProperty("邮箱", example = "foo@example.com")

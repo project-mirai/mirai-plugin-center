@@ -9,14 +9,18 @@
 
 package net.mamoe.mirai.plugincenter.services
 
+import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runInterruptible
 import net.mamoe.mirai.plugincenter.dto.LoginDTO
 import net.mamoe.mirai.plugincenter.dto.RegisterDTO
+import net.mamoe.mirai.plugincenter.dto.ResetPasswordByEmailDTO
+import net.mamoe.mirai.plugincenter.dto.ResetPasswordByPasswordDTO
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.naming.AuthenticationException
 import kotlin.time.ExperimentalTime
@@ -73,11 +77,51 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
     }
 
     @ExperimentalTime
-    fun clearResetToken(tokensMap: ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>): ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime> {
+    private fun clearResetToken(tokensMap: ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>): ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime> {
         for (key: UserEntity in tokensMap.keys()) {
             if (tokensMap[key]!!.time < System.currentTimeMillis() + 30.minutes.toLongMilliseconds()) tokensMap.remove(key)
         }
         return tokensMap
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun resetPassword(
+        email: String,
+        tokenMap: ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>
+    ): ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime> {
+        val tokens = clearResetToken(tokenMap)
+        val uuid = UUID.randomUUID()
+        val user = loadUserByUsername(email) ?: throw AuthenticationException("用户不存在")
+        if (tokens[user] != null) tokens.remove(user)
+        tokens[user] = ResetPasswordTokenAndTime(uuid)
+
+        //TODO 发送找回密码邮件 localhost/v1/sso/resetPassword [POST]
+
+        println(uuid)
+
+        return tokens
+    }
+
+    @OptIn(ExperimentalTime::class)
+    fun resetPassword(
+        reset: ResetPasswordByEmailDTO,
+        tokenMap: ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime>
+    ): ConcurrentHashMap<UserEntity, ResetPasswordTokenAndTime> {
+        val tokens = clearResetToken(tokenMap)
+        val user = loadUserByUsername(reset.email) ?: throw AuthenticationException("用户不存在")
+        if (tokens[user] == null) throw AuthenticationException("重置失败")
+        if (bcrypt.matches(reset.password, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
+        mono { updatePassword(user, reset.password) }
+        tokens.remove(user)
+        return tokens
+    }
+
+    fun resetPassword(reset: ResetPasswordByPasswordDTO) {
+        if (reset.password == reset.newPassword) throw AuthenticationException("你在改啥???")
+        val user = loadUserByUsername(reset.email) ?: throw AuthenticationException("用户不存在")
+        if (bcrypt.matches(reset.newPassword, user.password)) throw AuthenticationException("新密码不能与旧密码相同")
+        if (!bcrypt.matches(reset.password, user.password)) throw AuthenticationException("密码不正确")
+        else mono { updatePassword(user, reset.newPassword) }
     }
 
 
