@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiModel
 import io.swagger.annotations.ApiModelProperty
 import net.mamoe.mirai.plugincenter.utils.toJsonUseJackson
 import org.springframework.http.HttpStatus
+import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
 
 inline fun resp(code: Int = 200, builderAction: RespBuilder.() -> Unit): Resp {
@@ -38,14 +39,19 @@ class RespBuilder(
         this.msg = msg
     }
 
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> toApiResp(): ApiResp<T> =
+        ApiResp(code, message = msg ?: "success", response = map) as ApiResp<T>
+
     override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) {
-        ApiResp(code, message = msg ?: "success", response = map).writeTo(gen, provider)
+        toApiResp<Any?>().writeTo(gen, provider)
     }
 }
 
 
 sealed interface Resp {
     fun writeTo(gen: JsonGenerator, provider: SerializerProvider)
+    fun <T> toApiResp(): ApiResp<T>
 
     companion object {
         val OK = SerializedApiResp<Unit>(HttpStatus.OK)
@@ -68,7 +74,7 @@ open class ApiResp<T>(
     @ApiModelProperty("状态码", example = "200") val code: Int,
     @ApiModelProperty("提示信息") val message: String? = null,
     @ApiModelProperty("返回数据") val response: T? = null,
-    @ApiIgnore private val trace: Trace? = null,
+    @ApiIgnore internal val trace: Trace? = null,
 ) : Resp {
     companion object {
         private val localMapper = JsonMapper().apply {
@@ -140,6 +146,28 @@ open class ApiResp<T>(
 //        }
         gen.writeEndObject()
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> toApiResp(): ApiResp<T> = this as ApiResp<T>
+}
+
+class ApiRespForBrowser<T>(
+    code: Int,
+    message: String? = null,
+    response: T? = null,
+    trace: Trace? = null,
+    val callback: String? = null,
+) : ApiResp<T>(code, message, response, trace) {
+    override fun writeTo(gen: JsonGenerator, provider: SerializerProvider) {
+        if (callback != null) {
+            gen.writeRaw(callback)
+            gen.writeRaw('(')
+        }
+        super.writeTo(gen, provider)
+        if (callback != null) {
+            gen.writeRaw(')')
+        }
+    }
 }
 
 class SerializedApiResp<T>(
@@ -158,3 +186,10 @@ typealias Trace = () -> String
 typealias TraceElement = StackTraceElement
 
 fun <T> respOk(content: T) = ApiResp(200, "", content)
+fun <T> ApiResp<T>.toBrowserResponse(callback: String?): ApiResp<T> {
+    if (callback == null) return this
+    return ApiRespForBrowser(code, message, response, trace, callback)
+}
+
+fun <T> ApiResp<T>.toBrowserResponse(exchange: ServerWebExchange): ApiResp<T> =
+    this.toBrowserResponse(exchange.request.queryParams.getFirst("callback"))
