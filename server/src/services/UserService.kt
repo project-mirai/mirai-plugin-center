@@ -16,6 +16,9 @@ import net.mamoe.mirai.plugincenter.dto.ResetPasswordByPasswordDTO
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
+import net.mamoe.mirai.plugincenter.utils.href
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
@@ -26,7 +29,20 @@ import kotlin.time.minutes
 
 
 @Service
-class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPasswordEncoder) {
+class UserService(
+
+    private val userRepo: UserRepo,
+
+    private val bcrypt: BCryptPasswordEncoder,
+
+    @Autowired
+    private val mailService: MailService,
+
+    @Value("\${mail.base.url}")
+    val url: String
+) {
+
+
     fun loadUserByUsername(username: String): UserEntity? {
 
         // todo 用户角色判断
@@ -89,10 +105,16 @@ class UserService(private val userRepo: UserRepo, private val bcrypt: BCryptPass
         if (tokens[user] != null) tokens.remove(user)
         tokens[user] = ResetPasswordTokenAndTime(uuid)
 
-        //TODO 发送找回密码邮件 localhost/v1/sso/resetPassword [POST]
-
-        println(uuid)
-
+        mailService.sendMsg {
+            subject = "Password Reset"
+            to = user.email
+            html = mailService.mailTemplate {
+                greetingWithName("${user.nick} 你好")
+                header("找回密码")
+                content("您正在重置您在我们站点的密码,请点击${href("这里", "$url/browser/resetPassword?token=$uuid")}")
+                extContent("如果非本人操作,请忽略本邮件")
+            }
+        }
         return tokens
     }
 
