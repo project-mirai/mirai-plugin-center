@@ -7,11 +7,6 @@
         </v-card-title>
         <v-card-text>
           <p>插件中心仍在建设中</p>
-          <v-btn
-          to="/login"
-          type="success">
-            登录
-          </v-btn>
         </v-card-text>
       </v-card>
     </v-col>
@@ -23,6 +18,6 @@
 <script>
 
 export default {
-  layout:"welcome"
+  layout:"basic"
 }
 </script>

@@ -35,6 +35,6 @@ import LoginForm from "../components/Auth/LoginForm";
 export default {
   name: "login",
   components: {LoginForm},
-  layout: "welcome"
+  layout: "basic"
 }
 </script>
