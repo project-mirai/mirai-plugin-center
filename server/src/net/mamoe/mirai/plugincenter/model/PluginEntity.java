@@ -19,6 +19,11 @@ import java.util.Objects;
 @Entity
 @Table(name = "plugin", schema = "public", catalog = "plugins")
 public class PluginEntity {
+    public enum Status {
+        Accepted,
+        Denied
+    }
+
     private int id;
     private String name;
     private String pluginId;
