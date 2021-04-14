@@ -10,11 +10,13 @@
 (function(document,window,navigator){
     const pub = {
         deviceId: undefined,
+        debug: false
     }
 
     function md5_RotateLeft(lValue, iShiftBits) {
         return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
     }
+
     function md5_AddUnsigned(lX, lY) {
         var lX4, lY4, lX8, lY8, lResult;
         lX8 = (lX & 0x80000000);
@@ -212,8 +214,7 @@
     function quickHash(a) {
         if (null == a) return -1;
         try {
-            for (var t = 0,
-                     e = 0; e < a.length; e++) {
+            for (var t = 0, e = 0; e < a.length; e++) {
                 var n = a.charCodeAt(e);
                 n < 128 && (t += n)
             }
@@ -258,7 +259,7 @@
         } catch (e) {
             device.attr = 0;
         }
-        device.automated = window._phantom || window.webdriver || window.domAutomation || window.$cdc_asdjflasutopfhvcZLmcfl_ || document.$cdc_asdjflasutopfhvcZLmcfl_ ? 1 : 0
+        device.automated = (window._phantom || window.webdriver || window.domAutomation || window.$cdc_asdjflasutopfhvcZLmcfl_ || document.$cdc_asdjflasutopfhvcZLmcfl_) ? 1 : 0
 
         var canvas = function (a) {
             try {
@@ -293,5 +294,51 @@
 
         pub.deviceId = md5("" + device.attr,18) + "-" + device.automated + md5(device.fp + device.ua,16).substr(0,15)
     }
-    pub.calculateDeviceId()
+
+
+    pub.createRequestId = function (){
+        const a = 'xxxxxxxx-xxxx-4xxx'.replace(/[x]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+        const z = ('xxxxxxxxxxx'.replace(/[x]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        }));
+        const middle = md5( a + z,32).substr(0,4)
+        return a + "-" + middle + "-" + z
+    }
+
+    pub.calculateRequestKey = function() {
+        const timeStamp = Date.now();
+        const id = pub.createRequestId();
+
+        var key = null;
+        const start = Date.now();
+
+        var seed = ""
+        var genb = 0;
+
+        for (var gen = 0; key == null; ++gen) {
+            seed = ""
+            genb = gen;
+
+            while (genb > 74) {
+                seed += String.fromCharCode(genb % 74 + 48);
+                genb = Math.floor(genb / 74);
+            }
+
+            if (md5(timeStamp + id + seed, 32).substring(0, 2) === "00") {
+                key = seed
+            }
+        }
+
+        if (pub.debug) {
+            console.log("POW; timeTaken=" + (Date.now() - start) + "ms")
+            console.log("Seed=" + seed)
+            console.log("Timestamp=" + timeStamp)
+            console.log("Id=" + id)
+            console.log("Md5=" + md5(timeStamp + id + seed, 32))
+        }
+    }
 })(document,window,navigator);
