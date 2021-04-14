@@ -12,20 +12,17 @@
         <!--
         <authorization-dialog @click="$emit('click')"></authorization-dialog>
         -->
-        <v-btn
-          color="primary"
-          dark
-          small class="transparent elevation-0"
-          @click="$emit('click');"
-        >登录</v-btn>
+        <auth-dialog></auth-dialog>
       </v-list-item-action>
     </v-list-item>
   </v-list>
 </template>
 
 <script>
+import AuthDialog from "./AuthDialog";
 export default {
-  name: "NeedLogin"
+  name: "NeedLogin",
+  components: {AuthDialog}
 }
 </script>
 
