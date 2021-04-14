@@ -9,7 +9,7 @@
 
 (function(document,window,navigator){
     const pub = {
-        deviceId: null,
+        deviceId: undefined,
     }
 
     function md5_RotateLeft(lValue, iShiftBits) {
@@ -227,6 +227,9 @@
 
     pub.startTime = Date.now();
     pub.calculateDeviceId = function () {
+        if(this.deviceId !== undefined){
+            return
+        }
         var device = {}
         try {
             var a = window.addEventListener ? 1 : 0,
