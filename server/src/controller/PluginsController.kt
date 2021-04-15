@@ -127,7 +127,7 @@ class PluginsController(
     }
 
     private fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
-        return this.userByOwner.uid != user.uid
+        return this.userByOwner.uid == user.uid
     }
 
 

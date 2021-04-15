@@ -9,8 +9,12 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
+import kotlinx.coroutines.reactor.mono
 import net.mamoe.mirai.plugincenter.dto.Resp
-import net.mamoe.mirai.plugincenter.dto.resp
+import net.mamoe.mirai.plugincenter.dto.r
+import net.mamoe.mirai.plugincenter.services.PluginDescService
+import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,7 +26,10 @@ import org.springframework.web.server.ServerWebExchange
  */
 @RestController
 @RequestMapping("/v1/publish")
-class MavenRepositoryUploadController {
+class MavenRepositoryUploadController(
+    val desc: PluginDescService,
+    val storage: PluginStorageService,
+) {
     private data class PublishArtifact(
         val group: String,
         val artifact: String,
@@ -38,7 +45,7 @@ class MavenRepositoryUploadController {
     private fun String.doSplitPath(): PublishArtifact {
         val p = this
             .removePrefix("/")
-            .removePrefix("staging/upload/")
+            .removePrefix("v1/publish/upload/")
 
         val (tmp0, artifactName) = p.splitLatest()
         val (tmp1, version) = tmp0.splitLatest()
@@ -56,20 +63,19 @@ class MavenRepositoryUploadController {
 
     @PutMapping("/upload/**")
     fun doUpload(exchange: ServerWebExchange): Any {
+        val usr = exchange.loginUserOrReject
         val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
-
-        return exchange.request.body.map { buf ->
-            synchronized(System.out) {
-                buf.asInputStream().use { it.copyTo(System.out) }
-                println()
-            }
-            resp {
-                msg("Completed")
-                "group" - group
-                "version" - version
-                "artifact" - artifact
-                "artifactName" - artifactName
-            }
+        val pid = "$group.$artifact"
+        if (artifactName.startsWith("maven-metadata.xml")) { // dropped
+            return Resp.OK
+        }
+        val plugin = desc.get(pid) ?: return Resp.NOT_FOUND
+        if (plugin.userByOwner.uid != usr.uid) {
+            return Resp.FORBIDDEN
+        }
+        return mono {
+            storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
+            r.created<Any>()
         }
     }
 }

@@ -40,3 +40,7 @@ out/
 
 ### Spring ###
 application.properties
+
+### Misc ###
+/localtest/
+/data

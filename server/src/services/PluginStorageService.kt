@@ -65,11 +65,12 @@ class PluginStorageService {
             runBIO { file.outputStream.buffered() }.use { output ->
                 val bufferByteArray = ByteArray(DEFAULT_BUFFER_SIZE)
                 data.asFlow().collect { data ->
-                    data.asInputStream().useBIO { input ->
+                    data.asInputStream(true).useBIO { input ->
                         input.copyToBuffered(output, bufferByteArray)
                     }
                 }
             }
+            // TODO: plugin_file update
         } catch (e: Exception) {
             file.file.delete()
             throw e
