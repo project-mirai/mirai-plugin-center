@@ -127,7 +127,7 @@ class PluginsController(
     }
 
     private fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
-        return this.userByOwner.uid != user.uid
+        return this.userByOwner.uid == user.uid
     }
 
 
@@ -183,7 +183,10 @@ class PluginsController(
     ): Mono<ApiResp<Void?>> = mono {
         val user = loginUserOrReject
         val plugin = desc.get(id) ?: return@mono r.notFound(null)
+
         plugin.checkOwnedBy(user)
+        plugin.checkAvailable()
+
         if (!storage.hasVersion(plugin.pluginId, version)) return@mono r.notFound(message = "Version not found")
         val file = storage.get(plugin.pluginId, version, filename)
         if (file.exists()) return@mono r.conflict(null, message = "File already exists")
