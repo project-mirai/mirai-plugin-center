@@ -42,26 +42,15 @@ interface CircularIndexHashSet<T>{
 
 private class CircularIndexHashSetImpl<T>(override val capacity:Int):CircularIndexHashSet<T>{
 
-
-    /**
-     * Identify the current index
-     */
     private val curr = AtomicLong(0)
 
-    /**
-     * Use a circular index array to implement pop and push
-     */
     private val array = ArrayList<T?>(capacity).apply {
         repeat(capacity){
             add(null)
         }
     }
 
-    /**
-     * use a hash set with copied of data for o(1) contains check
-     */
-    private val set = Collections.synchronizedSet(HashSet<T>((this.capacity * 0.75 + 1).toInt()))//prevent rehash, 0.75 refers to load factor
-
+    private val set = Collections.synchronizedSet(HashSet<T>((this.capacity * 0.75 + 1).toInt()))
 
     override fun put(element: T): Boolean {
 
@@ -83,4 +72,8 @@ private class CircularIndexHashSetImpl<T>(override val capacity:Int):CircularInd
     }
 
 }
+
+
+
+
 
