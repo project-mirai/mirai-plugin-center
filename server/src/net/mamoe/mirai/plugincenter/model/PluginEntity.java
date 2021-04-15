@@ -36,6 +36,10 @@ public class PluginEntity {
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
 
+    public PluginEntity() {
+        this.status = Status.Denied.ordinal();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
     @Column(name = "id")
