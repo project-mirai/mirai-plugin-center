@@ -122,8 +122,16 @@ class PluginsController(
         return r.ok()
     }
 
+    private fun PluginEntity.checkAvailable() {
+        if (this.status != PluginEntity.Status.Accepted.ordinal) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not available")
+    }
+
     private fun PluginEntity.checkOwnedBy(user: UserEntity) {
         if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
+    }
+
+    private fun PluginEntity.checkEverything() {
+        // TODO
     }
 
     private fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
