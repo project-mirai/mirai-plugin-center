@@ -86,9 +86,9 @@ class SSOController(private val userService: UserService, private val mailServic
 
     @ApiOperation("当前用户")
     @GetMapping("/whoami")
-    fun whoami(@ApiIgnore req: ServerWebExchange): ApiResp<String> {
+    fun whoami(@ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
         val user = req.loginUserOrReject
 
-        return respOk(user.nick)
+        return respOk(user.toDto())
     }
 }
