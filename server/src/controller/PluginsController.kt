@@ -18,6 +18,8 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.utils.isAvailable
+import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
 import org.springframework.core.io.FileSystemResource
@@ -121,23 +123,13 @@ class PluginsController(
         desc.delete(plugin.pluginId)
         return r.ok()
     }
-
     private fun PluginEntity.checkAvailable() {
-        if (this.status != PluginEntity.Status.Accepted.ordinal) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not available")
+        if (! isAvailable()) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not available")
     }
 
     private fun PluginEntity.checkOwnedBy(user: UserEntity) {
         if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
     }
-
-    private fun PluginEntity.checkEverything() {
-        // TODO
-    }
-
-    private fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
-        return this.userByOwner.uid == user.uid
-    }
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Versions

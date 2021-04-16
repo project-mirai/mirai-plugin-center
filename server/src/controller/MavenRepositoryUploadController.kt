@@ -14,6 +14,8 @@ import net.mamoe.mirai.plugincenter.dto.Resp
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.utils.isAvailable
+import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -70,7 +72,7 @@ class MavenRepositoryUploadController(
             return Resp.OK
         }
         val plugin = desc.get(pid) ?: return Resp.NOT_FOUND
-        if (plugin.userByOwner.uid != usr.uid) {
+        if (! (plugin.isOwnedBy(usr) && plugin.isAvailable())) {
             return Resp.FORBIDDEN
         }
         return mono {
