@@ -14,6 +14,8 @@ import net.mamoe.mirai.plugincenter.dto.Resp
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.utils.isAvailable
+import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -37,10 +39,20 @@ class MavenRepositoryUploadController(
         val artifactName: String
     )
 
+    private val PublishArtifact.pluginId: String
+        get() {
+            return "$group.$artifact"
+        }
+
     private fun String.splitLatest(): Pair<String, String> {
         val index = this.lastIndexOf('/')
         return substring(0, index) to substring(index + 1)
     }
+
+    private val ServerWebExchange.publishArtifact: PublishArtifact
+        get() {
+            return request.uri.path.doSplitPath()
+        }
 
     private fun String.doSplitPath(): PublishArtifact {
         val p = this
@@ -56,26 +68,35 @@ class MavenRepositoryUploadController(
 
     @GetMapping("/upload/**")
     fun doGet(exchange: ServerWebExchange): Any {
-        // val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
+        return with(exchange.publishArtifact) {
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            val resource = storage.get(plugin.pluginId, version, artifactName)
 
-        return Resp.NOT_FOUND
+            if (resource.exists()) {
+                resource
+            } else {
+                Resp.NOT_FOUND
+            }
+        }
     }
 
     @PutMapping("/upload/**")
     fun doUpload(exchange: ServerWebExchange): Any {
         val usr = exchange.loginUserOrReject
-        val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
-        val pid = "$group.$artifact"
-        if (artifactName.startsWith("maven-metadata.xml")) { // dropped
-            return Resp.OK
-        }
-        val plugin = desc.get(pid) ?: return Resp.NOT_FOUND
-        if (plugin.userByOwner.uid != usr.uid) {
-            return Resp.FORBIDDEN
-        }
-        return mono {
-            storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
-            r.created<Any>()
+
+        return with(exchange.publishArtifact) {
+            if (artifactName.startsWith("maven-metadata.xml")) { // dropped
+                return Resp.OK
+            }
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            if (!(plugin.isOwnedBy(usr) && plugin.isAvailable())) {
+                return Resp.FORBIDDEN
+            }
+
+            mono {
+                storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
+                r.created<Any>()
+            }
         }
     }
 }
