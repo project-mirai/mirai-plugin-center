@@ -39,14 +39,20 @@ class MavenRepositoryUploadController(
         val artifactName: String
     )
 
-    private val PublishArtifact.pluginId: String get() {
-        return "$group.$artifact"
-    }
+    private val PublishArtifact.pluginId: String
+        get() {
+            return "$group.$artifact"
+        }
 
     private fun String.splitLatest(): Pair<String, String> {
         val index = this.lastIndexOf('/')
         return substring(0, index) to substring(index + 1)
     }
+
+    private val ServerWebExchange.publishArtifact: PublishArtifact
+        get() {
+            return request.uri.path.doSplitPath()
+        }
 
     private fun String.doSplitPath(): PublishArtifact {
         val p = this
@@ -62,16 +68,23 @@ class MavenRepositoryUploadController(
 
     @GetMapping("/upload/**")
     fun doGet(exchange: ServerWebExchange): Any {
-        // val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
+        return with(exchange.publishArtifact) {
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            val resource = storage.get(plugin.pluginId, version, artifactName)
 
-        return Resp.NOT_FOUND
+            if (resource.exists()) {
+                resource
+            } else {
+                Resp.NOT_FOUND
+            }
+        }
     }
 
     @PutMapping("/upload/**")
     fun doUpload(exchange: ServerWebExchange): Any {
         val usr = exchange.loginUserOrReject
 
-        return with(exchange.request.uri.path.doSplitPath()) {
+        return with(exchange.publishArtifact) {
             if (artifactName.startsWith("maven-metadata.xml")) { // dropped
                 return Resp.OK
             }
