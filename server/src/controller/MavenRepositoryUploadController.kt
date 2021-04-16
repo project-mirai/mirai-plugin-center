@@ -39,6 +39,10 @@ class MavenRepositoryUploadController(
         val artifactName: String
     )
 
+    private val PublishArtifact.pluginId: String get() {
+        return "$group.$artifact"
+    }
+
     private fun String.splitLatest(): Pair<String, String> {
         val index = this.lastIndexOf('/')
         return substring(0, index) to substring(index + 1)
@@ -66,18 +70,20 @@ class MavenRepositoryUploadController(
     @PutMapping("/upload/**")
     fun doUpload(exchange: ServerWebExchange): Any {
         val usr = exchange.loginUserOrReject
-        val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
-        val pid = "$group.$artifact"
-        if (artifactName.startsWith("maven-metadata.xml")) { // dropped
-            return Resp.OK
-        }
-        val plugin = desc.get(pid) ?: return Resp.NOT_FOUND
-        if (! (plugin.isOwnedBy(usr) && plugin.isAvailable())) {
-            return Resp.FORBIDDEN
-        }
-        return mono {
-            storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
-            r.created<Any>()
+
+        return with(exchange.request.uri.path.doSplitPath()) {
+            if (artifactName.startsWith("maven-metadata.xml")) { // dropped
+                return Resp.OK
+            }
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            if (!(plugin.isOwnedBy(usr) && plugin.isAvailable())) {
+                return Resp.FORBIDDEN
+            }
+
+            mono {
+                storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
+                r.created<Any>()
+            }
         }
     }
 }
