@@ -72,7 +72,7 @@ data class PluginDescUpdate(
 @ApiModel("插件状态信息")
 data class PluginStatusUpdate(
     @Order(1)
-    @ApiModelProperty("状态")
+    @ApiModelProperty("状态", allowableValues = "Accepted, Denied")
     val status: PluginEntity.Status,
 )
 
