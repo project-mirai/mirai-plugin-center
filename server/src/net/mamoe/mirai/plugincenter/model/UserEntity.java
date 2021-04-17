@@ -12,6 +12,7 @@ package net.mamoe.mirai.plugincenter.model;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -22,8 +23,9 @@ import java.util.Objects;
 @Table(name = "user", schema = "public", catalog = "plugins")
 public class UserEntity {
     public enum Role {
+        Undefined,
         Registered,
-        Manager
+        Manager,
     }
 
     private int uid;

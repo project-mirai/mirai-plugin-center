@@ -9,5 +9,19 @@
 
 package net.mamoe.mirai.plugincenter.services
 
-class ManagerService {
+import net.mamoe.mirai.plugincenter.model.PluginEntity
+import net.mamoe.mirai.plugincenter.repo.PluginRepo
+import org.springframework.stereotype.Service
+
+@Service
+class ManagerService(
+    private val pluginRepo: PluginRepo
+) {
+    fun modifyStatus(id: String, status: PluginEntity.Status): PluginEntity? {
+        val plugin = pluginRepo.findPluginEntityByPluginId(id) ?: return null
+
+        return pluginRepo.save(plugin.apply {
+            this.status = status.ordinal
+        })
+    }
 }
