@@ -29,9 +29,7 @@ import springfox.documentation.annotations.ApiIgnore
 class ManagerController(
     val manager: ManagerService
 ) {
-
-
-    private fun withManager(user: UserEntity, block: UserEntity.() -> Resp): Resp {
+    private inline fun withManager(user: UserEntity, block: UserEntity.() -> Resp): Resp {
         return if (user.isManager()) {
             user.block()
         } else {
@@ -53,12 +51,9 @@ class ManagerController(
         exchange: ServerWebExchange
     ): Resp {
         val user = exchange.loginUserOrReject
-        val status = PluginEntity.Status
-            .values()
-            .getOrNull(update.status) ?: return Resp.BAD_REQUEST
 
         return withManager(user) {
-            val ret = manager.modifyStatus(id, status)
+            val ret = manager.modifyStatus(id, update.status)
 
             if (ret == null) {      // TODO: enrich error message
                 Resp.NOT_FOUND

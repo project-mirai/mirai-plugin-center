@@ -43,8 +43,8 @@ data class PluginDesc(
     val owner: UserDto? = null,
 
     @Order(5)
-    @ApiModelProperty("状态", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
-    val status: Int
+    @ApiModelProperty("状态", accessMode = ApiModelProperty.AccessMode.READ_ONLY, allowableValues = "Accepted, Denied")
+    val status: PluginEntity.Status
 ) {
     companion object {
         const val ID_EXAMPLE = "org.example.mirai.test-plugin"
@@ -73,11 +73,12 @@ data class PluginDescUpdate(
 data class PluginStatusUpdate(
     @Order(1)
     @ApiModelProperty("状态")
-    val status: Int,
+    val status: PluginEntity.Status,
 )
 
 fun PluginEntity.toDto(): PluginDesc {
-    return PluginDesc(pluginId, name, info, userByOwner.toDto(), status)
+    return PluginDesc(pluginId, name, info, userByOwner.toDto(),
+        PluginEntity.Status.values().getOrElse(this.status) { PluginEntity.Status.Denied })
 }
 
 fun PluginEntity.copyFrom(desc: PluginDesc): PluginEntity {
