@@ -21,6 +21,11 @@ import java.util.Objects;
 @Entity
 @Table(name = "user", schema = "public", catalog = "plugins")
 public class UserEntity {
+    public enum Role {
+        Registered,
+        Manager
+    }
+
     private int uid;
     private String nick;
     private String email;
