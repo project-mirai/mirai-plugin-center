@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
+import java.nio.file.Path
+import kotlin.io.path.name
 
 /**
  * Fake Maven repository
@@ -32,43 +34,64 @@ class MavenRepositoryUploadController(
     val desc: PluginDescService,
     val storage: PluginStorageService,
 ) {
-    private data class PublishArtifact(
+    data class PublishArtifact(
         val group: String,
         val artifact: String,
         val version: String,
         val artifactName: String
     )
 
-    private val PublishArtifact.pluginId: String
-        get() {
-            return "$group.$artifact"
+    companion object {
+        private val PublishArtifact.pluginId: String
+            get() {
+                return "$group.$artifact"
+            }
+
+        private fun String.splitLatest(): Pair<String, String> {
+            val index = this.lastIndexOf('/')
+            return substring(0, index) to substring(index + 1)
         }
 
-    private fun String.splitLatest(): Pair<String, String> {
-        val index = this.lastIndexOf('/')
-        return substring(0, index) to substring(index + 1)
-    }
+        private val ServerWebExchange.publishArtifact: PublishArtifact?
+            get() {
+                return Path.of(request.uri.path).asArtifact()
+            }
 
-    private val ServerWebExchange.publishArtifact: PublishArtifact
-        get() {
-            return request.uri.path.doSplitPath()
+
+        /**
+         * 转化 api 请求路径为 [PublishArtifact] 数据
+         * 格式要求：/v1/publish/upload/<group>/<artifact>/<version>/<name>
+         */
+        fun Path.asArtifact(): PublishArtifact? {
+            val xs = this.toList().drop(3).map { it.fileName.toString() }
+
+            return if (xs.size >= 4) {
+                val (artifact, version, artifactName) = xs.takeLast(3)
+                val group = xs.dropLast(3).joinToString(separator = ".")
+
+                PublishArtifact(group, artifact, version, artifactName)
+            } else {
+                null
+            }
         }
 
-    private fun String.doSplitPath(): PublishArtifact {
-        val p = this
-            .removePrefix("/")
-            .removePrefix("v1/publish/upload/")
+        @Deprecated("Unsafe method, please use Path.asArtifact instead.")
+        private fun String.doSplitPath(): PublishArtifact {
+            val p = this
+                .removePrefix("/")
+                .removePrefix("v1/publish/upload/")
 
-        val (tmp0, artifactName) = p.splitLatest()
-        val (tmp1, version) = tmp0.splitLatest()
-        val (group, artifact) = tmp1.splitLatest()
+            val (tmp0, artifactName) = p.splitLatest()
+            val (tmp1, version) = tmp0.splitLatest()
+            val (group, artifact) = tmp1.splitLatest()
 
-        return PublishArtifact(group.replace('/', '.'), artifact, version, artifactName)
+            return PublishArtifact(group.replace('/', '.'), artifact, version, artifactName)
+        }
     }
 
     @GetMapping("/upload/**")
     fun doGet(exchange: ServerWebExchange): Any {
-        return with(exchange.publishArtifact) {
+        return with(exchange.publishArtifact ?: return Resp.BAD_REQUEST) {
             val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
             val resource = storage.get(plugin.pluginId, version, artifactName)
 
@@ -84,7 +107,7 @@ class MavenRepositoryUploadController(
     fun doUpload(exchange: ServerWebExchange): Any {
         val usr = exchange.loginUserOrReject
 
-        return with(exchange.publishArtifact) {
+        return with(exchange.publishArtifact ?: return Resp.BAD_REQUEST) {
             if (artifactName.startsWith("maven-metadata.xml")) { // dropped
                 return Resp.OK
             }
