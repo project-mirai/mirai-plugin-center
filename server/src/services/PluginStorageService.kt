@@ -16,6 +16,8 @@ import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.utils.runBIO
 import net.mamoe.mirai.plugincenter.utils.useBIO
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.data.domain.PageRequest
@@ -37,6 +39,7 @@ class PluginDescService(
 
     fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)
 
+    @CachePut("plugin", key = "#pid")
     fun update(pid: String, apply: PluginEntity.() -> Unit): PluginEntity {
         val existing = repo.findPluginEntityByPluginId(pid)
         return repo.save((existing ?: PluginEntity()).apply(apply))
