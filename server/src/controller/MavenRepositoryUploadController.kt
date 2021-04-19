@@ -74,19 +74,6 @@ class MavenRepositoryUploadController(
                 null
             }
         }
-
-        @Deprecated("Unsafe method, please use Path.asArtifact instead.")
-        private fun String.doSplitPath(): PublishArtifact {
-            val p = this
-                .removePrefix("/")
-                .removePrefix("v1/publish/upload/")
-
-            val (tmp0, artifactName) = p.splitLatest()
-            val (tmp1, version) = tmp0.splitLatest()
-            val (group, artifact) = tmp1.splitLatest()
-
-            return PublishArtifact(group.replace('/', '.'), artifact, version, artifactName)
-        }
     }
 
     @GetMapping("/upload/**")
