@@ -19,6 +19,7 @@ export function RouterObject(name,icon,link) {
 const ROUTER_INDEX = new RouterObject('主页','mdi-home','/');
 const ROUTER_UPLOAD = new RouterObject('上传插件','mdi-upload','/upload');
 const ROUTER_AUDIT = new RouterObject('审核','','/audit');
+
 /**
  * 获取当前的用户权限
  * @returns {number}
@@ -30,7 +31,7 @@ export function getNowPermission() {
 /**
  * 获取不同权限的用户router
  * @param permission
- * @returns {*[]}
+ * @returns {*[RouterObject]}
  */
 export function getRouter(permission) {
   switch (permission) {
@@ -47,6 +48,10 @@ export function getRouter(permission) {
   }
 }
 
+/**
+ * 获得当前的router列表
+ * @returns {*[RouterObject]}
+ */
 export function getSelfRouter() {
   return getRouter(getNowPermission());
 }
