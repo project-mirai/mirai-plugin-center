@@ -45,6 +45,7 @@ class PluginDescService(
         return repo.save((existing ?: PluginEntity()).apply(apply))
     }
 
+    @CacheEvict("plugin", key = "#pid")
     fun delete(pid: String) {
         return repo.deletePluginEntityByPluginId(pid)
     }
