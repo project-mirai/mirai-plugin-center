@@ -219,27 +219,14 @@
                                 </h1>
                             </td>
                         </tr>
-                        <!-- IF reason -->
                         <tr>
                             <td style="padding: 20px 40px; font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol; font-size: 15px; line-height: 20px; color: #555555;">
-                                <p style="margin: 0;" th:utext="${line0}">
-                                    email:banned.text3
-                                </p>
-                                <p style="margin: 0; padding: 6px 0px; font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol; font-size: 13px; line-height: 26px; color: #666666;" th:utext="${line1}">
-                                    {reason}
-                                </p>
+                                <p style="margin: 0; padding: 6px 0px; font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol; font-size: 13px; line-height: 26px; color: #666666;" 
+                                    th:each="line: ${lines}"
+                                    th:utext="${line}"
+                                >{line}</p>
                             </td>
                         </tr>
-                        <!-- ENDIF reason -->
-                        <!-- IF until -->
-                        <tr>
-                            <td style="padding: 20px 40px; font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol; font-size: 15px; line-height: 20px; color: #555555;">
-                                <p style="margin: 0;" th:utext="${line2}">
-                                    email:banned.text2, {until}
-                                </p>
-                            </td>
-                        </tr>
-                        <!-- ENDIF until -->
                     </table>
                 </td>
             </tr>

@@ -52,20 +52,16 @@ class MailService {
             variables["greeting_with_name"] = value
         }
 
-        fun subject(value: String) {
+        fun header(value: String) {
             variables["header"] = value
         }
 
-        fun header(value: String) {
-            variables["line0"] = value
+        fun content(vararg value: String) {
+            variables["lines"] = value
         }
 
-        fun content(value: String) {
-            variables["line1"] = value
-        }
-
-        fun extContent(value: String) {
-            variables["line2"] = value
+        fun content(value: Collection<String>) {
+            variables["lines"] = value
         }
 
         fun footer(value: String) {
@@ -81,8 +77,7 @@ class MailService {
             "greeting_with_name" to "",
             "header" to "",
             "line0" to "",
-            "line1" to "",
-            "line2" to "",
+            "lines" to emptyList<String>(),
             "footer" to stdFooter,
             "site_title" to "Mirai Plugin Center",
         )

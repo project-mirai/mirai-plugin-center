@@ -111,8 +111,10 @@ class UserService(
             html = mailService.mailTemplate {
                 greetingWithName("${user.nick} 你好")
                 header("找回密码")
-                content("您正在重置您在我们站点的密码,请点击${href("这里", "$url/browser/resetPassword?token=$uuid")}")
-                extContent("如果非本人操作,请忽略本邮件")
+                content(
+                    "您正在重置您在我们站点的密码,请点击${href("这里", "$url/browser/resetPassword?token=$uuid")}",
+                    "如果非本人操作,请忽略本邮件",
+                )
             }
         }
         return tokens
