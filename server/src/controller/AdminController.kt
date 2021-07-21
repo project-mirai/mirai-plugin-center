@@ -24,14 +24,14 @@ import org.springframework.web.server.ServerWebExchange
 class AdminController(private val pluginRepo: PluginRepo) {
 
     @PatchMapping("setstate")
-     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
+    fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
         val user = ctx.loginUserOrReject
         if (user.role != 1) {
-            return r(HttpStatus.FORBIDDEN, "你不是管理员")
+            return r<Any>(HttpStatus.FORBIDDEN, "你不是管理员")
         }
-        val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r(HttpStatus.NOT_FOUND, "插件不存在")
+        val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
         plugin.status = setStateDto.state
         pluginRepo.save(plugin)
-        return r(HttpStatus.OK, "成功")
+        return r.ok("成功")
     }
 }
