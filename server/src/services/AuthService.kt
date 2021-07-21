@@ -11,12 +11,13 @@ package net.mamoe.mirai.plugincenter.services
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.Resp
-import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.TokenRepo
 import net.mamoe.mirai.plugincenter.repo.UserRepo
 import net.mamoe.mirai.plugincenter.utils.AuthFailedReason
 import net.mamoe.mirai.plugincenter.utils.authFailedReason
+import net.mamoe.mirai.plugincenter.utils.decodeBase64
+import net.mamoe.mirai.plugincenter.utils.encodeToString
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authorization.AuthorizationDecision
@@ -87,17 +88,28 @@ class AuthService(
             context.exchange.request.headers["Authorization"]?.firstOrNull()?.let { authorization ->
                 val type = authorization.substringBefore(' ')
                 val value = authorization.substringAfter(' ')
+                fun resolveToken(tok: String): Mono<AuthorizationDecision> {
+                    val token = tokenRepo.findTokenEntityByToken(tok)
+                        ?: return authFailed(AuthFailedReason.TOKEN_NOT_FOUND)
+
+                    val expireTime = token.expireTime.time
+                    if (expireTime != 0L && expireTime < System.currentTimeMillis()) {
+                        return authFailed(AuthFailedReason.TOKEN_EXPIRED)
+                    }
+
+                    return completeAuth(token.userByOwner)
+                }
                 when (type) {
                     "token" -> {
-                        val token = tokenRepo.findTokenEntityByToken(value)
-                            ?: return@switchIfEmpty authFailed(AuthFailedReason.TOKEN_NOT_FOUND)
-
-                        val expireTime = token.expireTime.time
-                        if (expireTime != 0L && expireTime < System.currentTimeMillis()) {
-                            return@switchIfEmpty authFailed(AuthFailedReason.TOKEN_EXPIRED)
+                        return@switchIfEmpty resolveToken(value)
+                    }
+                    "Basic" -> { // Gradle Authorization
+                        val pd = value.decodeBase64().encodeToString()
+                        val username = pd.substringBefore(':')
+                        val passwd = pd.substringAfter(':')
+                        if (username == "x-access-token") {
+                            return@switchIfEmpty resolveToken(passwd)
                         }
-
-                        return@switchIfEmpty completeAuth(token.userByOwner)
                     }
                     else -> Unit
                 }
@@ -121,7 +133,6 @@ class AuthService(
             writer.onComplete()
         }
     }
-
 
 
 }

@@ -9,66 +9,103 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
+import kotlinx.coroutines.reactor.mono
 import net.mamoe.mirai.plugincenter.dto.Resp
-import net.mamoe.mirai.plugincenter.dto.resp
+import net.mamoe.mirai.plugincenter.dto.r
+import net.mamoe.mirai.plugincenter.services.PluginDescService
+import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.utils.isAvailable
+import net.mamoe.mirai.plugincenter.utils.isOwnedBy
+import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
+import java.nio.file.Path
+import kotlin.io.path.name
 
 /**
  * Fake Maven repository
  */
 @RestController
 @RequestMapping("/v1/publish")
-class MavenRepositoryUploadController {
-    private data class PublishArtifact(
+class MavenRepositoryUploadController(
+    val desc: PluginDescService,
+    val storage: PluginStorageService,
+) {
+    data class PublishArtifact(
         val group: String,
         val artifact: String,
         val version: String,
         val artifactName: String
     )
 
-    private fun String.splitLatest(): Pair<String, String> {
-        val index = this.lastIndexOf('/')
-        return substring(0, index) to substring(index + 1)
-    }
+    companion object {
+        private val PublishArtifact.pluginId: String
+            get() {
+                return "$group.$artifact"
+            }
 
-    private fun String.doSplitPath(): PublishArtifact {
-        val p = this
-            .removePrefix("/")
-            .removePrefix("staging/upload/")
+        private fun String.splitLatest(): Pair<String, String> {
+            val index = this.lastIndexOf('/')
+            return substring(0, index) to substring(index + 1)
+        }
 
-        val (tmp0, artifactName) = p.splitLatest()
-        val (tmp1, version) = tmp0.splitLatest()
-        val (group, artifact) = tmp1.splitLatest()
+        private val ServerWebExchange.publishArtifact: PublishArtifact?
+            get() {
+                return Path.of(request.uri.path).asArtifact()
+            }
 
-        return PublishArtifact(group.replace('/', '.'), artifact, version, artifactName)
+
+        /**
+         * 转化 api 请求路径为 [PublishArtifact] 数据
+         * 格式要求：/v1/publish/upload/<group>/<artifact>/<version>/<name>
+         */
+        fun Path.asArtifact(): PublishArtifact? {
+            val xs = this.toList().drop(3).map { it.fileName.toString() }
+
+            return if (xs.size >= 4) {
+                val (artifact, version, artifactName) = xs.takeLast(3)
+                val group = xs.dropLast(3).joinToString(separator = ".")
+
+                PublishArtifact(group, artifact, version, artifactName)
+            } else {
+                null
+            }
+        }
     }
 
     @GetMapping("/upload/**")
     fun doGet(exchange: ServerWebExchange): Any {
-        // val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
+        return with(exchange.publishArtifact ?: return Resp.BAD_REQUEST) {
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            val resource = storage.get(plugin.pluginId, version, artifactName)
 
-        return Resp.NOT_FOUND
+            if (resource.exists()) {
+                resource
+            } else {
+                Resp.NOT_FOUND
+            }
+        }
     }
 
     @PutMapping("/upload/**")
     fun doUpload(exchange: ServerWebExchange): Any {
-        val (group, artifact, version, artifactName) = exchange.request.uri.path.doSplitPath()
+        val usr = exchange.loginUserOrReject
 
-        return exchange.request.body.map { buf ->
-            synchronized(System.out) {
-                buf.asInputStream().use { it.copyTo(System.out) }
-                println()
+        return with(exchange.publishArtifact ?: return Resp.BAD_REQUEST) {
+            if (artifactName.startsWith("maven-metadata.xml")) { // dropped
+                return Resp.OK
             }
-            resp {
-                msg("Completed")
-                "group" - group
-                "version" - version
-                "artifact" - artifact
-                "artifactName" - artifactName
+            val plugin = desc.get(pluginId) ?: return Resp.NOT_FOUND
+            if (!(plugin.isOwnedBy(usr) && plugin.isAvailable())) {
+                return Resp.FORBIDDEN
+            }
+
+            mono {
+                storage.write(plugin.pluginId, version, artifactName, exchange.request.body)
+                r.created<Any>()
             }
         }
     }

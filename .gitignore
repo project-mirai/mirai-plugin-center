@@ -26,6 +26,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 !.idea/copyright
+!.idea/icon.png
 
 ### NetBeans ###
 /nbproject/private/
@@ -39,3 +40,7 @@ out/
 
 ### Spring ###
 application.properties
+
+### Misc ###
+/localtest/
+/data

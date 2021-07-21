@@ -19,6 +19,11 @@ import java.util.Objects;
 @Entity
 @Table(name = "plugin", schema = "public", catalog = "plugins")
 public class PluginEntity {
+    public enum Status {
+        Accepted,
+        Denied
+    }
+
     private int id;
     private String name;
     private String pluginId;
@@ -30,6 +35,10 @@ public class PluginEntity {
     private int status;
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
+
+    public PluginEntity() {
+        this.status = Status.Denied.ordinal();
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增

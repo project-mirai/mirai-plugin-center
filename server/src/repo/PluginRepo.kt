@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.transaction.annotation.Transactional
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
     @Cacheable("plugin", key = "#pluginId")
@@ -24,6 +25,7 @@ interface PluginRepo : CrudRepository<PluginEntity, Int> {
 
     fun findAllByStatus(status: Int, page: Pageable): Page<PluginEntity>
 
+    @Transactional
     fun deletePluginEntityByPluginId(pluginId: String)
 
     fun findByPluginId(pluginId: String):PluginEntity?
