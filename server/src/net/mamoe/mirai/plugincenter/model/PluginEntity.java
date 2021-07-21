@@ -115,6 +115,11 @@ public class PluginEntity {
 
     @Basic
     @Column(name = "status")
+    /**
+     * 审核状态
+     * 0 待审核
+     * 1 审核通过
+     * */
     public int getStatus() {
         return status;
     }

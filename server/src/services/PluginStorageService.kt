@@ -32,7 +32,7 @@ class PluginDescService(
 ) {
     fun getList(page: Int): List<PluginEntity> {
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        return repo.findAll(PageRequest.of(page,20)).toList()
+        return repo.findAllByStatus(1,PageRequest.of(page,20)).toList()
     }
 
     fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)

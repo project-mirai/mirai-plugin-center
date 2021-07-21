@@ -17,12 +17,16 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
-    @Cacheable("plugin",key = "#pluginId")
+    @Cacheable("plugin", key = "#pluginId")
     fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
 
-    fun findAll(page:Pageable):Page<PluginEntity>
+    fun findAll(page: Pageable): Page<PluginEntity>
+
+    fun findAllByStatus(status: Int, page: Pageable): Page<PluginEntity>
 
     fun deletePluginEntityByPluginId(pluginId: String)
+
+    fun findByPluginId(pluginId: String):PluginEntity?
 
     fun deletePluginEntityById(id: Int)
 }
