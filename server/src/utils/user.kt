@@ -11,6 +11,13 @@ package net.mamoe.mirai.plugincenter.utils
 
 import net.mamoe.mirai.plugincenter.model.UserEntity
 
+// TODO: Function or Property?
 fun UserEntity.isManager(): Boolean {
-    return this.role == UserEntity.Role.Manager.ordinal
+    return this.role() === UserEntity.Role.Manager
+}
+
+// TODO: Rename this
+fun UserEntity.role(): UserEntity.Role {
+    return UserEntity.Role.values()
+        .getOrNull(this.role) ?: UserEntity.Role.Undefined      // TODO: Undefiend or Registered?
 }
