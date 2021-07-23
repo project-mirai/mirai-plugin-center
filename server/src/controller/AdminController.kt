@@ -17,10 +17,13 @@ import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 
-@RestController("/admin")
+@RestController       // FIXME: /v1/admin
+@RequestMapping("/admin")
+@Api(tags = ["管理员服务"], position = 3)
 class AdminController(private val pluginRepo: PluginRepo) {
 
     @PatchMapping("setstate")
