@@ -9,10 +9,12 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
+import io.swagger.annotations.Api
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.SetStateDto
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
+import net.mamoe.mirai.plugincenter.utils.isManager
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
@@ -26,15 +28,19 @@ import org.springframework.web.server.ServerWebExchange
 @Api(tags = ["管理员服务"], position = 3)
 class AdminController(private val pluginRepo: PluginRepo) {
 
-    @PatchMapping("setstate")
+    @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
         val user = ctx.loginUserOrReject
-        if (user.role != 1) {
+        if (! user.isManager()) {
             return r<Any>(HttpStatus.FORBIDDEN, "你不是管理员")
         }
+
         val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
-        plugin.status = setStateDto.state
+        plugin.status = setStateDto.state       // TODO: Check state
         pluginRepo.save(plugin)
+
+        // TODO: Logging behaviour
+
         return r.ok("成功")
     }
 }
