@@ -16,8 +16,13 @@ fun UserEntity.isManager(): Boolean {
     return this.role() === UserEntity.Role.Manager
 }
 
+fun UserEntity.Role(value: Int): UserEntity.Role {
+    return UserEntity.Role.values()
+        .getOrNull(value) ?: UserEntity.Role.Undefined
+}
+
 // TODO: Rename this
 fun UserEntity.role(): UserEntity.Role {
-    return UserEntity.Role.values()
-        .getOrNull(this.role) ?: UserEntity.Role.Undefined      // TODO: Undefiend or Registered?
+    return Role(this.role)
 }
+
