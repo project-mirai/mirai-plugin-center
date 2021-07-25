@@ -18,6 +18,7 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
+import net.mamoe.mirai.plugincenter.services.updateOrDefault
 import net.mamoe.mirai.plugincenter.utils.isAvailable
 import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
@@ -93,7 +94,7 @@ class PluginsController(
             return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
         }
 
-        this@PluginsController.desc.update(id) {
+        this@PluginsController.desc.updateOrDefault(id, PluginEntity()) {
             pluginId = id
             desc.info?.let { info = it }
             desc.name?.let { name = it }

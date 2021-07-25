@@ -14,6 +14,7 @@ import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.SetStateDto
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
+import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.utils.isManager
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.http.HttpStatus
@@ -26,7 +27,10 @@ import org.springframework.web.server.ServerWebExchange
 @RestController       // FIXME: /v1/admin
 @RequestMapping("/admin")
 @Api(tags = ["管理员服务"], position = 3)
-class AdminController(private val pluginRepo: PluginRepo) {
+class AdminController(
+    private val pluginRepo: PluginRepo,
+    private val desc: PluginDescService
+) {
 
     @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
@@ -36,8 +40,10 @@ class AdminController(private val pluginRepo: PluginRepo) {
         }
 
         val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
-        plugin.status = setStateDto.state       // TODO: Check state
-        pluginRepo.save(plugin)
+
+        desc.update(plugin) {
+            this.status = setStateDto.state     // FIXME: Use PluginEntity.Status
+        }
 
         // TODO: Logging behaviour
 

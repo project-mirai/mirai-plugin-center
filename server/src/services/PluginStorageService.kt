@@ -34,15 +34,14 @@ class PluginDescService(
 ) {
     fun getList(page: Int): List<PluginEntity> {
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        return repo.findAllByStatus(1,PageRequest.of(page,20)).toList()
+        return repo.findAllByStatus(PluginEntity.Status.Accepted.ordinal ,PageRequest.of(page,20)).toList()
     }
 
     fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)
 
-    @CachePut("plugin", key = "#pid")
-    fun update(pid: String, apply: PluginEntity.() -> Unit): PluginEntity {
-        val existing = repo.findPluginEntityByPluginId(pid)
-        return repo.save((existing ?: PluginEntity()).apply(apply))
+    @CachePut("plugin", key = "#plugin.pluginId")
+    fun update(plugin: PluginEntity, apply: PluginEntity.() -> Unit): PluginEntity {
+        return repo.save(plugin.apply(apply))
     }
 
     @CacheEvict("plugin", key = "#pid")
@@ -101,4 +100,14 @@ class PluginStorageService {
         }
         return bytesCopied
     }
+}
+
+fun PluginDescService.update(pid: String, apply: PluginEntity.() -> Unit): PluginEntity? {
+    val existing = this.get(pid) ?: return null
+    return this.update(existing, apply)
+}
+
+fun PluginDescService.updateOrDefault(pid: String, default: PluginEntity, apply: PluginEntity.() -> Unit): PluginEntity {
+    val existing = this.get(pid)
+    return this.update(existing ?: default, apply)
 }
