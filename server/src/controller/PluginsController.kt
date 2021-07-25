@@ -94,7 +94,7 @@ class PluginsController(
             return r(null, HttpStatus.CONFLICT, "Id conflicted with an existing plugin owned by ${plugin.userByOwner.toStringGitLike()}")
         }
 
-        this@PluginsController.desc.updateOrDefault(id, PluginEntity()) {
+        this@PluginsController.desc.updateOrDefault(id, PluginEntity.newInstance()) {
             pluginId = id
             desc.info?.let { info = it }
             desc.name?.let { name = it }
