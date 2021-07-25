@@ -99,7 +99,6 @@ class PluginsController(
             desc.info?.let { info = it }
             desc.name?.let { name = it }
             userByOwner = user
-            status = 0
             updateTime = Timestamp(System.currentTimeMillis())
         }
 
