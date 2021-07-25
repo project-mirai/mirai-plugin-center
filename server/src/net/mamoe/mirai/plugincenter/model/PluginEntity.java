@@ -20,8 +20,9 @@ import java.util.Objects;
 @Table(name = "plugin", schema = "public", catalog = "plugins")
 public class PluginEntity {
     public enum Status {
+        Undefined,
+        Denied,
         Accepted,
-        Denied
     }
 
     private int id;
