@@ -22,7 +22,7 @@ import java.util.Objects;
 public class PluginEntity {
     public enum Status {
         Undefined,
-        Denied,
+        Rejected,
         Accepted,
     }
 
@@ -42,7 +42,7 @@ public class PluginEntity {
     public static PluginEntity newInstance() {
         var plugin = new PluginEntity();
 
-        plugin.status = Status.Denied.ordinal();
+        plugin.status = Status.Rejected.ordinal();
 
         return plugin;
     }

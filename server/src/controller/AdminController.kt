@@ -15,7 +15,7 @@ import net.mamoe.mirai.plugincenter.dto.SetStateDto
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.services.PluginDescService
-import net.mamoe.mirai.plugincenter.utils.isManager
+import net.mamoe.mirai.plugincenter.utils.isAdmin
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
@@ -35,7 +35,7 @@ class AdminController(
     @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
         val user = ctx.loginUserOrReject
-        if (! user.isManager()) {
+        if (! user.isAdmin) {
             return r<Any>(HttpStatus.FORBIDDEN, "你不是管理员")
         }
 

@@ -11,10 +11,10 @@ package net.mamoe.mirai.plugincenter.utils
 
 import net.mamoe.mirai.plugincenter.model.UserEntity
 
-// TODO: Function or Property?
-fun UserEntity.isManager(): Boolean {
-    return this.role() === UserEntity.Role.Manager
-}
+val UserEntity.isAdmin: Boolean
+    get() {
+        return this.role() === UserEntity.Role.Admin
+    }
 
 fun UserEntity.Role(value: Int): UserEntity.Role {
     return UserEntity.Role.values()
