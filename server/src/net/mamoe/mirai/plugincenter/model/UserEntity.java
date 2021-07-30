@@ -25,7 +25,7 @@ public class UserEntity {
     public enum Role {
         Undefined,
         Registered,
-        Manager,
+        Admin,
     }
 
     private int uid;

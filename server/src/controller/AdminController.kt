@@ -9,29 +9,44 @@
 
 package net.mamoe.mirai.plugincenter.controller
 
+import io.swagger.annotations.Api
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.SetStateDto
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
+import net.mamoe.mirai.plugincenter.services.PluginDescService
+import net.mamoe.mirai.plugincenter.utils.isAdmin
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 
-@RestController("/admin")
-class AdminController(private val pluginRepo: PluginRepo) {
+@RestController       // FIXME: /v1/admin
+@RequestMapping("/admin")
+@Api(tags = ["管理员服务"], position = 3)
+class AdminController(
+    private val pluginRepo: PluginRepo,
+    private val desc: PluginDescService
+) {
 
-    @PatchMapping("setstate")
+    @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
         val user = ctx.loginUserOrReject
-        if (user.role != 1) {
+        if (! user.isAdmin) {
             return r<Any>(HttpStatus.FORBIDDEN, "你不是管理员")
         }
+
         val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
-        plugin.status = setStateDto.state
-        pluginRepo.save(plugin)
+
+        desc.update(plugin) {
+            this.status = setStateDto.state     // FIXME: Use PluginEntity.Status
+        }
+
+        // TODO: Logging behaviour
+
         return r.ok("成功")
     }
 }
