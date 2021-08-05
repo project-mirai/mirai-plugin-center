@@ -10,6 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -20,8 +21,9 @@ import java.util.Objects;
 @Table(name = "plugin", schema = "public", catalog = "plugins")
 public class PluginEntity {
     public enum Status {
+        Undefined,
+        Rejected,
         Accepted,
-        Denied
     }
 
     private int id;
@@ -36,8 +38,13 @@ public class PluginEntity {
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
 
-    public PluginEntity() {
-        this.status = Status.Denied.ordinal();
+    @NotNull
+    public static PluginEntity newInstance() {
+        var plugin = new PluginEntity();
+
+        plugin.status = Status.Rejected.ordinal();
+
+        return plugin;
     }
 
     @Id
