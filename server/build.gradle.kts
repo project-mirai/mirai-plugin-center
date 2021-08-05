@@ -43,6 +43,7 @@ dependencies {
 //
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql")
+    implementation("com.vladmihalcea:hibernate-types-55:2.12.0")
 
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

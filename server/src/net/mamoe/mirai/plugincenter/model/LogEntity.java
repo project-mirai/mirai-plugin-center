@@ -9,16 +9,24 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import kotlinx.serialization.json.JsonElement;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+
 import javax.persistence.*;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
 @Table(name = "log", schema = "public", catalog = "plugins")
+@TypeDefs(@TypeDef(name="jsonb",typeClass = JsonBinaryType.class))
 public class LogEntity {
     private long id;
     private Integer operator;
     private String msg;
-    private String otherInfo;
+    private Map<String,Object> otherInfo;
     private UserEntity userByOperator;
 
     @Id
@@ -52,13 +60,13 @@ public class LogEntity {
         this.msg = msg;
     }
 
-    @Basic
+    @Type(type ="jsonb")
     @Column(name = "other_info")
-    public String getOtherInfo() {
+    public Map<String,Object> getOtherInfo() {
         return otherInfo;
     }
 
-    public void setOtherInfo(String otherInfo) {
+    public void setOtherInfo(Map<String,Object> otherInfo) {
         this.otherInfo = otherInfo;
     }
 
