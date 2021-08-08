@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Descriptions, Result, Avatar, Space, Statistic } from 'antd';
 import { LikeOutlined, UserOutlined } from '@ant-design/icons';
 
-import type { ProSettings } from '@ant-design/pro-layout';
-import ProLayout, { PageContainer, SettingDrawer } from '@ant-design/pro-layout';
+import ProLayout, { PageContainer } from '@ant-design/pro-layout';
 import defaultProps from './_defaultProps';
 
 const content = (
@@ -19,9 +18,7 @@ const content = (
 );
 
 export default () => {
-  const [settings, setSetting] = useState<Partial<ProSettings> | undefined>({ fixSiderbar: true });
-  const [pathname, setPathname] = useState('/welcome');
-  return (
+    return (
       <div
           id="test-pro-layout"
           style={{
@@ -30,9 +27,6 @@ export default () => {
       >
         <ProLayout
             {...defaultProps}
-            location={{
-              pathname,
-            }}
             waterMarkProps={{
               content: 'Pro Layout',
             }}
@@ -68,7 +62,7 @@ export default () => {
             menuItemRender={(item, dom) => (
                 <a
                     onClick={() => {
-                      setPathname(item.path || '/welcome');
+                      //setPathname(item.path || '/welcome');
                     }}
                 >
                   {dom}
