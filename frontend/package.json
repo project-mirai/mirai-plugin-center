@@ -18,6 +18,7 @@
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.8",
     "antd": "^4.16.9",
+    "axios": "^0.21.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.0",
@@ -50,6 +51,7 @@
       "last 1 safari version"
     ]
   },
+  "proxy": "http://127.0.0.1:8080",
   "devDependencies": {
     "@types/react-router": "^5.1.16"
   }
