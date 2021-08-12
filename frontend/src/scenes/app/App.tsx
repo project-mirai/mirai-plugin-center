@@ -8,15 +8,15 @@ import defaultProps from './_defaultProps';
 export default (props:any) => {
     return (
       <div
-          id="test-pro-layout"
+          id="app-layout"
           style={{
-            height: '100vh',
+            height: '100vh'
           }}
       >
         <ProLayout
             {...defaultProps}
             waterMarkProps={{
-              content: 'Pro Layout',
+              content: 'Mirai',
             }}
             menuFooterRender={(props) => {
               return (
@@ -69,6 +69,9 @@ export default (props:any) => {
             contentWidth={'Fixed'}
             splitMenus={false}
             fixedHeader={false}
+            style={{
+                backgroundColor:'white'
+            }}
         >
             {props.children}
         </ProLayout>

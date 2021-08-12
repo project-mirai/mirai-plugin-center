@@ -10,18 +10,28 @@ import '@ant-design/pro-form/dist/form.css';
 import '@ant-design/pro-table/dist/table.css';
 import '@ant-design/pro-layout/dist/layout.css';
 import '@ant-design/pro-card/dist/card.css';
+import Register from "./scenes/verify/Register";
+import VerifyLayout from "./scenes/verify/VerifyLayout";
 const RouterConfig = ()=> {
     return (
-        <HashRouter>
-            <Switch>
-                <App>
+        <div>
+
+            <HashRouter>
+                <Switch>
                     <Route exact path="/">
+                        <App>
                             <PluginList/>
+                        </App>
                     </Route>
-                    <Route exact component={Login} path="/login"/>
-                </App>
-            </Switch>
-        </HashRouter>
+                    <Route path="/verify">
+                        <VerifyLayout>
+                            <Route exact component={Login} path="/verify/login"/>
+                            <Route exact component={Register} path="/verify/register"/>
+                        </VerifyLayout>
+                    </Route>
+                </Switch>
+            </HashRouter>
+        </div>
     );
 }
 
