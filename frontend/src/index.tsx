@@ -24,10 +24,16 @@ const RouterConfig = ()=> {
                         </App>
                     </Route>
                     <Route path="/verify">
-                        <VerifyLayout>
-                            <Route exact component={Login} path="/verify/login"/>
-                            <Route exact component={Register} path="/verify/register"/>
-                        </VerifyLayout>
+                            <Route exact path="/verify/login">
+                                <VerifyLayout>
+                                    <Login/>
+                                </VerifyLayout>
+                            </Route>
+                            <Route exact path="/verify/register">
+                                <VerifyLayout>
+                                    <Register/>
+                                </VerifyLayout>
+                            </Route>
                     </Route>
                 </Switch>
             </HashRouter>

@@ -8,7 +8,7 @@ import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} fr
 import {useVerficationFormStyle} from "./VerifyLayout";
 import Typography from "@material-ui/core/Typography";
 
-export default function Register(props:any){
+export default function Register(){
     const classes = useVerficationFormStyle();
     const [open, setOpen] = React.useState(false);
     const [nick, setNick] = useState('');
@@ -128,7 +128,7 @@ export default function Register(props:any){
                     <Grid item xs>
                     </Grid>
                     <Grid item>
-                        <Link href="#" variant="body2" onClick={props.history.push('/verify/login')}>
+                        <Link href="#" variant="body2">
                             {"返回登陆"}
                         </Link>
                     </Grid>
