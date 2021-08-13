@@ -31,4 +31,5 @@ interface PluginRepo : CrudRepository<PluginEntity, Int> {
     fun findByPluginId(pluginId: String):PluginEntity?
 
     fun deletePluginEntityById(id: Int)
+
 }

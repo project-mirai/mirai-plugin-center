@@ -52,6 +52,10 @@ class PluginsController(
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
         return r.ok(desc.getList(page).map { it.toDto() })
     }
+    @ApiOperation("获取插件数")
+    @GetMapping("/count")
+    fun count() = r.ok(PluginCount(desc.count()))
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Desc

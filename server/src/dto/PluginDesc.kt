@@ -76,6 +76,12 @@ data class PluginStatusUpdate(
     val status: PluginEntity.Status,
 )
 
+@Serializable
+@ApiModel("插件数量")
+data class PluginCount(
+    val countL: Long
+)
+
 fun PluginEntity.toDto(): PluginDesc {
     return PluginDesc(pluginId, name, info, userByOwner.toDto(),
         PluginEntity.Status.values().getOrElse(this.status) { PluginEntity.Status.Rejected })
