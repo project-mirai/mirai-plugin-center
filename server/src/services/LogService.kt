@@ -9,22 +9,31 @@
 
 package net.mamoe.mirai.plugincenter.services
 
+import com.fasterxml.jackson.core.type.TypeReference
 import net.mamoe.mirai.plugincenter.model.LogEntity
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.LogRepo
 import net.mamoe.mirai.plugincenter.utils.jsonMapper
 import org.springframework.stereotype.Component
+import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
 @Component
 class LogService(
     val repo: LogRepo
 ) {
-    fun <T: Any> push(clazz: KClass<T>, detail: T): LogEntity {
-        val otherInfo: String = jsonMapper.writeValueAsString(detail)
+    fun <T: Any> push(operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
+        val bytes = jsonMapper.writeValueAsBytes(detail)
+        val map = jsonMapper.readValue(bytes, object : TypeReference<Map<String, Any>>() {
+            override fun getType(): Type {
+                return Map::class.java
+            }
+        })
 
         return repo.save(LogEntity().apply {
+            this.operator = operator.uid
             this.msg = clazz.simpleName
-            this.otherInfo = otherInfo
+            this.otherInfo = map
         })
     }
 }

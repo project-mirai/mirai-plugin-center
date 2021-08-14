@@ -45,6 +45,8 @@ class AdminController(
 
         val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
 
+        logger.push(user, PluginModifiedEvent(plugin.state, setStateDto.state), PluginModifiedEvent::class)
+
         desc.update(plugin) {
             this.state = setStateDto.state
         }
