@@ -29,3 +29,14 @@ fun PluginEntity.isAvailable(): Boolean {
 fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
     return this.userByOwner.uid == user.uid
 }
+
+var PluginEntity.state: PluginEntity.Status
+    get() {
+        return PluginEntity.Status.values()
+            .getOrNull(this.status)
+            ?: PluginEntity.Status.Undefined
+    }
+
+    set(value) {
+        this.status = value.ordinal
+    }

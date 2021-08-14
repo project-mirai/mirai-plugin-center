@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 import net.mamoe.mirai.plugincenter.dto.PluginDesc.Companion.INFO_EXAMPLE
 import net.mamoe.mirai.plugincenter.dto.PluginDesc.Companion.NAME_EXAMPLE
 import net.mamoe.mirai.plugincenter.model.PluginEntity
+import net.mamoe.mirai.plugincenter.utils.state
 import org.springframework.core.annotation.Order
 
 /**
@@ -77,8 +78,7 @@ data class PluginStatusUpdate(
 )
 
 fun PluginEntity.toDto(): PluginDesc {
-    return PluginDesc(pluginId, name, info, userByOwner.toDto(),
-        PluginEntity.Status.values().getOrElse(this.status) { PluginEntity.Status.Rejected })
+    return PluginDesc(pluginId, name, info, userByOwner.toDto(), this.state)
 }
 
 fun PluginEntity.copyFrom(desc: PluginDesc): PluginEntity {
