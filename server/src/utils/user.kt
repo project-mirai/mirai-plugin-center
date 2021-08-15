@@ -13,7 +13,7 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 
 val UserEntity.isAdmin: Boolean
     get() {
-        return this.role() === UserEntity.Role.Admin
+        return this.role === UserEntity.Role.Admin
     }
 
 fun UserEntity.Role(value: Int): UserEntity.Role {
@@ -21,8 +21,16 @@ fun UserEntity.Role(value: Int): UserEntity.Role {
         .getOrNull(value) ?: UserEntity.Role.Undefined
 }
 
-// TODO: Rename this
-fun UserEntity.role(): UserEntity.Role {
-    return Role(this.role)
-}
+//// TODO: Rename this
+//fun UserEntity.role(): UserEntity.Role {
+//    return Role(this.role)
+//}
 
+var UserEntity.role: UserEntity.Role
+    get() {
+        return Role(this.rawRole)
+    }
+
+    set(value) {
+        this.rawRole = value.ordinal
+    }

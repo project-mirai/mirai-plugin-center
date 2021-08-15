@@ -71,7 +71,7 @@ class UserService(
             password = encodedPwd
             nick = user.nick
             registerIp = ip
-            role = 1
+            rawRole = 1
         })
 
 

@@ -29,7 +29,7 @@ class FrontEndBridgeController {
         return resp {
             "whoami" - mapOf(
                 "nick" to usr.nick,
-                "role" to usr.role,
+                "role" to usr.rawRole,
             )
         }.toApiResp<Any>().toBrowserResponse(exchange)
     }

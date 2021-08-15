@@ -10,9 +10,6 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.security.core.userdetails.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -37,7 +34,7 @@ public class UserEntity {
     private String registerIp;
     private String lastLoginIp;
     private boolean banned;
-    private int role;
+    private int rawRole;
     private Collection<FileEntity> filesByUid;
     private Collection<LogEntity> logsByUid;
     private Collection<PluginEntity> pluginsByUid;
@@ -135,19 +132,20 @@ public class UserEntity {
         this.banned = banned;
     }
 
-    @Basic
-    @Column(name = "role")
     /**
      * 用户权限
-     * 0 普通用户
-     * 1 管理员
+     * 0 未定义
+     * 1 普通用户
+     * 2 管理员
      * */
-    public int getRole() {
-        return role;
+    @Basic
+    @Column(name = "role")
+    public int getRawRole() {
+        return rawRole;
     }
 
-    public void setRole(int role) {
-        this.role = role;
+    public void setRawRole(int role) {
+        this.rawRole = role;
     }
 
     @Override
@@ -155,12 +153,12 @@ public class UserEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserEntity that = (UserEntity) o;
-        return uid == that.uid && banned == that.banned && role == that.role && Objects.equals(nick, that.nick) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(registerTime, that.registerTime) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(registerIp, that.registerIp) && Objects.equals(lastLoginIp, that.lastLoginIp);
+        return uid == that.uid && banned == that.banned && rawRole == that.rawRole && Objects.equals(nick, that.nick) && Objects.equals(email, that.email) && Objects.equals(password, that.password) && Objects.equals(registerTime, that.registerTime) && Objects.equals(lastLoginTime, that.lastLoginTime) && Objects.equals(registerIp, that.registerIp) && Objects.equals(lastLoginIp, that.lastLoginIp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, nick, email, password, registerTime, lastLoginTime, registerIp, lastLoginIp, banned, role);
+        return Objects.hash(uid, nick, email, password, registerTime, lastLoginTime, registerIp, lastLoginIp, banned, rawRole);
     }
 
     @OneToMany(mappedBy = "userByOwner")

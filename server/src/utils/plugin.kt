@@ -18,7 +18,7 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
  * @see PluginEntity.Status
  */
 fun PluginEntity.isAvailable(): Boolean {
-    return this.status == PluginEntity.Status.Accepted.ordinal
+    return this.rawState == PluginEntity.Status.Accepted.ordinal
 }
 
 /**
@@ -33,10 +33,10 @@ fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
 var PluginEntity.state: PluginEntity.Status
     get() {
         return PluginEntity.Status.values()
-            .getOrNull(this.status)
+            .getOrNull(this.rawState)
             ?: PluginEntity.Status.Undefined
     }
 
     set(value) {
-        this.status = value.ordinal
+        this.rawState = value.ordinal
     }

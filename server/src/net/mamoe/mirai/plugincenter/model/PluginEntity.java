@@ -34,7 +34,7 @@ public class PluginEntity {
     private String info;
     private Timestamp updateTime;
     private String postUrl;
-    private int status;
+    private int rawState;
     private UserEntity userByOwner;
     private Collection<PluginFileEntity> pluginFilesById;
 
@@ -42,7 +42,7 @@ public class PluginEntity {
     public static PluginEntity newInstance() {
         var plugin = new PluginEntity();
 
-        plugin.status = Status.Rejected.ordinal();
+        plugin.rawState = Status.Rejected.ordinal();
 
         return plugin;
     }
@@ -129,19 +129,20 @@ public class PluginEntity {
         this.postUrl = postUrl;
     }
 
-    @Basic
-    @Column(name = "status")
     /**
      * 审核状态
-     * 0 待审核
-     * 1 审核通过
+     * 0 未定义
+     * 1 待审核
+     * 2 审核通过
      * */
-    public int getStatus() {
-        return status;
+    @Basic
+    @Column(name = "status")
+    public int getRawState() {
+        return rawState;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setRawState(int status) {
+        this.rawState = status;
     }
 
     @Override
@@ -149,12 +150,12 @@ public class PluginEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PluginEntity that = (PluginEntity) o;
-        return id == that.id && Float.compare(that.rank, rank) == 0 && status == that.status && Objects.equals(name, that.name) && Objects.equals(pluginId, that.pluginId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(info, that.info) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
+        return id == that.id && Float.compare(that.rank, rank) == 0 && rawState == that.rawState && Objects.equals(name, that.name) && Objects.equals(pluginId, that.pluginId) && Objects.equals(publishTime, that.publishTime) && Objects.equals(info, that.info) && Objects.equals(updateTime, that.updateTime) && Objects.equals(postUrl, that.postUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, pluginId, rank, publishTime, info, updateTime, postUrl, status);
+        return Objects.hash(id, name, pluginId, rank, publishTime, info, updateTime, postUrl, rawState);
     }
 
 

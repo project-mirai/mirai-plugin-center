@@ -23,7 +23,7 @@ interface PluginRepo : CrudRepository<PluginEntity, Int> {
 
     fun findAll(page: Pageable): Page<PluginEntity>
 
-    fun findAllByStatus(status: Int, page: Pageable): Page<PluginEntity>
+    fun findAllByRawState(rawState: Int, page: Pageable): Page<PluginEntity>
 
     @Transactional
     fun deletePluginEntityByPluginId(pluginId: String)
