@@ -7,8 +7,8 @@
  * https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
  */
 
-package net.mamoe.mirai.plugincenter.dto
+package net.mamoe.mirai.plugincenter.event
 
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 
-data class SetStateDto(val pluginId: String = "", val state: PluginEntity.Status = PluginEntity.Status.Rejected)
+data class PluginModifiedEvent(val old: PluginEntity.Status, val new: PluginEntity.Status)

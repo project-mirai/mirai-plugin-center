@@ -7,8 +7,10 @@
  * https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
  */
 
-package net.mamoe.mirai.plugincenter.dto
+package net.mamoe.mirai.plugincenter.repo
 
-import net.mamoe.mirai.plugincenter.model.PluginEntity
+import net.mamoe.mirai.plugincenter.model.LogEntity
+import org.springframework.data.repository.CrudRepository
 
-data class SetStateDto(val pluginId: String = "", val state: PluginEntity.Status = PluginEntity.Status.Rejected)
+interface LogRepo : CrudRepository<LogEntity, Long> {
+}
