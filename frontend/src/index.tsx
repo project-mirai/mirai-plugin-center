@@ -12,28 +12,35 @@ import '@ant-design/pro-layout/dist/layout.css';
 import '@ant-design/pro-card/dist/card.css';
 import Register from "./scenes/verify/Register";
 import VerifyLayout from "./scenes/verify/VerifyLayout";
+import CreatePlugin from "./scenes/app/sub/CreatePlugin";
 const RouterConfig = ()=> {
     return (
         <div>
 
             <HashRouter>
                 <Switch>
-                    <Route exact path="/">
+                    <Route path="/app">
                         <App>
-                            <PluginList/>
+                            <Route exact path="/app">
+                                <PluginList/>
+                            </Route>
+                            <Route exact path="/app/create">
+                                <CreatePlugin/>
+                            </Route>
+                            <Route exact path="/app/create">
+                                <CreatePlugin/>
+                            </Route>
                         </App>
                     </Route>
                     <Route path="/verify">
+                        <VerifyLayout>
                             <Route exact path="/verify/login">
-                                <VerifyLayout>
-                                    <Login/>
-                                </VerifyLayout>
+                                <Login/>
                             </Route>
                             <Route exact path="/verify/register">
-                                <VerifyLayout>
-                                    <Register/>
-                                </VerifyLayout>
+                                <Register/>
                             </Route>
+                        </VerifyLayout>
                     </Route>
                 </Switch>
             </HashRouter>
