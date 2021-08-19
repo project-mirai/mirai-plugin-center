@@ -4,6 +4,7 @@ import React from "react";
 import ProCard from '@ant-design/pro-card';
 import axios from "axios";
 import {PluginInfo} from "../../../models/Plugin";
+import SearchBar from "../../../components/SearchBar";
 
 async function getPluginList(page:number) {
     const res = await axios.get('/v1/plugins/',{
@@ -32,43 +33,48 @@ export default () => {
         <PageContainer
             title={"插件列表"}
             waterMarkProps={{
-            content: '',
-        }}>
-                <ProCard gutter={8} title={"第"+(page+1)+"页"} style={{ marginTop: 8 }} >
-                    {
-                        pluginList.map((item,index) => {
-                            return(
-                                <ProCard
-                                    key={index}
-                                    headerBordered
-                                    title={
-                                            <h2>
-                                                {(item as PluginInfo).name}
-                                            </h2>
-                                    }
-                                    colSpan={12}
-                                    bordered={true}
-                                    extra={
-                                        ((item as PluginInfo).status==='Accepted')?
-                                            <Tag color={"green"}>
-                                                {(item as PluginInfo).status}
-                                            </Tag>
-                                            :
-                                            <Tag color={"red"}>
-                                                {(item as PluginInfo).status}
-                                            </Tag>
-                                    }
-                                    layout="default"
-                                    direction="column"
-                                >
-                                    <h5>info:{(item as PluginInfo).info}</h5>
-                                    <h5>package:{(item as PluginInfo).id}</h5>
-                                    <h5>author:{(item as PluginInfo).owner.nick}/{(item as PluginInfo).owner.email}</h5>
-                                </ProCard>
-                            )
-                        })
-                    }
-                </ProCard>
+                content: '',
+            }}>
+
+            <ProCard colSpan={12} layout={"center"}>
+                <SearchBar/>
+            </ProCard>
+
+            <ProCard gutter={8} title={"第"+(page+1)+"页"} style={{ marginTop: 8 }} >
+                {
+                    pluginList.map((item,index) => {
+                        return(
+                            <ProCard
+                                key={index}
+                                headerBordered
+                                title={
+                                    <h2>
+                                        {(item as PluginInfo).name}
+                                    </h2>
+                                }
+                                colSpan={12}
+                                bordered={true}
+                                extra={
+                                    ((item as PluginInfo).status==='Accepted')?
+                                        <Tag color={"green"}>
+                                            {(item as PluginInfo).status}
+                                        </Tag>
+                                        :
+                                        <Tag color={"red"}>
+                                            {(item as PluginInfo).status}
+                                        </Tag>
+                                }
+                                layout="default"
+                                direction="column"
+                            >
+                                <h5>info:{(item as PluginInfo).info}</h5>
+                                <h5>package:{(item as PluginInfo).id}</h5>
+                                <h5>author:{(item as PluginInfo).owner.nick}/{(item as PluginInfo).owner.email}</h5>
+                            </ProCard>
+                        )
+                    })
+                }
+            </ProCard>
             <ProCard colSpan={24} layout={"center"}>
                 {page>0&&<Button onClick={()=>setPage(page-1)}>上一页</Button>}
                 <Button onClick={()=>setPage(page+1)}>下一页</Button>

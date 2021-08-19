@@ -25,6 +25,17 @@
     classnames "^2.2.6"
     rc-util "^5.9.4"
 
+"@ant-design/icons@^4.6.3":
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/@ant-design/icons/-/icons-4.6.3.tgz#cdcccf4df24d51501acef9228444efb7ef8938b1"
+  integrity sha512-OO4JW3OE13FKahplPYhqEg3uEhMiMDxujVUUx/RJUCEkSgBtAEnpKnq8oz2sBKqXeEhkr9/GE2tAHO1gyc70Uw==
+  dependencies:
+    "@ant-design/colors" "^6.0.0"
+    "@ant-design/icons-svg" "^4.0.0"
+    "@babel/runtime" "^7.11.2"
+    classnames "^2.2.6"
+    rc-util "^5.9.4"
+
 "@ant-design/pro-card@^1.14.12":
   version "1.14.12"
   resolved "https://registry.yarnpkg.com/@ant-design/pro-card/-/pro-card-1.14.12.tgz#1b69cbed7d8ee9a9553b051f7f3dab1b0e2ddb55"
