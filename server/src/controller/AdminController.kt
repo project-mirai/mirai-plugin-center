@@ -10,10 +10,12 @@
 package net.mamoe.mirai.plugincenter.controller
 
 import io.swagger.annotations.Api
+import net.mamoe.mirai.plugincenter.advice.ExceptionResponse
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.SetStateDto
 import net.mamoe.mirai.plugincenter.dto.r
 import net.mamoe.mirai.plugincenter.event.PluginModifiedEvent
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.services.LogService
 import net.mamoe.mirai.plugincenter.services.PluginDescService
@@ -35,15 +37,21 @@ class AdminController(
     private val desc: PluginDescService,
     private val logger: LogService,
 ) {
+    // region utils
+
+    private fun UserEntity.checkAdmin() {
+        if (! isAdmin) throw ExceptionResponse(HttpStatus.FORBIDDEN, "你不是管理员")
+    }
+
+    // endregion
 
     @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, ctx: ServerWebExchange): ApiResp<*> {
         val user = ctx.loginUserOrReject
-        if (! user.isAdmin) {
-            return r<Any>(HttpStatus.FORBIDDEN, "你不是管理员")
-        }
 
-        val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: return r.notFound("插件不存在")
+        user.checkAdmin()
+
+        val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: throw ExceptionResponse(HttpStatus.NOT_FOUND, "插件不存在")
 
         logger.push(user, PluginModifiedEvent(plugin.state, setStateDto.state), PluginModifiedEvent::class)
 
