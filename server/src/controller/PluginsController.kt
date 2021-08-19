@@ -40,6 +40,18 @@ class PluginsController(
     val desc: PluginDescService,
     val storage: PluginStorageService,
 ) {
+    // region utils
+
+    private fun PluginEntity.checkAvailable() {
+        if (! isAvailable()) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not available")
+    }
+
+    private fun PluginEntity.checkOwnedBy(user: UserEntity) {
+        if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
+    }
+
+    // endregion
+
     @ApiOperation("获取插件列表")
     @Order(0)
     @GetMapping("/")
@@ -79,6 +91,7 @@ class PluginsController(
     @ApiResponses(
         ApiResponse(code = 409, message = "Id conflicted with an existing plugin owned by {plugin.owner}", response = ApiResp::class),
     )
+
     @RequestMapping("/{id}", method = [RequestMethod.PUT, RequestMethod.PATCH])
     fun (@receiver:ApiIgnore ServerWebExchange).put(
         @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
@@ -127,13 +140,6 @@ class PluginsController(
         plugin.checkOwnedBy(user)
         desc.delete(plugin.pluginId)
         return r.ok()
-    }
-    private fun PluginEntity.checkAvailable() {
-        if (! isAvailable()) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not available")
-    }
-
-    private fun PluginEntity.checkOwnedBy(user: UserEntity) {
-        if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
     }
 
     ///////////////////////////////////////////////////////////////////////////
