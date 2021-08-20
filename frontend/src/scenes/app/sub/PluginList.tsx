@@ -5,6 +5,9 @@ import ProCard from '@ant-design/pro-card';
 import axios from "axios";
 import {PluginInfo} from "../../../models/Plugin";
 import SearchBar from "../../../components/SearchBar";
+import Meta from "antd/es/card/Meta";
+import {DownloadOutlined, InfoOutlined} from "@ant-design/icons";
+import {useHistory} from "react-router";
 
 async function getPluginList(page:number) {
     const res = await axios.get('/v1/plugins/',{
@@ -19,6 +22,7 @@ async function getPluginList(page:number) {
 export default () => {
     const [page, setPage] = React.useState(0);
     const [pluginList, setPluginList] = React.useState([]);
+    const history = useHistory()
     React.useEffect(() => {
         getPluginList(0).then((res)=>{
             setPluginList(res)
@@ -48,10 +52,15 @@ export default () => {
                                 key={index}
                                 headerBordered
                                 title={
-                                    <h2>
-                                        {(item as PluginInfo).name}
-                                    </h2>
+                                    <Meta
+                                        title={(item as PluginInfo).name}
+                                        description={(item as PluginInfo).id}
+                                    />
                                 }
+                                actions={[
+                                    <InfoOutlined key="info" onClick={()=>history.push('/app/info/'+(item as PluginInfo).id)}/>,
+                                    <DownloadOutlined key="download" onClick={()=>history.push('/app/info/'+(item as PluginInfo).id)}/>
+                                ]}
                                 colSpan={12}
                                 bordered={true}
                                 extra={
@@ -67,9 +76,7 @@ export default () => {
                                 layout="default"
                                 direction="column"
                             >
-                                <h5>info:{(item as PluginInfo).info}</h5>
-                                <h5>package:{(item as PluginInfo).id}</h5>
-                                <h5>author:{(item as PluginInfo).owner.nick}/{(item as PluginInfo).owner.email}</h5>
+                                <h4>{(item as PluginInfo).info}</h4>
                             </ProCard>
                         )
                     })

@@ -14,28 +14,25 @@ import Register from "./scenes/verify/Register";
 import VerifyLayout from "./scenes/verify/VerifyLayout";
 import CreatePlugin from "./scenes/app/sub/CreatePlugin";
 import PluginInfo from "./scenes/app/sub/PluginInfo";
+import EditPlugin from "./scenes/app/sub/EditPlugin";
 const RouterConfig = ()=> {
     return (
         <div>
-
             <HashRouter>
-                <Redirect path="" to="/app"/>
                 <Switch>
+                    <Redirect exact path="/" to="/app"/>
                     <Route path="/app">
                         <App>
                             <Route exact path="/app" component={PluginList}/>
-                            <Route exact path="/app/create" component={CreatePlugin}/>
                             <Route path="/app/info/:id" component={PluginInfo}/>
+                            <Route exact path="/app/create" component={CreatePlugin}/>
+                            <Route exact path="/app/edit/:id" component={EditPlugin}/>
                         </App>
                     </Route>
                     <Route path="/verify">
                         <VerifyLayout>
-                            <Route exact path="/verify/login">
-                                <Login/>
-                            </Route>
-                            <Route exact path="/verify/register">
-                                <Register/>
-                            </Route>
+                            <Route exact path="/verify/login" component={Login}/>
+                            <Route exact path="/verify/register" component={Register}/>
                         </VerifyLayout>
                     </Route>
                 </Switch>

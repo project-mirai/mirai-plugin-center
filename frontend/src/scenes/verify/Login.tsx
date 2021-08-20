@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import axios from "axios";
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "./VerifyLayout";
+import {useHistory} from "react-router";
 
 export default function Login(){
     const classes = useVerficationFormStyle();
@@ -14,7 +15,7 @@ export default function Login(){
     const [message, setMessage] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    const history = useHistory()
     const handleDialogOpen = () => {
         setOpen(true);
     };
@@ -29,6 +30,7 @@ export default function Login(){
         }
         axios.post('/v1/sso/login',data).then((res)=>{
             console.log(res)
+            history.push('/app')
         }).catch((err)=>{
             console.log(err.response)
             if(err.response.data.code === 400) {

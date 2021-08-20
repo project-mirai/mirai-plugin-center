@@ -5,6 +5,7 @@ import { UserOutlined } from '@ant-design/icons';
 import ProLayout from '@ant-design/pro-layout';
 import defaultProps from './_defaultProps';
 import axios from "axios";
+import {useHistory} from "react-router";
 
 
 
@@ -14,6 +15,7 @@ export default (props:any) => {
     }
     const [logon, setLogon] = React.useState(false)
     const [userInfo, setUserInfo] = React.useState(defaultUserInfo)
+    const history = useHistory()
     const loadingInfo = () => {
         axios.get('/v1/sso/whoami').then((res)=>{
             setLogon(true)
@@ -38,7 +40,7 @@ export default (props:any) => {
                 :
                 <>
                     <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+                        <a rel="noopener noreferrer" onClick={()=>history.push('/verify/login')}>
                             请登录
                         </a>
                     </Menu.Item>

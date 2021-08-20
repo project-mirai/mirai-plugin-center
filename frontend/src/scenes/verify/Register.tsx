@@ -7,6 +7,7 @@ import axios from "axios";
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "./VerifyLayout";
 import Typography from "@material-ui/core/Typography";
+import {useHistory} from "react-router";
 
 export default function Register(){
     const classes = useVerficationFormStyle();
@@ -16,7 +17,7 @@ export default function Register(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
+    const history = useHistory()
     const handleDialogOpen = () => {
         setOpen(true);
     };
@@ -34,6 +35,7 @@ export default function Register(){
             if(res.data.code === 200) {
                 setMessage("注册成功")
                 handleDialogOpen()
+                history.push('/app')
             }
         }).catch((err)=>{
             setMessage(err.response.data.message)

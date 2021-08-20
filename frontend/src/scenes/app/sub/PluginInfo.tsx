@@ -5,9 +5,11 @@ import {EditOutlined} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import axios from "axios";
 import {PluginInfo} from "../../../models/Plugin";
+import {useHistory} from "react-router";
 
 export default (props:any) => {
     const id = props.match.params.id
+    const history = useHistory()
     const [success, setSuccess] = useState(true)
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState({
@@ -34,7 +36,7 @@ export default (props:any) => {
                 loading={loading}
                 gutter={8}
                 actions={[
-                    <EditOutlined key="edit"/>,
+                    <EditOutlined key="edit" onClick={()=>history.push('/app/edit/'+id)}/>,
                 ]}
                 colSpan={12}
                 bordered={true}
@@ -77,7 +79,7 @@ export default (props:any) => {
                 status="warning"
                 title="错误"
                 subTitle="您查找的ID并不存在"
-                extra={<Button onClick={()=>setSuccess(false)}>返回主页</Button>}
+                extra={<Button onClick={()=>history.push('/')}>返回主页</Button>}
             />
         </div>
     )
