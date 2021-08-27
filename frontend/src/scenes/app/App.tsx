@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Dropdown, Menu, Space} from 'antd';
+import {Avatar, Button, Dropdown, Menu, Space} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import ProLayout from '@ant-design/pro-layout';
@@ -93,6 +93,7 @@ export default (props:any) => {
                     <a
                         onClick={() => {
                             //setPathname(item.path || '/welcome');
+                            history.push(item.path as string,true)
                         }}
                     >
                         {dom}
@@ -100,11 +101,17 @@ export default (props:any) => {
                 )}
                 rightContentRender={() => (
                     <Space wrap>
-                        <Dropdown overlay={userControlMenu}>
-                            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                                <Avatar shape="square" size="small" icon={<UserOutlined/>}/>
-                            </a>
-                        </Dropdown>
+                        {
+                            logon ?
+                                (<Dropdown overlay={userControlMenu}>
+                                    <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                                        <Avatar shape="square" size="small" icon={<UserOutlined/>}/>
+                                    </a>
+                                </Dropdown>)
+                                :
+                                (<Button onClick={() => history.push("/verify/login")}>请登录</Button>)
+                        }
+
                     </Space>
                 )}
                 title={'Mirai插件中心'}
