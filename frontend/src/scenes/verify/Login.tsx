@@ -103,12 +103,12 @@ export default function Login(){
                 </Button>
                 <Grid container>
                     <Grid item xs>
-                        <Link href="#" variant="body2">
+                        <Link variant="body2" onClick={()=>history.push("/verify/resetpassword/sendmail")}>
                             忘记密码
                         </Link>
                     </Grid>
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link variant="body2" onClick={()=>history.push("/verify/register")}>
                             {"注册"}
                         </Link>
                     </Grid>

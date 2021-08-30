@@ -130,7 +130,7 @@ export default function Register(){
                     <Grid item xs>
                     </Grid>
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link variant="body2" onClick={()=>history.push("/verify/login")}>
                             {"返回登陆"}
                         </Link>
                     </Grid>

@@ -15,12 +15,13 @@ import VerifyLayout from "./scenes/verify/VerifyLayout";
 import CreatePlugin from "./scenes/app/sub/CreatePlugin";
 import PluginInfo from "./scenes/app/sub/PluginInfo";
 import EditPlugin from "./scenes/app/sub/EditPlugin";
+import SendMail from "./scenes/verify/resetPassword/SendMail";
 const RouterConfig = ()=> {
     return (
         <div>
             <HashRouter>
                 <Switch>
-                    <Redirect exact path="/" to="/app"/>
+                    <Redirect exact from="/" to="/app"/>
                     <Route path="/app">
                         <App>
                             <Route exact path="/app" component={PluginList}/>
@@ -33,6 +34,7 @@ const RouterConfig = ()=> {
                         <VerifyLayout>
                             <Route exact path="/verify/login" component={Login}/>
                             <Route exact path="/verify/register" component={Register}/>
+                            <Route exact path="/verify/resetpassword/sendmail" component={SendMail}/>
                         </VerifyLayout>
                     </Route>
                 </Switch>
