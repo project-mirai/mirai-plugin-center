@@ -22,6 +22,7 @@ export default (props:any) => {
             setUserInfo(res.data.response)
         }).catch(()=>{
             setLogon(false)
+
             setUserInfo(defaultUserInfo)
         })
     }
@@ -31,9 +32,12 @@ export default (props:any) => {
             {logon?
                 <>
                     <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+                        <a>
                             {userInfo.nick}
                         </a>
+                    </Menu.Item>
+                    <Menu.Item onClick={()=>history.push('/verify/resetpassword/manual/')}>
+                            修改密码
                     </Menu.Item>
                     <Menu.Item danger>注销</Menu.Item>
                 </>
@@ -92,7 +96,6 @@ export default (props:any) => {
                 menuItemRender={(item, dom) => (
                     <a
                         onClick={() => {
-                            //setPathname(item.path || '/welcome');
                             history.push(item.path as string,true)
                         }}
                     >

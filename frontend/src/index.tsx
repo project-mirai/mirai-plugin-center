@@ -16,6 +16,7 @@ import CreatePlugin from "./scenes/app/sub/CreatePlugin";
 import PluginInfo from "./scenes/app/sub/PluginInfo";
 import EditPlugin from "./scenes/app/sub/EditPlugin";
 import SendMail from "./scenes/verify/resetPassword/SendMail";
+import ManualResetPassword from "./scenes/verify/resetPassword/ManualResetPassword";
 const RouterConfig = ()=> {
     return (
         <div>
@@ -35,6 +36,7 @@ const RouterConfig = ()=> {
                             <Route exact path="/verify/login" component={Login}/>
                             <Route exact path="/verify/register" component={Register}/>
                             <Route exact path="/verify/resetpassword/sendmail" component={SendMail}/>
+                            <Route exact path="/verify/resetpassword/manual" component={ManualResetPassword}/>
                         </VerifyLayout>
                     </Route>
                 </Switch>
