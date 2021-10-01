@@ -3,7 +3,8 @@ import {Avatar, Button, Dropdown, Menu, Space} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import ProLayout from '@ant-design/pro-layout';
-import defaultProps from './_defaultProps';
+import userRouter from './router/UserRouter';
+import guestRouter from './router/GuestRouter';
 import axios from "axios";
 import {useHistory} from "react-router";
 
@@ -60,7 +61,7 @@ export default (props:any) => {
             }}
         >
             <ProLayout
-                {...defaultProps}
+                {...(logon?userRouter:guestRouter)}
                 waterMarkProps={{
                     content: 'Mirai',
                 }}
@@ -94,7 +95,7 @@ export default (props:any) => {
                 }}
                 onMenuHeaderClick={(e) => console.log(e)}
                 menuItemRender={(item, dom) => (
-                    <a
+                    <a aria-disabled={!logon}
                         onClick={() => {
                             history.push(item.path as string,true)
                         }}
