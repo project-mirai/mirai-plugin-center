@@ -28,6 +28,12 @@ fun ServerWebExchange.setSessionAccount(user: UserEntity) {
     }
 }
 
+fun ServerWebExchange.removeSessionAccount() {
+    session.subscribe { session ->
+        session.attributes.remove("User")
+    }
+}
+
 enum class AuthFailedReason(val msg: String) {
     UNKNOWN("Unknown"),
     GUEST("Unauthorized"),

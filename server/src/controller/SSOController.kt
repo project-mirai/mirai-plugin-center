@@ -17,6 +17,7 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.services.MailService
 import net.mamoe.mirai.plugincenter.services.UserService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
+import net.mamoe.mirai.plugincenter.utils.removeSessionAccount
 import net.mamoe.mirai.plugincenter.utils.setSessionAccount
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -82,6 +83,14 @@ class SSOController(private val userService: UserService, private val mailServic
     fun resetPassword(@RequestBody resetPassword: ResetPasswordByEmailDTO): ApiResp<String> {
         tokenMap = userService.resetPassword(resetPassword, tokenMap)
         return respOk("ok")
+    }
+
+    @ApiOperation("注销")
+    @GetMapping("/logout")
+    fun logout(@ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
+        req.removeSessionAccount()
+        val user = req.loginUserOrReject
+        return respOk(user.toDto())
     }
 
     @ApiOperation("当前用户")
