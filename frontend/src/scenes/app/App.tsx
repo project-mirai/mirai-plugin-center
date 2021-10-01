@@ -16,18 +16,22 @@ export default (props:any) => {
     }
     const [logon, setLogon] = React.useState(false)
     const [userInfo, setUserInfo] = React.useState(defaultUserInfo)
+    const [needReloading, setNeedReloading] = React.useState(true)
     const history = useHistory()
     const loadingInfo = () => {
+        setNeedReloading(false)
         axios.get('/v1/sso/whoami').then((res)=>{
             setLogon(true)
             setUserInfo(res.data.response)
         }).catch(()=>{
             setLogon(false)
-
             setUserInfo(defaultUserInfo)
         })
     }
-    React.useEffect(()=>loadingInfo(),[])
+    const logout = () =>
+            axios.get('/v1/sso/logout').finally(()=>setNeedReloading(true))
+
+    React.useEffect(()=>loadingInfo(),[needReloading])
     const userControlMenu = (
         <Menu>
             {logon?
@@ -40,7 +44,7 @@ export default (props:any) => {
                     <Menu.Item onClick={()=>history.push('/verify/resetpassword/manual/')}>
                             修改密码
                     </Menu.Item>
-                    <Menu.Item danger>注销</Menu.Item>
+                    <Menu.Item onClick={()=>logout()} danger>注销</Menu.Item>
                 </>
                 :
                 <>
@@ -53,6 +57,7 @@ export default (props:any) => {
             }
         </Menu>
     );
+
     return (
         <div
             id="app-layout"
