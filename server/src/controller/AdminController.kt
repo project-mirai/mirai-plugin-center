@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ServerWebExchange
 
 @RestController       // FIXME: /v1/admin
-@RequestMapping("/admin")
+@RequestMapping("/v1/admin")
 @Api(tags = ["管理员服务"], position = 3)
 class AdminController(
     private val pluginRepo: PluginRepo,
