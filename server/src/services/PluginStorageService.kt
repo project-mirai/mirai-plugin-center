@@ -32,9 +32,14 @@ import java.io.OutputStream
 class PluginDescService(
     private val repo: PluginRepo
 ) {
-    fun getList(page: Int): List<PluginEntity> {
+    fun getAcceptedList(page: Int): List<PluginEntity> {
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
         return repo.findAllByRawState(PluginEntity.Status.Accepted.ordinal ,PageRequest.of(page,20)).toList()
+    }
+
+    fun getList(page: Int): List<PluginEntity> {
+        require( page >= 0 ) {  }
+        return repo.findAll(PageRequest.of(page, 20)).toList()
     }
 
     fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)
