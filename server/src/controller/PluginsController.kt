@@ -62,7 +62,7 @@ class PluginsController(
     ): ApiResp<List<PluginDesc>> {
         val page = page0 ?: 0
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        return r.ok(desc.getList(page).map { it.toDto() })
+        return r.ok(desc.getAcceptedList(page).map { it.toDto() })
     }
     @ApiOperation("获取插件数")
     @GetMapping("/count")
