@@ -5,13 +5,14 @@ import { UserOutlined } from '@ant-design/icons';
 import ProLayout from '@ant-design/pro-layout';
 import axios from "axios";
 import {useHistory} from "react-router";
-import {GuestRouter, DeveloperRouter} from "./router/Routers";
+import {GuestRouter, DeveloperRouter, AdministratorRouter} from "./router/Routers";
 
 
 
 export default (props:any) => {
     const defaultUserInfo = {
-        nick:'nickname'
+        nick:'nickname',
+        role:0
     }
     const [logon, setLogon] = React.useState(false)
     const [userInfo, setUserInfo] = React.useState(defaultUserInfo)
@@ -65,7 +66,8 @@ export default (props:any) => {
             }}
         >
             <ProLayout
-                {...(logon?DeveloperRouter:GuestRouter)}
+                {...(logon?
+                    (userInfo.role>1?AdministratorRouter:DeveloperRouter):GuestRouter)}
                 waterMarkProps={{
                     content: 'Mirai',
                 }}

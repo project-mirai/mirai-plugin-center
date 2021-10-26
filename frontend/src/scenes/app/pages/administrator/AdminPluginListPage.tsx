@@ -9,7 +9,7 @@ import PluginList from "../../../../components/PluginList/PluginList";
 export default () => {
     return (
         <PageContainer
-            title={"插件列表"}
+            title={"插件列表（管理员）"}
             waterMarkProps={{
                 content: '',
             }}>
@@ -18,7 +18,7 @@ export default () => {
                 <SearchBar/>
             </ProCard>
 
-            <PluginList url={"/v1/plugins/"}/>
+            <PluginList url={"/v1/admin/plugins/"}/>
 
         </PageContainer>
     )

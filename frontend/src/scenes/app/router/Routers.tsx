@@ -23,6 +23,20 @@ const DeveloperSubRouters = {
     ]
 }
 
+const AdministratorSubRouters = {
+    name: '管理员',
+    icon: <TabletOutlined />,
+    needLogin: true,
+    routes: [
+        {
+            name: '所有插件列表',
+            icon: <UploadOutlined />,
+            needLogin: true,
+            path: '/app/admin',
+        }
+    ]
+}
+
 export function getRouterObject(subRouters:any) {
     return {
         route: {
@@ -36,3 +50,4 @@ export function getRouterObject(subRouters:any) {
 
 export const GuestRouter = getRouterObject([CommonSubRouters])
 export const DeveloperRouter = getRouterObject([CommonSubRouters, DeveloperSubRouters])
+export const AdministratorRouter = getRouterObject([CommonSubRouters, DeveloperSubRouters, AdministratorSubRouters])

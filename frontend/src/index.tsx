@@ -17,6 +17,7 @@ import EditPluginPage from "./scenes/app/pages/developer/EditPluginPage";
 import PluginInfoPage from "./scenes/app/pages/developer/PluginInfoPage";
 import CreatePluginPage from "./scenes/app/pages/developer/CreatePluginPage";
 import PluginListPage from "./scenes/app/pages/PluginListPage";
+import AdminPluginListPage from "./scenes/app/pages/administrator/AdminPluginListPage";
 const RouterConfig = ()=> {
     return (
         <div>
@@ -29,6 +30,8 @@ const RouterConfig = ()=> {
                             <Route path="/app/info/:id" component={PluginInfoPage}/>
                             <Route exact path="/app/create" component={CreatePluginPage}/>
                             <Route exact path="/app/edit/:id" component={EditPluginPage}/>
+                            <Route exact path="/app/admin" component={AdminPluginListPage}/>
+
                         </App>
                     </Route>
                     <Route path="/verify">
