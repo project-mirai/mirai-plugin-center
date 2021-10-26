@@ -4,8 +4,8 @@ import {PageContainer} from "@ant-design/pro-layout";
 import {EditOutlined} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
 import axios from "axios";
-import {PluginInfo} from "../../../models/Plugin";
 import {useHistory} from "react-router";
+import {PluginInfo} from "../../../../models/Plugin";
 
 export default (props:any) => {
     const id = props.match.params.id

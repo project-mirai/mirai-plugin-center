@@ -3,10 +3,9 @@ import {Avatar, Button, Dropdown, Menu, Space} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import ProLayout from '@ant-design/pro-layout';
-import userRouter from './router/UserRouter';
-import guestRouter from './router/GuestRouter';
 import axios from "axios";
 import {useHistory} from "react-router";
+import {GuestRouter, DeveloperRouter} from "./router/Routers";
 
 
 
@@ -66,7 +65,7 @@ export default (props:any) => {
             }}
         >
             <ProLayout
-                {...(logon?userRouter:guestRouter)}
+                {...(logon?DeveloperRouter:GuestRouter)}
                 waterMarkProps={{
                     content: 'Mirai',
                 }}
