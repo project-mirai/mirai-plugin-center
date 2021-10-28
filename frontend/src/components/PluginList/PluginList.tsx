@@ -23,6 +23,12 @@ interface PluginListInfo{
 export default (props:PluginListInfo) => {
     const [page, setPage] = React.useState(0);
     const [pluginList, setPluginList] = React.useState([]);
+    const [count, setCount] = React.useState(0);
+    React.useEffect(()=>{
+        axios.get(props.url+"count").then((res)=>{
+            setCount(res.data.response.countL)
+        })
+    },[])
     React.useEffect(()=>{
         getPluginList(props.url,page).then((res)=>{
             setPluginList(res)
@@ -58,7 +64,7 @@ export default (props:PluginListInfo) => {
     }
     return (
         <Fragment>
-            <ProCard title={"第"+(page+1)+"页"} style={{ marginTop: 8 }} gutter={[16, 16]} wrap>
+            <ProCard title={"第"+(page+1)+"页" + "(共"+count+"个插件/"+Math.round(count/20)+"页)"} style={{ marginTop: 8 }} gutter={[16, 16]} wrap>
                 {
                     pluginList.map((item,index) => {
                         const pluginInfoItem = item as PluginInfo
@@ -71,7 +77,7 @@ export default (props:PluginListInfo) => {
 
             <ProCard layout={"center"}>
                 <Button disabled={page<1} onClick={()=>setPage(page-1)}>上一页</Button>
-                <Button onClick={()=>setPage(page+1)}>下一页</Button>
+                <Button disabled={page+1 > Math.round(count/20)} onClick={()=>setPage(page+1)}>下一页</Button>
             </ProCard>
         </Fragment>
 

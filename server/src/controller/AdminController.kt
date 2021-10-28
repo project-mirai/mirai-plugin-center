@@ -70,4 +70,9 @@ class AdminController(
 
         return ApiResp.ok(desc.getList(page).map { it.toDto() })
     }
+
+
+    @ApiOperation("获取插件数")
+    @GetMapping("/plugins/count")
+    fun count() = r.ok(PluginCount(desc.count()))
 }
