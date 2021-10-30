@@ -46,6 +46,10 @@ class PluginDescService(
 
     fun count() = repo.count()
 
+    fun countByRawStates(rawState:Int):Long {
+        return repo.findAllByRawState(rawState ,PageRequest.of(0,20)).totalElements
+    }
+
     @CachePut("plugin", key = "#plugin.pluginId")
     fun update(plugin: PluginEntity, apply: PluginEntity.() -> Unit): PluginEntity {
         return repo.save(plugin.apply(apply))

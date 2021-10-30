@@ -2,7 +2,7 @@ import axios from "axios";
 import React, {Fragment} from "react";
 import ProCard from "@ant-design/pro-card";
 import {PluginInfo} from "../../models/Plugin";
-import {Button, Tag} from "antd";
+import {Pagination, Tag} from "antd";
 import {useHistory} from "react-router";
 import Meta from "antd/es/card/Meta";
 import {DownloadOutlined, InfoOutlined} from "@ant-design/icons";
@@ -10,7 +10,7 @@ import {DownloadOutlined, InfoOutlined} from "@ant-design/icons";
 async function getPluginList(api:string,page:number) {
     const res = await axios.get(api,{
         params:{
-            page: page
+            page: page - 1
         }
     })
     return res.data.response
@@ -20,8 +20,15 @@ interface PluginListInfo{
     url:string
 }
 
+function pageTotal(rowCount:number, pageSize:number) : number{
+        if(rowCount % pageSize==0) {
+            return rowCount/pageSize
+        }
+        return Math.round(rowCount/pageSize) + 1
+}
+
 export default (props:PluginListInfo) => {
-    const [page, setPage] = React.useState(0);
+    const [page, setPage] = React.useState(1);
     const [pluginList, setPluginList] = React.useState([]);
     const [count, setCount] = React.useState(0);
     React.useEffect(()=>{
@@ -60,11 +67,15 @@ export default (props:PluginListInfo) => {
         >
             <h4>{pluginInfoItem.info}</h4>
         </ProCard>
-
     }
+    const Pager = ()=>(
+        <ProCard layout={"center"}>
+            <Pagination defaultCurrent={1} pageSize={20} total={count} onChange={setPage} showQuickJumper/>
+        </ProCard>
+    )
     return (
         <Fragment>
-            <ProCard title={"第"+(page+1)+"页" + "(共"+count+"个插件/"+Math.round(count/20)+"页)"} style={{ marginTop: 8 }} gutter={[16, 16]} wrap>
+            <ProCard title={"第"+(page)+"页" + "(共"+count+"个插件/共"+pageTotal(count,20)+"页)"} style={{ marginTop: 8 }} gutter={[16, 16]} wrap>
                 {
                     pluginList.map((item,index) => {
                         const pluginInfoItem = item as PluginInfo
@@ -74,11 +85,7 @@ export default (props:PluginListInfo) => {
                     })
                 }
             </ProCard>
-
-            <ProCard layout={"center"}>
-                <Button disabled={page<1} onClick={()=>setPage(page-1)}>上一页</Button>
-                <Button disabled={page+1 > Math.round(count/20)} onClick={()=>setPage(page+1)}>下一页</Button>
-            </ProCard>
+            <Pager/>
         </Fragment>
 
     )

@@ -66,7 +66,7 @@ class PluginsController(
     }
     @ApiOperation("获取插件数")
     @GetMapping("/count")
-    fun count() = r.ok(PluginCount(desc.count()))
+    fun count() = r.ok(PluginCount(desc.countByRawStates(PluginEntity.Status.Accepted.ordinal)))
 
 
     ///////////////////////////////////////////////////////////////////////////

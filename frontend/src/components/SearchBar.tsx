@@ -4,5 +4,5 @@ import {useHistory} from "react-router";
 
 export default () => {
     const history = useHistory()
-    return <Search placeholder="搜索包名" enterButton onSearch={(id) => history.push('/app/info/'+id)}/>
+    return <Search placeholder="跳转至包名" enterButton onSearch={(id) => history.push('/app/info/'+id)}/>
 }
