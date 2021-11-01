@@ -21,7 +21,6 @@ import org.springframework.cache.annotation.CachePut
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import java.io.File
@@ -68,6 +67,7 @@ class PluginStorageService {
 
     fun resolveFile(pid: String, version: String, filename: String) = resolveVersionDir(pid, version).resolve(filename)
     fun resolveVersionDir(pid: String, version: String) = storage.resolve(pid).resolve(version)
+    fun resolvePluginDir(pid: String) = storage.resolve(pid)
 
     fun get(plugin: PluginEntity, version: String, filename: String) = FileSystemResource(resolveFile(plugin.pluginId, version, filename))
     fun get(pid: String, version: String, filename: String) = FileSystemResource(resolveFile(pid, version, filename))
@@ -93,6 +93,14 @@ class PluginStorageService {
 
     fun hasVersion(pid: String, version: String): Boolean {
         return resolveVersionDir(pid, version).exists()
+    }
+
+    fun getVersionList(pid: String): Array<String>? {
+        return resolvePluginDir(pid).list()
+    }
+
+    fun addVersion(pid: String, version: String): Boolean {
+        return resolveVersionDir(pid, version).mkdirs()
     }
 
     fun delete(pid: String, version: String): Boolean {
