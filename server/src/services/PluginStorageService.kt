@@ -95,8 +95,12 @@ class PluginStorageService {
         return resolveVersionDir(pid, version).exists()
     }
 
-    fun getVersionList(pid: String): Array<String>? {
-        return resolvePluginDir(pid).list()
+    fun getVersionFiles(pid: String, version: String): Array<String> {
+        return resolveVersionDir(pid, version).list()?: arrayOf()
+    }
+
+    fun getVersionList(pid: String): Array<String> {
+        return resolvePluginDir(pid).list()?: arrayOf()
     }
 
     fun addVersion(pid: String, version: String): Boolean {

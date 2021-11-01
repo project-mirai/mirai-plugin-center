@@ -227,10 +227,27 @@ class PluginsController(
         return r.ok()
     }
 
+    @ApiOperation("查看目标版本的所有文件")
+    @GetMapping("/{id}/{version}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Version not found", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).getVersionFiles(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+        @ApiParam("插件 ID", example = PluginDesc.VERSION_EXAMPLE)
+        @PathVariable
+        version: String
+    ): ApiResp<Array<String>?> {
+        desc.get(id) ?: return r.notFound(null)
+        if(!storage.hasVersion(id,version)) return r(404)
+        return r.ok(storage.getVersionFiles(id,version))
+    }
+
     @ApiOperation("查看版本列表")
     @GetMapping("/{id}/versionList")
     @ApiResponses(
-        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
         ApiResponse(code = 404, message = "Version not found", response = ApiResp::class),
     )
     fun (@receiver:ApiIgnore ServerWebExchange).getVersionList(
@@ -239,8 +256,7 @@ class PluginsController(
         id: String
     ): ApiResp<Array<String>?> {
         desc.get(id) ?: return r.notFound(null)
-        val result = storage.getVersionList(id)?: arrayOf()
-        return r.ok(result)
+        return r.ok(storage.getVersionList(id))
     }
 
     @ApiOperation("删除一个版本及该版本下的所有文件")
@@ -254,7 +270,7 @@ class PluginsController(
         @PathVariable
         id: String,
 
-        @ApiParam("插件版本号")
+        @ApiParam("插件版本号", example = PluginDesc.VERSION_EXAMPLE)
         @PathVariable
         version: String,
     ): ApiResp<Void?> {

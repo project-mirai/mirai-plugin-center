@@ -51,6 +51,7 @@ data class PluginDesc(
         const val ID_EXAMPLE = "org.example.mirai.test-plugin"
         const val NAME_EXAMPLE = "A Simple Test Plugin"
         const val INFO_EXAMPLE = "This is a sample plugin providing some features."
+        const val VERSION_EXAMPLE = "1.0.0"
     }
 }
 
