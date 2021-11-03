@@ -113,6 +113,12 @@ class PluginStorageService {
         return dir.deleteRecursively()
     }
 
+    fun delete(pid: String, version: String, fileName:String): Boolean {
+        val file = resolveFile(pid, version,fileName)
+        if (!file.exists()) return false
+        return file.delete()
+    }
+
     private fun InputStream.copyToBuffered(out: OutputStream, buffer: ByteArray): Long {
         var bytesCopied: Long = 0
         var bytes = read(buffer)

@@ -206,6 +206,39 @@ class PluginsController(
         r.created()
     }
 
+    @ApiOperation("删除一个文件")
+    @DeleteMapping("/{id}/{version}/{filename}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Plugin not found", response = ApiResp::class),
+        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
+        ApiResponse(code = 201, message = "Uploaded", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).delFile(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+
+        @ApiParam("文件名")
+        @PathVariable
+        filename: String,
+    ): Mono<ApiResp<Void?>> = mono {
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return@mono r.notFound(null)
+
+        plugin.checkOwnedBy(user)
+        plugin.checkAvailable()
+
+        if (!storage.hasVersion(plugin.pluginId, version)) return@mono r.notFound(message = "Version not found")
+        val file = storage.get(plugin.pluginId, version, filename)
+        if (!file.exists()) return@mono r.conflict(null, message = "File doesn't exist")
+        storage.delete(id, version, filename)
+        r.ok()
+    }
+
     @ApiOperation("创建版本")
     @PutMapping("/{id}/{version}")
     @ApiResponses(
