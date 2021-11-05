@@ -2,8 +2,9 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 
 export interface VersionFilesProps{
-    id:string,
+    id:string
     version:string
+    refresh?:()=>void
 }
 export default function(props:VersionFilesProps){
     const [fileList, setFileList] = useState(Array<string>())

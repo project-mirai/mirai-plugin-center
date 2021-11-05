@@ -3,8 +3,8 @@ import {PageContainer} from "@ant-design/pro-layout";
 import axios from "axios";
 import PluginNotFound from "../../../../components/Plugin/PluginNotFound";
 import EditPluginForm from "../../../../components/Plugin/EditPluginForm";
-
 export default (props:any) => {
+    const [key, setKey] = useState(0)
     const id = props.match.params.id
     const [success, setSuccess] = useState(true)
     const [loading, setLoading] = useState(true)
@@ -16,7 +16,8 @@ export default (props:any) => {
         status: "Accepted",
     })
     console.log(id)
-    useEffect(()=>{
+    const doRefresh = ()=>{
+        setKey(key+1)
         axios.get('/v1/plugins/'+id).then((res)=>{
             setData(res.data.response)
             setLoading(false)
@@ -24,7 +25,8 @@ export default (props:any) => {
         }).catch(()=>{
             setSuccess(false)
         })
-    },[])
+    }
+    useEffect(doRefresh,[])
 
     return (
         <PageContainer
@@ -32,7 +34,7 @@ export default (props:any) => {
             waterMarkProps={{
                 content: '',
             }}>
-            {success?<EditPluginForm loading={loading} info={data}/>:<PluginNotFound/>}
+            {success?<EditPluginForm key={key} refresh={doRefresh} loading={loading} info={data}/>:<PluginNotFound/>}
         </PageContainer>
     );
 };

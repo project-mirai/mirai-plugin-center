@@ -8,6 +8,11 @@ import {PluginInfoFormParams} from "../EditPluginForm";
 type LayoutType = Parameters<typeof ProForm>[0]['layout'];
 
 export default function(props:PluginInfoFormParams) {
+    const {refresh} = props
+    const doRefresh = ()=>{
+        if(refresh) refresh()
+    }
+    const {status} = props.info
     const {id} = props.info
     const [formLayout ] = useState<LayoutType>('horizontal');
     const history = useHistory()
@@ -22,9 +27,10 @@ export default function(props:PluginInfoFormParams) {
         try{
             await axios.patch('/v1/admin/setstate',{
                 pluginId:props.info.id,
-                state:2
+                state:status==='Accepted'?1:2
             })
-            message.success('切换状态成功');
+            message.success('切换状态成功')
+            doRefresh()
         }catch (err) {
             message.error(err.response.data.message)
         }
@@ -46,7 +52,8 @@ export default function(props:PluginInfoFormParams) {
                         name:values.name,
                         info:values.info
                     })
-                    message.success('提交成功');
+                    message.success('提交成功')
+                    doRefresh()
                 }catch (err) {
                     message.error(err.response.data.message)
                 }
@@ -55,7 +62,7 @@ export default function(props:PluginInfoFormParams) {
                 render: (props, doms) => {
                     return [
                         <Button key={"status"} htmlType="button" onClick={() => setStatus()}>
-                            设置状态为启用(admin)
+                            设置状态为{status==='Accepted'?"禁用":"启用"}(admin)
                         </Button>,
                         <Button key={"preview"} htmlType="button" onClick={() => history.push('/app/info/'+id)}>
                             查看该插件信息
