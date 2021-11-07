@@ -1,20 +1,24 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {Space, Table} from "antd";
+import {message, Space, Table} from "antd";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
+import confirm from "antd/lib/modal/confirm";
 
 export interface VersionFilesProps{
     id:string
     version:string
     refresh?:()=>void
+    refreshFile?:()=>void
 }
 
 interface tableView {
     filename:string
 }
 
+
 export default function(props:VersionFilesProps){
     const [fileList, setFileList] = useState(Array<tableView>())
-    useEffect( ()=>{
+    const refreshList = ()=>{
         axios.get("/v1/plugins/"+props.id+"/"+props.version+"/").then(res=>{
             const arr = []
             for(let i = 0; i < res.data.response.length; i++) {
@@ -24,7 +28,28 @@ export default function(props:VersionFilesProps){
             }
             setFileList(arr)
         })
-    },[])
+    }
+    useEffect( refreshList,[])
+
+
+    const showDeleteConfirm = (filename:string) => confirm({
+        title: '你确认要删除'+filename+'文件吗？',
+        icon: <ExclamationCircleOutlined />,
+        content: '该操作不可复原。',
+        okText: '确认',
+        okType: 'danger',
+        cancelText: '取消',
+        onOk: async ()=>{
+            try{
+                await axios.delete("/v1/plugins/"+props.id+"/"+props.version+"/"+filename)
+                message.success("删除成功")
+                refreshList()
+            }catch (e) {
+                message.error(e.response.data.message)
+            }
+        },
+    });
+
     //TODO 在ENV中增加变量用于控制API
     const API_URL = "http://localhost:8080"
     const downloadFile = (filename:string)=>window.open(API_URL+'/v1/plugins/'+props.id+"/"+props.version+"/"+filename, '_blank')
@@ -40,7 +65,7 @@ export default function(props:VersionFilesProps){
             render: (text:any, record:any) => (
                 <Space size="middle">
                     <a onClick={()=>downloadFile(record.filename)}>下载 {record.filename}</a>
-                    <a>删除</a>
+                    <a onClick={()=>showDeleteConfirm(record.filename)}>删除</a>
                 </Space>
             ),
         },

@@ -16,13 +16,10 @@ export default function(props:PluginInfoFormParams){
         axios.get("/v1/plugins/"+props.info.id+"/versionList").then(res=>setVersionList(res.data.response))
     },[])
 
-    function callback(key:any) {
-        console.log(key);
-    }
-
     return(
-        <Collapse defaultActiveKey={[]} onChange={callback}>
+        <Collapse defaultActiveKey={[]}>
             {versionList.map((item,index)=>{
+                //TODO 完成后进行文件列表局部刷新，而不是整体刷新
                 return <CollapsePanel header={item} key={index}>
                     <FileList refresh={doRefresh} id={props.info.id} version={item}/>
                     <VersionOperation refresh={doRefresh} id={props.info.id} version={item}/>

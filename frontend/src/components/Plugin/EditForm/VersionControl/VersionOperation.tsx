@@ -3,24 +3,18 @@ import {VersionFilesProps} from "./FileList";
 import {Modal, Button, Space, message} from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import axios from "axios";
+import FileUpload from "./FileUpload";
 
 const { confirm } = Modal;
-
-function showConfirm() {
-    confirm({
-        title: 'Do you Want to delete these items?',
-        icon: <ExclamationCircleOutlined />,
-        content: 'Some descriptions',
-        onOk() {
-            console.log('OK');
-        },
-        onCancel() {
-            console.log('Cancel');
-        },
-    });
-}
-
 export default function (props:VersionFilesProps){
+    const {refresh} = props
+    const {refreshFile} = props
+    const doRefresh = ()=>{
+        if(refresh) refresh()
+    }
+    const doRefreshFile = ()=>{
+        if(refreshFile) refreshFile()
+    }
     const showDeleteConfirm = () => confirm({
         title: '你确认要删除'+props.version+'版本吗？',
         icon: <ExclamationCircleOutlined />,
@@ -32,20 +26,15 @@ export default function (props:VersionFilesProps){
             try{
                 await axios.delete("/v1/plugins/"+props.id+"/"+props.version)
                 message.success("删除成功")
-                if(props.refresh) {
-                    props.refresh()
-                }
+                doRefresh()
             }catch (e) {
                 message.error(e.response.data.message)
             }
         },
-        onCancel() {
-            console.log('Cancel');
-        },
     });
     return (
         <Space wrap>
-            <Button onClick={showConfirm}>新增版本文件</Button>
+            <FileUpload {...props} refreshFile={doRefreshFile} refresh={doRefresh}/>
             <Button onClick={showDeleteConfirm} type="dashed">
                 删除版本
             </Button>
