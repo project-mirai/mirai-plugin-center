@@ -24,8 +24,10 @@ import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
 import org.springframework.core.io.FileSystemResource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
@@ -146,6 +148,7 @@ class PluginsController(
     // Versions
     ///////////////////////////////////////////////////////////////////////////
 
+
     @ApiOperation("下载一个文件")
     @GetMapping("/{id}/{version}/{filename}")
     @ApiResponses(
@@ -163,13 +166,14 @@ class PluginsController(
         @ApiParam("文件名")
         @PathVariable
         filename: String,
-    ): FileSystemResource {
+    ): ResponseEntity<FileSystemResource> {
         // This should be handled by the upstream Nginx server.
         //  Spring sed as a fallback.
-
         val resource = storage.get(id, version, filename)
         if (!resource.exists()) throw ExceptionResponse(404, "File not found")
-        return resource
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Content-Disposition", "attachment; filename=\"${filename}\"")
+        return ResponseEntity<FileSystemResource>(resource, responseHeaders, HttpStatus.OK)
     }
 
     @ApiOperation("上传一个文件")
