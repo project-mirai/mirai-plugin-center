@@ -34,7 +34,7 @@ export default (props:any) => {
             waterMarkProps={{
                 content: '',
             }}>
-            {success?<EditPluginForm key={key} refresh={doRefresh} loading={loading} info={data}/>:<PluginNotFound/>}
+            {success?<EditPluginForm key={key} refresh={doRefresh} loading={loading} info={data} adminView={true}/>:<PluginNotFound/>}
         </PageContainer>
     );
 };

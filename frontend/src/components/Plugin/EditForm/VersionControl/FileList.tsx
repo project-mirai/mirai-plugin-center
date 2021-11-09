@@ -3,8 +3,9 @@ import axios from "axios";
 import {message, Space, Table} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import confirm from "antd/lib/modal/confirm";
+import {AdminView, isAdminView} from "../../../../models/View";
 
-export interface VersionFilesProps{
+export interface VersionFilesProps extends AdminView {
     id:string
     version:string
     refresh?:()=>void
@@ -64,8 +65,9 @@ export default function(props:VersionFilesProps){
             key: 'action',
             render: (text:any, record:any) => (
                 <Space size="middle">
-                    <a onClick={()=>downloadFile(record.filename)}>下载 {record.filename}</a>
-                    <a onClick={()=>showDeleteConfirm(record.filename)}>删除</a>
+                    <a onClick={()=>downloadFile(record.filename)}>下载</a>
+                    {props.adminView}
+                    {isAdminView(props)&&<a onClick={()=>showDeleteConfirm(record.filename)}>删除</a>}
                 </Space>
             ),
         },

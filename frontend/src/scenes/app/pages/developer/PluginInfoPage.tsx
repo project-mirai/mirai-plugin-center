@@ -6,6 +6,7 @@ import ProCard from "@ant-design/pro-card";
 import axios from "axios";
 import {useHistory} from "react-router";
 import {PluginInfo} from "../../../../models/Plugin";
+import PluginVersionControlForm from "../../../../components/Plugin/EditForm/PluginVersionControlForm";
 
 export default (props:any) => {
     const id = props.match.params.id
@@ -62,6 +63,18 @@ export default (props:any) => {
                     </Descriptions.Item>
                 </Descriptions>
 
+            </ProCard>
+
+            <ProCard
+                gutter={8}
+                colSpan={12}
+                style={{ marginTop: 8 }}
+                bordered={true}
+                layout="default"
+                direction="column"
+                title={"插件下载"}
+            >
+                <PluginVersionControlForm loading={loading} info={data}/>
             </ProCard>
         </>
     );

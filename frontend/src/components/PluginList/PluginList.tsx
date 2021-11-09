@@ -5,7 +5,7 @@ import {PluginInfo} from "../../models/Plugin";
 import {Pagination, Tag} from "antd";
 import {useHistory} from "react-router";
 import Meta from "antd/es/card/Meta";
-import {DownloadOutlined, InfoOutlined} from "@ant-design/icons";
+import {InfoOutlined} from "@ant-design/icons";
 
 async function getPluginList(api:string,page:number) {
     const res = await axios.get(api,{
@@ -52,8 +52,7 @@ export default (props:PluginListInfo) => {
                 />
             }
             actions={[
-                <InfoOutlined key="info" onClick={()=>history.push('/app/info/'+pluginInfoItem.id)}/>,
-                <DownloadOutlined key="download" onClick={()=>history.push('/app/info/'+pluginInfoItem.id)}/>
+                <InfoOutlined key="info" onClick={()=>history.push('/app/info/'+pluginInfoItem.id)}/>
             ]}
             colSpan={12}
             bordered={true}
