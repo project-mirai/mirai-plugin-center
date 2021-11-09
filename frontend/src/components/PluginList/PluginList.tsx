@@ -69,7 +69,7 @@ export default (props:PluginListInfo) => {
     }
     const Pager = ()=>(
         <ProCard layout={"center"}>
-            <Pagination defaultCurrent={1} pageSize={20} total={count} onChange={setPage} showQuickJumper/>
+            <Pagination defaultCurrent={page} pageSize={20} total={count} onChange={setPage} showQuickJumper/>
         </ProCard>
     )
     return (
