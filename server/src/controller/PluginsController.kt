@@ -19,6 +19,7 @@ import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
 import net.mamoe.mirai.plugincenter.services.updateOrDefault
+import net.mamoe.mirai.plugincenter.utils.isAdmin
 import net.mamoe.mirai.plugincenter.utils.isAvailable
 import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
@@ -49,7 +50,7 @@ class PluginsController(
     }
 
     private fun PluginEntity.checkOwnedBy(user: UserEntity) {
-        if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
+        if (! isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
     }
 
     // endregion
