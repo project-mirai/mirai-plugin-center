@@ -27,7 +27,7 @@ fun PluginEntity.isAvailable(): Boolean {
  * @see PluginEntity.userByOwner
  */
 fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
-    return this.userByOwner.uid == user.uid
+    return this.userByOwner.uid == user.uid || user.isAdmin
 }
 
 var PluginEntity.state: PluginEntity.Status
