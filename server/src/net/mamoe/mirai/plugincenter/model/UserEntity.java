@@ -39,6 +39,7 @@ public class UserEntity {
     private Collection<LogEntity> logsByUid;
     private Collection<PluginEntity> pluginsByUid;
     private Collection<TokenEntity> tokensByUid;
+    private Collection<UserRoleEntity> rolesByUid;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
@@ -196,4 +197,14 @@ public class UserEntity {
     public void setTokensByUid(Collection<TokenEntity> tokensByUid) {
         this.tokensByUid = tokensByUid;
     }
+
+    @OneToMany(mappedBy = "user")
+    public Collection<UserRoleEntity> getRolesByUid() {
+        return rolesByUid;
+    }
+
+    public void setRolesByUid(Collection<UserRoleEntity> rolesByUid) {
+        this.rolesByUid = rolesByUid;
+    }
+
 }

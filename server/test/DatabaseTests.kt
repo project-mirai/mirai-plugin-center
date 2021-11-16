@@ -1,27 +1,34 @@
 package net.mamoe.mirai.plugincenter
 
-import net.mamoe.mirai.plugincenter.repo.RolePermissionRepo
 import net.mamoe.mirai.plugincenter.repo.RoleRepo
+import net.mamoe.mirai.plugincenter.repo.UserRepo
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 class DatabaseTests {
     @Autowired
-    lateinit var rolePermissionRepo: RolePermissionRepo
+    lateinit var userRepo: UserRepo
 
     @Autowired
     lateinit var roleRepo: RoleRepo
 
     @Test
-    @Transactional
     fun roleRepoTest() {
         val roles = roleRepo.findAll()
 
         for (role in roles) {
             println("${role.id} ${role.name} ${role.owner.uid} ${role.permissionSet} ${role.log?.id}")
+        }
+    }
+
+    @Test
+    fun userRolesTest() {
+        val user = userRepo.findById(31).get()
+
+        for (role in user.rolesByUid) {
+            println("${role.role.id} ${role.role.name}")
         }
     }
 }
