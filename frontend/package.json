@@ -21,6 +21,7 @@
     "@types/react-router-dom": "^5.1.8",
     "antd": "^4.16.9",
     "axios": "^0.21.1",
+    "dotenv-cli": "^4.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router": "^5.2.0",
@@ -31,7 +32,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:dev": "dotenv -e .env.dev react-scripts start",
+    "start:production": "dotenv -e .env.production react-scripts start",
     "build": "react-scripts build",
+    "build:dev": "dotenv -e .env.dev react-scripts build",
+    "build:production": "dotenv -e .env.production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
