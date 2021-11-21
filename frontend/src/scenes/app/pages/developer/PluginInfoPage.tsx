@@ -3,10 +3,10 @@ import { Result, Button, Tag, Descriptions} from 'antd';
 import {PageContainer} from "@ant-design/pro-layout";
 import {EditOutlined} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
-import axios from "axios";
 import {useHistory} from "react-router";
 import {PluginInfo} from "../../../../models/Plugin";
 import PluginVersionControlForm from "../../../../components/Plugin/EditForm/PluginVersionControlForm";
+import request from "../../../../lib/request";
 
 export default (props:any) => {
     const id = props.match.params.id
@@ -22,7 +22,7 @@ export default (props:any) => {
     })
     console.log(id)
     useEffect(()=>{
-        axios.get('/v1/plugins/'+id).then((res)=>{
+        request.get('/v1/plugins/'+id).then((res)=>{
             setData(res.data.response)
             setLoading(false)
             console.log(data)

@@ -19,8 +19,6 @@ import CreatePluginPage from "./scenes/app/pages/developer/CreatePluginPage";
 import PluginListPage from "./scenes/app/pages/PluginListPage";
 import AdminPluginListPage from "./scenes/app/pages/administrator/AdminPluginListPage";
 const RouterConfig = ()=> {
-    const mode = process.env.REACT_APP_API_URL
-    console.log(mode)
     return (
         <div>
             <HashRouter>

@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import axios from "axios";
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "./VerifyLayout";
 import {useHistory} from "react-router";
+import request from "../../lib/request";
 
 export default function Login(){
     const classes = useVerficationFormStyle();
@@ -28,7 +28,7 @@ export default function Login(){
             email:username,
             password:password
         }
-        axios.post('/v1/sso/login',data).then((res)=>{
+        request.post('/v1/sso/login',data).then((res)=>{
             console.log(res)
             history.push('/app')
         }).catch((err)=>{

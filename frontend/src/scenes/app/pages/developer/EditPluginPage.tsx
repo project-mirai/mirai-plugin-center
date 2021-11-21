@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from "@ant-design/pro-layout";
-import axios from "axios";
 import PluginNotFound from "../../../../components/Plugin/PluginNotFound";
 import EditPluginForm from "../../../../components/Plugin/EditPluginForm";
+import request from "../../../../lib/request";
 export default (props:any) => {
     const [key, setKey] = useState(0)
     const id = props.match.params.id
@@ -18,7 +18,7 @@ export default (props:any) => {
     console.log(id)
     const doRefresh = ()=>{
         setKey(key+1)
-        axios.get('/v1/plugins/'+id).then((res)=>{
+        request.get('/v1/plugins/'+id).then((res)=>{
             setData(res.data.response)
             setLoading(false)
             console.log(data)

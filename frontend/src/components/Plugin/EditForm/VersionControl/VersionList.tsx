@@ -1,11 +1,11 @@
 import {PluginInfoFormParams} from "../../EditPluginForm";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Collapse} from "antd";
 import CollapsePanel from "antd/es/collapse/CollapsePanel";
 import FileList from "./FileList";
 import VersionOperation from "./VersionOperation";
 import {isAdminView} from "../../../../models/View";
+import request from "../../../../lib/request";
 
 export default function(props:PluginInfoFormParams){
     const [versionList,setVersionList] = useState(Array<string>())
@@ -14,7 +14,7 @@ export default function(props:PluginInfoFormParams){
         if(refresh) refresh()
     }
     useEffect( ()=>{
-        axios.get("/v1/plugins/"+props.info.id+"/versionList").then(res=>setVersionList(res.data.response))
+        request.get("/v1/plugins/"+props.info.id+"/versionList").then(res=>setVersionList(res.data.response))
     },[])
 
     return(

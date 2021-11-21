@@ -3,11 +3,11 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import axios from "axios";
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "./VerifyLayout";
 import Typography from "@material-ui/core/Typography";
 import {useHistory} from "react-router";
+import request from "../../lib/request";
 
 export default function Register(){
     const classes = useVerficationFormStyle();
@@ -31,7 +31,7 @@ export default function Register(){
             password:password,
             nick:nick
         }
-        axios.post('/v1/sso/register',data).then((res)=>{
+        request.post('/v1/sso/register',data).then((res)=>{
             if(res.data.code === 200) {
                 setMessage("注册成功")
                 handleDialogOpen()

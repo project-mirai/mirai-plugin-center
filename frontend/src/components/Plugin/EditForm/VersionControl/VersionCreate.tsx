@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {Modal, Button, Form, Input, message} from 'antd';
 import {PluginInfoFormParams} from "../../EditPluginForm";
-import axios from "axios";
+import request from "../../../../lib/request";
 export default function(props:PluginInfoFormParams) {
     const [form] = Form.useForm();
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -20,7 +20,7 @@ export default function(props:PluginInfoFormParams) {
 
     const onFinish = async (values: any) => {
         try{
-            await axios.put("/v1/plugins/"+props.info.id+"/"+values.version)
+            await request.put("/v1/plugins/"+props.info.id+"/"+values.version)
             setIsModalVisible(false)
             if(props.refresh) {
                 props.refresh()

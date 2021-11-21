@@ -3,9 +3,9 @@ import {Avatar, Button, Dropdown, Menu, Space} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import ProLayout from '@ant-design/pro-layout';
-import axios from "axios";
 import {useHistory} from "react-router";
 import {GuestRouter, DeveloperRouter, AdministratorRouter} from "./router/Routers";
+import request from "../../lib/request";
 
 
 
@@ -20,7 +20,7 @@ export default (props:any) => {
     const history = useHistory()
     const loadingInfo = () => {
         setNeedReloading(false)
-        axios.get('/v1/sso/whoami').then((res)=>{
+        request.get('/v1/sso/whoami').then((res)=>{
             setLogon(true)
             setUserInfo(res.data.response)
         }).catch(()=>{
@@ -29,7 +29,7 @@ export default (props:any) => {
         })
     }
     const logout = () =>
-            axios.get('/v1/sso/logout').finally(()=>setNeedReloading(true))
+        request.get('/v1/sso/logout').finally(()=>setNeedReloading(true))
 
     React.useEffect(()=>loadingInfo(),[needReloading])
     const userControlMenu = (

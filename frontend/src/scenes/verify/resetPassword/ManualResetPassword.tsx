@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import axios from "axios";
 import {Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "../VerifyLayout";
 import {useHistory} from "react-router";
+import request from "../../../lib/request";
 
 export default function ManualResetPassword(){
     const classes = useVerficationFormStyle();
@@ -28,7 +28,7 @@ export default function ManualResetPassword(){
     };
 
     const loadingInfo = () => {
-        axios.get('/v1/sso/whoami').then((res)=>{
+        request.get('/v1/sso/whoami').then((res)=>{
             setEmail(res.data.response.email)
         }).catch(()=>{
             history.push('/')
@@ -46,7 +46,7 @@ export default function ManualResetPassword(){
             password: oldPassword,
             newPassword: newPassword
         }
-        axios.patch('/v1/sso/resetPassword',data).then((res)=>{
+        request.patch('/v1/sso/resetPassword',data).then((res)=>{
             console.log(res)
             setMessage("修改成功")
             setSuccess(true)

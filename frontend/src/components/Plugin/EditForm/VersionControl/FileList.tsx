@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {message, Space, Table} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import confirm from "antd/lib/modal/confirm";
 import {AdminView, isAdminView} from "../../../../models/View";
+import request from "../../../../lib/request";
 
 export interface VersionFilesProps extends AdminView {
     id:string
@@ -20,7 +20,7 @@ interface tableView {
 export default function(props:VersionFilesProps){
     const [fileList, setFileList] = useState(Array<tableView>())
     const refreshList = ()=>{
-        axios.get("/v1/plugins/"+props.id+"/"+props.version+"/").then(res=>{
+        request.get("/v1/plugins/"+props.id+"/"+props.version+"/").then(res=>{
             const arr = []
             for(let i = 0; i < res.data.response.length; i++) {
                 arr.push({
@@ -41,19 +41,13 @@ export default function(props:VersionFilesProps){
         okType: 'danger',
         cancelText: '取消',
         onOk: async ()=>{
-            try{
-                await axios.delete("/v1/plugins/"+props.id+"/"+props.version+"/"+filename)
-                message.success("删除成功")
-                refreshList()
-            }catch (e) {
-                message.error(e.response.data.message)
-            }
+            await request.delete("/v1/plugins/"+props.id+"/"+props.version+"/"+filename)
+            message.success("删除成功")
+            refreshList()
         },
     });
 
-    //TODO 在ENV中增加变量用于控制API
-    const API_URL = "http://localhost:8080"
-    const downloadFile = (filename:string)=>window.open(API_URL+'/v1/plugins/'+props.id+"/"+props.version+"/"+filename, '_blank')
+    const downloadFile = (filename:string)=>window.open(process.env.REACT_APP_API_URL+'/v1/plugins/'+props.id+"/"+props.version+"/"+filename, '_blank')
     const columns = [
         {
             title: '文件名',

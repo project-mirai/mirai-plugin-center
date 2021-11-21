@@ -1,10 +1,10 @@
 import ProForm, {ProFormText} from "@ant-design/pro-form";
-import axios from "axios";
 import {Button, message} from "antd";
 import ProCard from "@ant-design/pro-card";
 import React, {useState} from "react";
 import {useHistory} from "react-router";
 import {PluginInfoFormParams} from "../EditPluginForm";
+import request from "../../../lib/request";
 type LayoutType = Parameters<typeof ProForm>[0]['layout'];
 
 export default function(props:PluginInfoFormParams) {
@@ -25,15 +25,14 @@ export default function(props:PluginInfoFormParams) {
             : null;
     const setStatus = async () =>{
         try{
-            await axios.patch('/v1/admin/setstate',{
+            await request.patch('/v1/admin/setstate',{
                 pluginId:props.info.id,
                 state:status==='Accepted'?1:2
             })
             message.success('切换状态成功')
-            doRefresh()
-        }catch (err) {
-            message.error(err.response.data.message)
+        }catch (e) {
         }
+        doRefresh()
     }
     return <ProCard style={{ marginTop: 8 }} loading={props.loading}>
         <ProForm<{
@@ -47,16 +46,12 @@ export default function(props:PluginInfoFormParams) {
                 return props.info
             }}
             onFinish={async (values) => {
-                try{
-                    await axios.put('/v1/plugins/'+values.id,{
-                        name:values.name,
-                        info:values.info
-                    })
-                    message.success('提交成功')
-                    doRefresh()
-                }catch (err) {
-                    message.error(err.response.data.message)
-                }
+                await request.put('/v1/plugins/'+values.id,{
+                    name:values.name,
+                    info:values.info
+                })
+                message.success('提交成功')
+                doRefresh()
             }}
             submitter={{
                 render: (props, doms) => {

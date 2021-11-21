@@ -2,8 +2,8 @@ import {VersionFilesProps} from "./FileList";
 
 import {Modal, Button, Space, message} from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import axios from "axios";
 import FileUpload from "./FileUpload";
+import request from "../../../../lib/request";
 
 const { confirm } = Modal;
 export default function (props:VersionFilesProps){
@@ -24,11 +24,10 @@ export default function (props:VersionFilesProps){
         cancelText: '取消',
         onOk: async ()=>{
             try{
-                await axios.delete("/v1/plugins/"+props.id+"/"+props.version)
+                await request.delete("/v1/plugins/"+props.id+"/"+props.version)
                 message.success("删除成功")
                 doRefresh()
             }catch (e) {
-                message.error(e.response.data.message)
             }
         },
     });

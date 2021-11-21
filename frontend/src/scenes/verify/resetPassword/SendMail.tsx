@@ -4,10 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import axios from "axios";
 import {Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "../VerifyLayout";
 import {useHistory} from "react-router";
+import request from "../../../lib/request";
 
 export default function SendMail(){
     const classes = useVerficationFormStyle();
@@ -25,7 +25,7 @@ export default function SendMail(){
         history.push('/verify/resetpassword/sendmail')
     };
     const SubmitForm = ()=>{
-        axios.get('/v1/sso/resetPassword?email='+email).then((res)=>{
+        request.get('/v1/sso/resetPassword?email='+email).then((res)=>{
             console.log(res)
             setMessage("发送成功")
             setSuccess(true)

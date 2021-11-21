@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, {Fragment} from "react";
 import ProCard from "@ant-design/pro-card";
 import {PluginInfo} from "../../models/Plugin";
@@ -6,9 +5,10 @@ import {Pagination, Tag} from "antd";
 import {useHistory} from "react-router";
 import Meta from "antd/es/card/Meta";
 import {InfoOutlined} from "@ant-design/icons";
+import request from "../../lib/request";
 
 async function getPluginList(api:string,page:number) {
-    const res = await axios.get(api,{
+    const res = await request.get(api,{
         params:{
             page: page - 1
         }
@@ -32,7 +32,7 @@ export default (props:PluginListInfo) => {
     const [pluginList, setPluginList] = React.useState([]);
     const [count, setCount] = React.useState(0);
     React.useEffect(()=>{
-        axios.get(props.url+"count").then((res)=>{
+        request.get(props.url+"count").then((res)=>{
             setCount(res.data.response.countL)
         })
     },[])

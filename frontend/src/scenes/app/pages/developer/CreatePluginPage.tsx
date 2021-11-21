@@ -3,7 +3,7 @@ import {message, Result, Button} from 'antd';
 import ProForm, { ProFormText } from '@ant-design/pro-form';
 import {PageContainer} from "@ant-design/pro-layout";
 import ProCard from "@ant-design/pro-card";
-import axios from "axios";
+import request from "../../../../lib/request";
 
 type LayoutType = Parameters<typeof ProForm>[0]['layout'];
 
@@ -38,16 +38,13 @@ export default () => {
                 onFinish={async (values) => {
                     await waitTime(500);
                     try{
-                        const res = await axios.put('/v1/plugins/'+values.id,{
+                        await request.put('/v1/plugins/'+values.id,{
                             name:values.name,
                             info:values.info
                         })
-                        console.log(res)
                         message.success('提交成功');
                         setSuccess(true)
                     }catch (err) {
-                        console.log(err)
-                        message.error(err.response.data.message)
                     }
                 }}
                 params={{}}
