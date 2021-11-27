@@ -18,6 +18,12 @@ import PluginInfoPage from "./scenes/app/pages/developer/PluginInfoPage";
 import CreatePluginPage from "./scenes/app/pages/developer/CreatePluginPage";
 import PluginListPage from "./scenes/app/pages/PluginListPage";
 import AdminPluginListPage from "./scenes/app/pages/administrator/AdminPluginListPage";
+import {createStore} from "redux";
+import loginReducer from "./context/account/loginReducer";
+import {Provider} from "react-redux";
+
+const loginStore = createStore(loginReducer)
+
 const RouterConfig = ()=> {
     return (
         <div>
@@ -25,14 +31,15 @@ const RouterConfig = ()=> {
                 <Switch>
                     <Redirect exact from="/" to="/app"/>
                     <Route path="/app">
-                        <App>
-                            <Route exact path="/app" component={PluginListPage}/>
-                            <Route path="/app/info/:id" component={PluginInfoPage}/>
-                            <Route exact path="/app/create" component={CreatePluginPage}/>
-                            <Route exact path="/app/edit/:id" component={EditPluginPage}/>
-                            <Route exact path="/app/admin" component={AdminPluginListPage}/>
-
-                        </App>
+                        <Provider store={loginStore}>
+                            <App>
+                                <Route exact path="/app" component={PluginListPage}/>
+                                <Route path="/app/info/:id" component={PluginInfoPage}/>
+                                <Route exact path="/app/create" component={CreatePluginPage}/>
+                                <Route exact path="/app/edit/:id" component={EditPluginPage}/>
+                                <Route exact path="/app/admin" component={AdminPluginListPage}/>
+                            </App>
+                        </Provider>
                     </Route>
                     <Route path="/verify">
                         <VerifyLayout>
