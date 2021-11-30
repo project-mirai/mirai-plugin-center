@@ -35,7 +35,7 @@ class RoleController(
     fun newRole(
         @RequestBody
         request: CreateRoleRequest,
-        @ApiIgnore exchange: ServerWebExchange): ApiResp<String?> {
+        @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
         // TODO: check permission
 
         val user = exchange.loginUserOrReject
@@ -50,7 +50,7 @@ class RoleController(
         @RequestBody
         request: AssignPermissionRequest,
 
-        @ApiIgnore exchange: ServerWebExchange): ApiResp<String?> {
+        @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
         // TODO: check permission
 
         val user = exchange.loginUserOrReject
@@ -62,7 +62,9 @@ class RoleController(
             ?: throw IllegalArgumentException("permission with code '${request.permissionCode}' doesn't exist.")
 
         // do assign
-        roleSvc.assignPermission(user, roleByName, permissionByCode)
+        with (roleSvc) {
+            roleByName.assignPermission(user, permissionByCode)
+        }
 
         return ApiResp.ok()
     }
