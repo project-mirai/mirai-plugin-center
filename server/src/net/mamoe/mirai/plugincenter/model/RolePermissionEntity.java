@@ -55,7 +55,7 @@ public class RolePermissionEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RolePermissionEntity that = (RolePermissionEntity) o;
-        return id == that.id && permission == that.permission && Objects.equals(role, that.role);
+        return id == that.id && permission == that.permission && role.getId() == that.role.getId();
     }
 
     @Override

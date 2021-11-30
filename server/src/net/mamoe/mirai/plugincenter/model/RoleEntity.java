@@ -68,7 +68,7 @@ public class RoleEntity implements Logable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RoleEntity that = (RoleEntity) o;
-        return id == that.id && name.equals(that.name) && permissionSet.equals(that.permissionSet) && Objects.equals(log, that.log);
+        return id == that.id && name.equals(that.name) && permissionSet.equals(that.permissionSet) && log.getId() == that.log.getId();
     }
 
     @Override
