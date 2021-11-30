@@ -35,6 +35,7 @@ public class UserEntity {
     private String lastLoginIp;
     private boolean banned;
     private int rawRole;
+    private LogEntity log;
     private Collection<FileEntity> filesByUid;
     private Collection<LogEntity> logsByUid;
     private Collection<PluginEntity> pluginsByUid;
@@ -140,13 +141,25 @@ public class UserEntity {
      * 2 管理员
      * */
     @Basic
+    @Deprecated
     @Column(name = "role")
     public int getRawRole() {
         return rawRole;
     }
 
+    @Deprecated
     public void setRawRole(int role) {
         this.rawRole = role;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "log_id")
+    public LogEntity getLog() {
+        return log;
+    }
+
+    public void setLog(LogEntity log) {
+        this.log = log;
     }
 
     @Override
