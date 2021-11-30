@@ -19,8 +19,9 @@ import net.mamoe.mirai.plugincenter.repo.RolePermissionRepo
 import net.mamoe.mirai.plugincenter.repo.RoleRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
-@Component
+@Service
 class RoleService {
     @Autowired
     lateinit var roleRepo: RoleRepo
@@ -60,20 +61,20 @@ class RoleService {
         })
     }
 
-    fun assignPermission(operator: UserEntity, roleEntity: RoleEntity, permission: PermissionEntity): RolePermissionEntity {
+    fun RoleEntity.assignPermission(operator: UserEntity, permission: PermissionEntity): RolePermissionEntity {
         // check role-permission relationship
-        rolePermissionRepo.findByRoleAndPermission(roleEntity, permission.code)?.run {
-            throw IllegalArgumentException("role with name '${roleEntity.name}' has had permission with code '${permission.code}'.")
+        rolePermissionRepo.findByRoleAndPermission(this, permission.code)?.run {
+            throw IllegalArgumentException("role with name '${this@assignPermission.name}' has had permission with code '${permission.code}'.")
         }
 
         val log = logSvc.newLog(
-            roleEntity.logChain,
+            this.logChain,
             operator,
             AssignPermissionEvent(permission),
             AssignPermissionEvent::class)
 
         return rolePermissionRepo.save(RolePermissionEntity().apply {
-            this.role = roleEntity
+            this.role = this@assignPermission
             this.permission = permission.code
         })
     }
