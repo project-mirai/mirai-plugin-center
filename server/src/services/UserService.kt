@@ -14,8 +14,12 @@ import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByEmailDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByPasswordDTO
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
+import net.mamoe.mirai.plugincenter.event.AssignRoleEvent
+import net.mamoe.mirai.plugincenter.model.RoleEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.model.UserRoleEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
+import net.mamoe.mirai.plugincenter.repo.UserRoleRepo
 import net.mamoe.mirai.plugincenter.utils.href
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -30,10 +34,14 @@ import kotlin.time.minutes
 
 @Service
 class UserService(
+    private val userRoleRepo: UserRoleRepo,
 
     private val userRepo: UserRepo,
 
     private val bcrypt: BCryptPasswordEncoder,
+
+    @Autowired
+    private val logSvc: LogService,
 
     @Autowired
     private val mailService: MailService,
@@ -140,5 +148,19 @@ class UserService(
         updatePassword(user, reset.newPassword)
     }
 
+    fun UserEntity.assignRole(operator: UserEntity, role: RoleEntity): UserRoleEntity {
+        // check user-role relationship
+        this.rolesByUid.firstOrNull { it.role.id == role.id }?.run {
+            throw IllegalArgumentException("role with name '${role.name}' is already assigned for user with name '${this@assignRole.nick}'")
+        }
 
+        // do log
+        logSvc.newLog(this.log, operator, AssignRoleEvent(role.id, role.name), AssignRoleEvent::class)
+
+        // assignment
+        return userRoleRepo.save(UserRoleEntity().apply {
+            this.user = this@assignRole
+            this.role = role
+        })
+    }
 }
