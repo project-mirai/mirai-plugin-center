@@ -18,7 +18,6 @@ import java.util.Objects;
 public class RoleEntity {
     private int id;
     private String name;
-    private UserEntity owner;
     private LogEntity log;
     private Collection<RolePermissionEntity> permissionSet;
 
@@ -52,16 +51,6 @@ public class RoleEntity {
         this.permissionSet = permissionSet;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "owner")
-    public UserEntity getOwner() {
-        return owner;
-    }
-
-    public void setOwner(UserEntity owner) {
-        this.owner = owner;
-    }
-
     @OneToOne
     @JoinColumn(name = "log")
     public LogEntity getLog() {
@@ -77,11 +66,11 @@ public class RoleEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RoleEntity that = (RoleEntity) o;
-        return id == that.id && name.equals(that.name) && permissionSet.equals(that.permissionSet) && owner.equals(that.owner) && Objects.equals(log, that.log);
+        return id == that.id && name.equals(that.name) && permissionSet.equals(that.permissionSet) && Objects.equals(log, that.log);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, permissionSet, owner, log);
+        return Objects.hash(id, name, permissionSet, log);
     }
 }
