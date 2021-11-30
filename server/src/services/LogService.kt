@@ -12,17 +12,28 @@ package net.mamoe.mirai.plugincenter.services
 import com.fasterxml.jackson.core.type.TypeReference
 import net.mamoe.mirai.plugincenter.model.LogEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.model.interfaces.Logable
 import net.mamoe.mirai.plugincenter.repo.LogRepo
 import net.mamoe.mirai.plugincenter.utils.jsonMapper
 import org.springframework.stereotype.Component
 import java.lang.reflect.Type
+import java.nio.file.spi.FileTypeDetector
 import kotlin.reflect.KClass
 
 @Component
 class LogService(
     val repo: LogRepo
 ) {
-    fun <T: Any> push(operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
+    /**
+     * 创建一条 log 条目
+     *
+     * @param parent 父 log，如果为 null 则是根 log
+     * @param operator 进行操作的用户
+     * @param detail 日志额外内容
+     * @param clazz T 的 [KClass] 实例
+     * @return 创建成功的 [LogEntity] 示例
+     */
+    fun <T: Any> newLog(parent: LogEntity? = null, operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
         val bytes = jsonMapper.writeValueAsBytes(detail)
         val map = jsonMapper.readValue(bytes, object : TypeReference<Map<String, Any>>() {
             override fun getType(): Type {
@@ -34,6 +45,7 @@ class LogService(
             this.operator = operator.uid
             this.msg = clazz.simpleName
             this.otherInfo = map
+            this.parent = parent
         })
     }
 }
