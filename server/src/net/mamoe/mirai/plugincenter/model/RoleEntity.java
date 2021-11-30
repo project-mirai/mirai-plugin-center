@@ -9,13 +9,15 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import net.mamoe.mirai.plugincenter.model.interfaces.Logable;
+
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Objects;
 
 @Entity
 @Table(name = "role", schema = "public", catalog = "plugins")
-public class RoleEntity {
+public class RoleEntity implements Logable {
     private int id;
     private String name;
     private LogEntity log;
@@ -72,5 +74,15 @@ public class RoleEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, permissionSet, log);
+    }
+
+    @Override
+    public LogEntity getLogChain() {
+        return getLog();
+    }
+
+    @Override
+    public void setLogChain(LogEntity log) {
+        setLog(log);
     }
 }
