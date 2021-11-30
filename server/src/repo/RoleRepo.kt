@@ -13,4 +13,5 @@ import net.mamoe.mirai.plugincenter.model.RoleEntity
 import org.springframework.data.repository.CrudRepository
 
 interface RoleRepo : CrudRepository<RoleEntity, Int> {
+    fun findByName(name: String): RoleEntity?
 }

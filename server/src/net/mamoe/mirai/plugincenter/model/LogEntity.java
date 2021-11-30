@@ -11,6 +11,7 @@ package net.mamoe.mirai.plugincenter.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import kotlinx.serialization.json.JsonElement;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;

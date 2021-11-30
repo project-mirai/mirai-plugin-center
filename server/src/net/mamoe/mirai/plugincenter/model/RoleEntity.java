@@ -44,7 +44,7 @@ public class RoleEntity implements Logable {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "id")
+    @OneToMany(mappedBy = "role")
     public Collection<RolePermissionEntity> getPermissionSet() {
         return permissionSet;
     }
@@ -77,11 +77,13 @@ public class RoleEntity implements Logable {
     }
 
     @Override
+    @Transient
     public LogEntity getLogChain() {
         return getLog();
     }
 
     @Override
+    @Transient
     public void setLogChain(LogEntity log) {
         setLog(log);
     }

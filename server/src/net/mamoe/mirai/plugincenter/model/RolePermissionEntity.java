@@ -31,7 +31,7 @@ public class RolePermissionEntity {
     }
 
     @OneToOne
-    @JoinColumn(name = "role")
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     public RoleEntity getRole() {
         return role;
     }

@@ -12,18 +12,26 @@ package net.mamoe.mirai.plugincenter.services
 import com.fasterxml.jackson.core.type.TypeReference
 import net.mamoe.mirai.plugincenter.model.LogEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
-import net.mamoe.mirai.plugincenter.model.interfaces.Logable
 import net.mamoe.mirai.plugincenter.repo.LogRepo
 import net.mamoe.mirai.plugincenter.utils.jsonMapper
 import org.springframework.stereotype.Component
 import java.lang.reflect.Type
-import java.nio.file.spi.FileTypeDetector
+import java.sql.Timestamp
 import kotlin.reflect.KClass
 
 @Component
 class LogService(
     val repo: LogRepo
 ) {
+    /**
+     * 创建一条根 log 条目
+     *
+     * @see LogService.newLog
+     */
+    fun <T: Any> newRootLog(operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
+        return newLog(null, operator, detail, clazz)
+    }
+
     /**
      * 创建一条 log 条目
      *
@@ -33,7 +41,7 @@ class LogService(
      * @param clazz T 的 [KClass] 实例
      * @return 创建成功的 [LogEntity] 示例
      */
-    fun <T: Any> newLog(parent: LogEntity? = null, operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
+    fun <T: Any> newLog(parent: LogEntity?, operator: UserEntity, detail: T, clazz: KClass<T>): LogEntity {
         val bytes = jsonMapper.writeValueAsBytes(detail)
         val map = jsonMapper.readValue(bytes, object : TypeReference<Map<String, Any>>() {
             override fun getType(): Type {
@@ -46,6 +54,7 @@ class LogService(
             this.msg = clazz.simpleName
             this.otherInfo = map
             this.parent = parent
+            this.logTime = Timestamp(System.currentTimeMillis())
         })
     }
 }

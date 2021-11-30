@@ -29,3 +29,12 @@ data class RoleData(
         }
     }
 }
+
+data class CreateRoleRequest(
+    val name: String
+)
+
+data class AssignPermissionRequest(
+    val roleName: String,
+    val permissionCode: Int
+)

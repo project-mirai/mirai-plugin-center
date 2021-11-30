@@ -7,12 +7,14 @@
  * https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
  */
 
-package net.mamoe.mirai.plugincenter.repo
+package net.mamoe.mirai.plugincenter.controller.admin
 
-import net.mamoe.mirai.plugincenter.model.RoleEntity
-import net.mamoe.mirai.plugincenter.model.RolePermissionEntity
-import org.springframework.data.repository.CrudRepository
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-interface RolePermissionRepo : CrudRepository<RolePermissionEntity, Int> {
-    fun findByRoleAndPermission(roleEntity: RoleEntity, permission: Int): RolePermissionEntity?
+@RestController
+@RequestMapping("/admin/permission")
+class PermissionController(
+
+) {
 }

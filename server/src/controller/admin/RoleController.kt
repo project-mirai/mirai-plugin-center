@@ -10,12 +10,16 @@
 package net.mamoe.mirai.plugincenter.controller.admin
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
+import net.mamoe.mirai.plugincenter.dto.AssignPermissionRequest
+import net.mamoe.mirai.plugincenter.dto.CreateRoleRequest
 import net.mamoe.mirai.plugincenter.dto.RoleData
 import net.mamoe.mirai.plugincenter.model.RoleEntity
 import net.mamoe.mirai.plugincenter.services.RoleService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
+import net.mamoe.mirai.plugincenter.utils.permissions
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ServerWebExchange
+import springfox.documentation.annotations.ApiIgnore
 
 @RestController
 @RequestMapping("/admin/role")
@@ -25,5 +29,41 @@ class RoleController(
     @GetMapping("list")
     fun roles(): ApiResp<List<Any>> {
         return ApiResp.ok(roleSvc.roles.map(RoleData.Companion::fromRole))
+    }
+
+    @PostMapping("create")
+    fun newRole(
+        @RequestBody
+        request: CreateRoleRequest,
+        @ApiIgnore exchange: ServerWebExchange): ApiResp<String?> {
+        // TODO: check permission
+
+        val user = exchange.loginUserOrReject
+
+        roleSvc.newRole(user, request.name)
+
+        return ApiResp.ok()
+    }
+
+    @PostMapping("assign")
+    fun assignPermission(
+        @RequestBody
+        request: AssignPermissionRequest,
+
+        @ApiIgnore exchange: ServerWebExchange): ApiResp<String?> {
+        // TODO: check permission
+
+        val user = exchange.loginUserOrReject
+
+        val roleByName = roleSvc.findRoleByName(request.roleName)
+            ?: throw IllegalArgumentException("role with name '${request.roleName}' doesn't exist.")
+
+        val permissionByCode = permissions[request.permissionCode]
+            ?: throw IllegalArgumentException("permission with code '${request.permissionCode}' doesn't exist.")
+
+        // do assign
+        roleSvc.assignPermission(user, roleByName, permissionByCode)
+
+        return ApiResp.ok()
     }
 }

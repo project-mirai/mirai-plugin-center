@@ -7,12 +7,10 @@
  * https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
  */
 
-package net.mamoe.mirai.plugincenter.repo
+package net.mamoe.mirai.plugincenter.event
 
-import net.mamoe.mirai.plugincenter.model.RoleEntity
-import net.mamoe.mirai.plugincenter.model.RolePermissionEntity
-import org.springframework.data.repository.CrudRepository
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 
-interface RolePermissionRepo : CrudRepository<RolePermissionEntity, Int> {
-    fun findByRoleAndPermission(roleEntity: RoleEntity, permission: Int): RolePermissionEntity?
-}
+object NewRoleEvent
+
+data class AssignPermissionEvent(val permission: PermissionEntity)
