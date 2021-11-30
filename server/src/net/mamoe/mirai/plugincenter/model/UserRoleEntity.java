@@ -39,7 +39,7 @@ public class UserRoleEntity {
         this.user = user;
     }
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "role_id")
     public RoleEntity getRole() {
         return role;

@@ -82,7 +82,7 @@ public class LogEntity {
      */
     @Nullable
     @OneToOne()
-    @JoinColumn(name = "parent", referencedColumnName = "id", updatable = false, insertable = false)
+    @JoinColumn(name = "parent_id")
     public LogEntity getParent() {
         return parent;
     }
