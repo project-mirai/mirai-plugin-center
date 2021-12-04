@@ -9,11 +9,7 @@
 
 package net.mamoe.mirai.plugincenter.controller.admin
 
-import net.mamoe.mirai.plugincenter.dto.ApiResp
-import net.mamoe.mirai.plugincenter.dto.AssignPermissionRequest
-import net.mamoe.mirai.plugincenter.dto.CreateRoleRequest
-import net.mamoe.mirai.plugincenter.dto.RoleData
-import net.mamoe.mirai.plugincenter.model.RoleEntity
+import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.services.RoleService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.permissions
@@ -32,7 +28,7 @@ class RoleController(
     }
 
     @PostMapping("create")
-    fun newRole(
+    fun createRole(
         @RequestBody
         request: CreateRoleRequest,
         @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
@@ -40,7 +36,7 @@ class RoleController(
 
         val user = exchange.loginUserOrReject
 
-        roleSvc.newRole(user, request.name)
+        roleSvc.createRole(user, request.roleName)
 
         return ApiResp.ok()
     }
@@ -48,7 +44,7 @@ class RoleController(
     @PostMapping("assign")
     fun assignPermission(
         @RequestBody
-        request: AssignPermissionRequest,
+        request: ModifyPermissionRequest,
 
         @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
         // TODO: check permission
@@ -65,6 +61,45 @@ class RoleController(
         with (roleSvc) {
             roleByName.assignPermission(user, permissionByCode)
         }
+
+        return ApiResp.ok()
+    }
+
+    @PostMapping("deassign")
+    fun dropPermission(
+        @RequestBody
+        request: ModifyPermissionRequest,
+
+        @ApiIgnore
+        exchange: ServerWebExchange): ApiResp<Nothing?> {
+        // TODO: check permission
+
+        val user = exchange.loginUserOrReject
+
+        return roleSvc.withExistRole(request.roleName) { role ->
+            roleSvc.withExistPermission(request.permissionCode) { permission ->
+                with (roleSvc) {
+                    role.dropPermission(user, permission)
+
+                    ApiResp.ok()
+                }
+            }
+        }
+    }
+
+    @PostMapping("delete")
+    fun deleteRole(
+        @RequestBody
+        request: DeleteRoleRequest,
+
+        @ApiIgnore
+        exchange: ServerWebExchange
+    ): ApiResp<Nothing?> {
+        // TODO: check permission
+
+        val user = exchange.loginUserOrReject
+
+        roleSvc.deleteRole(user, request.roleName, request.force)
 
         return ApiResp.ok()
     }

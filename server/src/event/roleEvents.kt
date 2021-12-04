@@ -12,5 +12,14 @@ package net.mamoe.mirai.plugincenter.event
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
 
 object NewRoleEvent
+object DeleteRoleEvent
 
+/**
+ * 为角色赋予权限的事件
+ */
 data class AssignPermissionEvent(val permission: PermissionEntity)
+
+/**
+ * 删除角色权限的事件
+ */
+data class DropPermissionEvent(val permission: PermissionEntity)

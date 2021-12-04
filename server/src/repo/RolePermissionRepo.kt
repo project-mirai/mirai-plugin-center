@@ -15,4 +15,5 @@ import org.springframework.data.repository.CrudRepository
 
 interface RolePermissionRepo : CrudRepository<RolePermissionEntity, Int> {
     fun findByRoleAndPermission(roleEntity: RoleEntity, permission: Int): RolePermissionEntity?
+    fun findAllByRole(role: RoleEntity): Iterable<RolePermissionEntity>
 }

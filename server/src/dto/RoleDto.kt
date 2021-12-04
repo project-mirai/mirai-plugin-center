@@ -31,10 +31,15 @@ data class RoleData(
 }
 
 data class CreateRoleRequest(
-    val name: String
+    val roleName: String
 )
 
-data class AssignPermissionRequest(
+data class DeleteRoleRequest(
+    val roleName: String,
+    val force: Boolean = false
+)
+
+data class ModifyPermissionRequest(
     val roleName: String,
     val permissionCode: Int
 )

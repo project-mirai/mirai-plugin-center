@@ -10,6 +10,8 @@
 package net.mamoe.mirai.plugincenter.services
 
 import net.mamoe.mirai.plugincenter.event.AssignPermissionEvent
+import net.mamoe.mirai.plugincenter.event.DeleteRoleEvent
+import net.mamoe.mirai.plugincenter.event.DropPermissionEvent
 import net.mamoe.mirai.plugincenter.event.NewRoleEvent
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.model.RoleEntity
@@ -17,12 +19,15 @@ import net.mamoe.mirai.plugincenter.model.RolePermissionEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.RolePermissionRepo
 import net.mamoe.mirai.plugincenter.repo.RoleRepo
+import net.mamoe.mirai.plugincenter.repo.UserRoleRepo
+import net.mamoe.mirai.plugincenter.utils.permissions
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
 @Service
-class RoleService {
+class RoleService(
+    val userRoleRepo: UserRoleRepo
+) {
     @Autowired
     lateinit var roleRepo: RoleRepo
 
@@ -47,7 +52,7 @@ class RoleService {
      * @param operator 操作用户
      * @param name role 名称，应该是唯一的
      */
-    fun newRole(operator: UserEntity, name: String): RoleEntity {
+    fun createRole(operator: UserEntity, name: String): RoleEntity {
         // check role name
         roleRepo.findByName(name)?.run {
             throw IllegalArgumentException("role with name '$name' is already exist.")
@@ -61,6 +66,13 @@ class RoleService {
         })
     }
 
+    /**
+     * 为 role 赋予权限
+     *
+     * @receiver 目标 role
+     * @param operator 操作者
+     * @param permission 目标权限
+     */
     fun RoleEntity.assignPermission(operator: UserEntity, permission: PermissionEntity): RolePermissionEntity {
         // check role-permission relationship
         rolePermissionRepo.findByRoleAndPermission(this, permission.code)?.run {
@@ -78,4 +90,98 @@ class RoleService {
             this.permission = permission.code
         })
     }
+
+    /**
+     * 为 role 删除权限
+     *
+     * @receiver 目标 role
+     * @param operator 操作者
+     * @param permission 目标权限
+     */
+    fun RoleEntity.dropPermission(operator: UserEntity, permission: PermissionEntity): Unit {
+        withExistRolePermit(this, permission) {
+            val log = logSvc.newLog(
+                this.logChain,
+                operator,
+                DropPermissionEvent(permission),
+                DropPermissionEvent::class)
+
+            rolePermissionRepo.delete(it)
+        }
+    }
+
+    fun deleteRole(operator: UserEntity, roleName: String, force: Boolean = false) {
+        withExistRole(roleName) { role ->
+            val userRole = userRoleRepo.findAllByRole(role)
+
+            // inspecting the user-role relationship and reject or remove those
+            if (userRole.any()) {
+                if (force) {
+                    // remove all user-role relationship of this role
+                    userRoleRepo.deleteAll(userRole)
+                } else {
+                    // reject operation
+                    val userList = userRole.joinToString(", ", limit = 3) { "(uid: ${it.user.uid}) ${it.user.nick}" }
+
+                    throw IllegalArgumentException("role with name '$roleName' is already assigned to other user: $userList")
+                }
+            }
+
+            // remove all role-permission relationships of this role
+            with (rolePermissionRepo) {
+                deleteAll(findAllByRole(role))
+            }
+
+            logSvc.newLog(
+                role.logChain,
+                operator,
+                DeleteRoleEvent,
+                DeleteRoleEvent::class
+            )
+
+            roleRepo.delete(role)
+        }
+    }
+
+    final inline fun <R> withExistRole(roleName: String, block: (RoleEntity) -> R): R {
+        val role = roleRepo.findByName(roleName)
+            ?: throw IllegalArgumentException("the role with name '${roleName}' doesn't exist")
+
+        return block(role)
+    }
+
+    final inline fun <R> withoutExistRole(roleName: String, block: () -> R): R {
+        roleRepo.findByName(roleName)?.run {
+            throw IllegalArgumentException("a role with name '$roleName' already exists")
+        }
+
+        return block()
+    }
+
+    final inline fun <R> withExistPermission(permissionCode: Int, block: (PermissionEntity) -> R): R {
+        val permission = permissions[permissionCode] ?: throw IllegalArgumentException("the permission with code '$permissionCode' doesn't exist")
+
+        return block(permission)
+    }
+
+    final inline fun <R> withExistRolePermit(role: RoleEntity, permissionCode: Int, block: (RolePermissionEntity) -> R): R {
+        val relationship = rolePermissionRepo.findByRoleAndPermission(role, permissionCode)
+            ?: throw IllegalArgumentException("the role with name '${role.name}' doesn't obtain a permission with code '$permissionCode'")
+
+        return block(relationship)
+    }
+
+    final inline fun <R> withExistRolePermit(role: RoleEntity, permission: PermissionEntity, block: (RolePermissionEntity) -> R): R =
+        withExistRolePermit(role, permission.code, block)
+
+    final inline fun <R> withoutExistRolePermit(role: RoleEntity, permissionCode: Int, block: () -> R): R {
+        rolePermissionRepo.findByRoleAndPermission(role, permissionCode)?.run {
+            throw IllegalArgumentException("the role with name '${role.name}' already had the permission with code '$permissionCode'")
+        }
+
+        return block()
+    }
+
+    final inline fun <R> withoutExistPermit(role: RoleEntity, permission: PermissionEntity, block: () -> R): R =
+        withoutExistRolePermit(role, permission.code, block)
 }
