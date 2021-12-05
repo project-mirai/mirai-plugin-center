@@ -34,7 +34,7 @@ import kotlin.time.minutes
 
 @Service
 class UserService(
-    private val userRoleRepo: UserRoleRepo,
+    val userRoleRepo: UserRoleRepo,
 
     private val userRepo: UserRepo,
 
@@ -150,17 +150,36 @@ class UserService(
 
     fun UserEntity.assignRole(operator: UserEntity, role: RoleEntity): UserRoleEntity {
         // check user-role relationship
-        this.rolesByUid.firstOrNull { it.role.id == role.id }?.run {
-            throw IllegalArgumentException("role with name '${role.name}' is already assigned for user with name '${this@assignRole.nick}'")
+        withoutExistUserRole(this, role) {
+            // do log
+            logSvc.newLog(this.log, operator, AssignRoleEvent(role.id, role.name), AssignRoleEvent::class)
+
+            // assignment
+            return userRoleRepo.save(UserRoleEntity().apply {
+                this.user = this@assignRole
+                this.role = role
+            })
+        }
+    }
+
+    fun UserEntity.dropRole(operator: UserEntity, role: RoleEntity) {
+        withExistUserRole(this, role) {
+            userRoleRepo.delete(it)
+        }
+    }
+
+    final inline fun <R> withExistUserRole(user: UserEntity, role: RoleEntity, block: (UserRoleEntity) -> R): R {
+        val userRole = user.rolesByUid.find { it.role.id == role.id }
+            ?: throw IllegalArgumentException("role with name '${role.name}' wasn't assigned to user with id '${user.uid}'")
+
+        return block(userRole)
+    }
+
+    final inline fun <R> withoutExistUserRole(user: UserEntity, role: RoleEntity, block: () -> R): R {
+        user.rolesByUid.find { it.role.id == role.id }?.run {
+            throw IllegalArgumentException("role with name '${role.name}' was assigned to user with id '${user.uid}'")
         }
 
-        // do log
-        logSvc.newLog(this.log, operator, AssignRoleEvent(role.id, role.name), AssignRoleEvent::class)
-
-        // assignment
-        return userRoleRepo.save(UserRoleEntity().apply {
-            this.user = this@assignRole
-            this.role = role
-        })
+        return block()
     }
 }

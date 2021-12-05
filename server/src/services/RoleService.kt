@@ -26,16 +26,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class RoleService(
-    val userRoleRepo: UserRoleRepo
+    val userRoleRepo: UserRoleRepo,
+    val rolePermissionRepo: RolePermissionRepo
 ) {
     @Autowired
     lateinit var roleRepo: RoleRepo
 
     @Autowired
     lateinit var logSvc: LogService
-
-    @Autowired
-    lateinit var rolePermissionRepo: RolePermissionRepo
 
     val roles: Iterable<RoleEntity>
     get() {

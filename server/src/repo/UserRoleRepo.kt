@@ -10,10 +10,13 @@
 package net.mamoe.mirai.plugincenter.repo
 
 import net.mamoe.mirai.plugincenter.model.RoleEntity
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.model.UserRoleEntity
 import org.springframework.data.repository.CrudRepository
 
 interface UserRoleRepo : CrudRepository<UserRoleEntity, Int> {
-    fun existsByRole(role: RoleEntity): Boolean
     fun findAllByRole(role: RoleEntity): Iterable<UserRoleEntity>
+    fun findByUserAndRole(userEntity: UserEntity, roleEntity: RoleEntity): UserRoleEntity?
+
+    fun existsByRole(role: RoleEntity): Boolean
 }
