@@ -9,4 +9,4 @@
 
 package net.mamoe.mirai.plugincenter.dto
 
-data class AssignRoleRequest(val email: String, val roleName: String)
+data class ModifyRoleRequest(val uid: Int, val roleName: String)

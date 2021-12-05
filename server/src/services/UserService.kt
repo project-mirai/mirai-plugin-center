@@ -49,7 +49,7 @@ class UserService(
     @Value("\${mail.base.url}")
     val url: String
 ) {
-
+    fun findUserById(uid: Int): UserEntity? = userRepo.findUserEntityByUid(uid)
 
     fun loadUserByUsername(username: String): UserEntity? {
 
@@ -181,5 +181,11 @@ class UserService(
         }
 
         return block()
+    }
+
+    final inline fun <R> withExistUser(uid: Int, block: (UserEntity) -> R): R {
+        val user = findUserById(uid) ?: throw IllegalArgumentException("user with id $uid doesn't exist")
+
+        return block(user)
     }
 }

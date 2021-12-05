@@ -10,7 +10,7 @@
 package net.mamoe.mirai.plugincenter.controller.admin
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
-import net.mamoe.mirai.plugincenter.dto.AssignRoleRequest
+import net.mamoe.mirai.plugincenter.dto.ModifyRoleRequest
 import net.mamoe.mirai.plugincenter.services.RoleService
 import net.mamoe.mirai.plugincenter.services.UserService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
@@ -31,7 +31,7 @@ class UserController(
     @PostMapping("assign")
     fun assignRole(
         @RequestBody
-        request: AssignRoleRequest,
+        request: ModifyRoleRequest,
 
         @ApiIgnore
         exchange: ServerWebExchange
@@ -40,16 +40,39 @@ class UserController(
 
         val user = exchange.loginUserOrReject
 
-        val userByEmail = userSvc.loadUserByUsername(request.email)
-            ?: throw IllegalArgumentException("user with email '${request.email}' doesn't exist.")
+        val userById = userSvc.findUserById(request.uid)
+            ?: throw IllegalArgumentException("user with id '${request.uid}' doesn't exist.")
 
         val roleByName = roleSvc.findRoleByName(request.roleName)
             ?: throw IllegalArgumentException("role with name '${request.roleName} doesn't exist.'")
 
         with(userSvc) {
-            userByEmail.assignRole(user, roleByName)
+            userById.assignRole(user, roleByName)
         }
 
         return ApiResp.ok()
+    }
+
+    @PostMapping("deassign")
+    fun dropRole(
+        @RequestBody
+        request: ModifyRoleRequest,
+
+        @ApiIgnore
+        exchange: ServerWebExchange
+    ): ApiResp<Nothing?> {
+        // TODO: check permission
+
+        val user = exchange.loginUserOrReject
+
+        return userSvc.withExistUser(request.uid) { targetUser ->
+            roleSvc.withExistRole(request.roleName) { role ->
+                with (userSvc) {
+                    targetUser.dropRole(user, role)
+                }
+            }
+
+            ApiResp.ok()
+        }
     }
 }
