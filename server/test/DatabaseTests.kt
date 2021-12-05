@@ -19,7 +19,7 @@ class DatabaseTests {
         val roles = roleRepo.findAll()
 
         for (role in roles) {
-            println("${role.id} ${role.name} ${role.owner.uid} ${role.permissionSet} ${role.log?.id}")
+            println("${role.id} ${role.name} ${role.permissionSet} ${role.log?.id}")
         }
     }
 
