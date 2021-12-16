@@ -13,10 +13,13 @@ import net.mamoe.mirai.plugincenter.model.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.QueryHints
 import java.sql.Timestamp
+import javax.persistence.QueryHint
 import javax.transaction.Transactional
 
 interface UserRepo : JpaRepository<UserEntity, Int> {
+    @QueryHints(QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     fun findUserEntityByEmail(email: String): UserEntity?
     fun findUserEntityByUid(uid: Int): UserEntity?
     fun existsByEmail(email: String): Boolean

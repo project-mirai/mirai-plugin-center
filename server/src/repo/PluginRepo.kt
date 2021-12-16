@@ -18,7 +18,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.transaction.annotation.Transactional
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
-    @Cacheable("plugin", key = "#pluginId")
     fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
 
     fun findAll(page: Pageable): Page<PluginEntity>

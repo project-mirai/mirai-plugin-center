@@ -19,11 +19,13 @@ import net.mamoe.mirai.plugincenter.repo.UserRepo
 import net.mamoe.mirai.plugincenter.utils.href
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.naming.AuthenticationException
+import javax.persistence.QueryHint
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
@@ -41,8 +43,6 @@ class UserService(
     @Value("\${mail.base.url}")
     val url: String
 ) {
-
-
     fun loadUserByUsername(username: String): UserEntity? {
 
         // todo 用户角色判断
