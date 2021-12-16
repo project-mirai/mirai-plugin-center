@@ -9,12 +9,15 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @Table(name = "plugin_file", schema = "public", catalog = "plugins")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PluginFileEntity {
     private int id;
     private String version;

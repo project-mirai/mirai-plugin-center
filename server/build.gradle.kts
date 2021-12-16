@@ -52,4 +52,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 
     api("net.mamoe:mirai-console-compiler-annotations:2.6-M2")
+
+    // hibernate
+    implementation("org.hibernate:hibernate-jcache:5.4.29.Final")
 }

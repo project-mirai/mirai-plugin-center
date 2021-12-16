@@ -7,19 +7,21 @@
   ~ https://github.com/project-mirai/mirai-plugin-center/blob/master/LICENSE
   -->
 
-<config
+<ehcache:config
+        xmlns:ehcache="http://www.ehcache.org/v3"
+        xmlns:jcache="http://www.ehcache.org/v3/jsr107"
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-        xmlns='http://www.ehcache.org/v3'
+        xmlns:eh='http://www.ehcache.org/v3'
         xmlns:jsr107='http://www.ehcache.org/v3/jsr107'>
 
-    <cache alias="plugin">
-        <resources>
-           <heap unit="entries">2000</heap>
-        </resources>
-    </cache>
-    <cache-template name="heap-cache">
-        <resources>
-            <heap unit="entries">2000</heap>
-        </resources>
-    </cache-template>
-</config>
+    <ehcache:cache alias="plugin">
+        <ehcache:resources>
+           <ehcache:heap unit="entries">2000</ehcache:heap>
+        </ehcache:resources>
+    </ehcache:cache>
+    <ehcache:cache-template name="heap-cache">
+        <ehcache:resources>
+            <ehcache:heap unit="entries">2000</ehcache:heap>
+        </ehcache:resources>
+    </ehcache:cache-template>
+</ehcache:config>
