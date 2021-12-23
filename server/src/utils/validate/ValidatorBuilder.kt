@@ -91,7 +91,9 @@ open class ValidatorBuilder(val validationName: String = "Validation") {
         return this@unaryPlus
     }
 
-    infix fun UserEntity.can(permit: PermissionEntity): Validator = assert(this@can.hasPermit(permit))
+    infix fun UserEntity.can(permit: PermissionEntity): Validator = +{
+        this@can.hasPermit(permit).toResult("user with id '${this.uid}' doesn't have permission with code '${permit.code}'")
+    }
 
     /**
      * Make a subrequirement for string.
