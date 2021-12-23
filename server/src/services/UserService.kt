@@ -14,8 +14,12 @@ import net.mamoe.mirai.plugincenter.dto.RegisterDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByEmailDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByPasswordDTO
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
+import net.mamoe.mirai.plugincenter.event.AssignRoleEvent
+import net.mamoe.mirai.plugincenter.model.RoleEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.model.UserRoleEntity
 import net.mamoe.mirai.plugincenter.repo.UserRepo
+import net.mamoe.mirai.plugincenter.repo.UserRoleRepo
 import net.mamoe.mirai.plugincenter.utils.href
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -32,10 +36,14 @@ import kotlin.time.minutes
 
 @Service
 class UserService(
+    val userRoleRepo: UserRoleRepo,
 
     private val userRepo: UserRepo,
 
     private val bcrypt: BCryptPasswordEncoder,
+
+    @Autowired
+    private val logSvc: LogService,
 
     @Autowired
     private val mailService: MailService,
@@ -43,6 +51,7 @@ class UserService(
     @Value("\${mail.base.url}")
     val url: String
 ) {
+    fun findUserById(uid: Int): UserEntity? = userRepo.findByUid(uid)
     fun loadUserByUsername(username: String): UserEntity? {
 
         // todo 用户角色判断
@@ -140,5 +149,44 @@ class UserService(
         updatePassword(user, reset.newPassword)
     }
 
+    fun UserEntity.assignRole(operator: UserEntity, role: RoleEntity): UserRoleEntity {
+        // check user-role relationship
+        withoutExistUserRole(this, role) {
+            // do log
+            logSvc.newLog(this.log, operator, AssignRoleEvent(role.id, role.name), AssignRoleEvent::class)
 
+            // assignment
+            return userRoleRepo.save(UserRoleEntity().apply {
+                this.user = this@assignRole
+                this.role = role
+            })
+        }
+    }
+
+    fun UserEntity.dropRole(operator: UserEntity, role: RoleEntity) {
+        withExistUserRole(this, role) {
+            userRoleRepo.delete(it)
+        }
+    }
+
+    final inline fun <R> withExistUserRole(user: UserEntity, role: RoleEntity, block: (UserRoleEntity) -> R): R {
+        val userRole = user.rolesByUid.find { it.role.id == role.id }
+            ?: throw IllegalArgumentException("role with name '${role.name}' wasn't assigned to user with id '${user.uid}'")
+
+        return block(userRole)
+    }
+
+    final inline fun <R> withoutExistUserRole(user: UserEntity, role: RoleEntity, block: () -> R): R {
+        user.rolesByUid.find { it.role.id == role.id }?.run {
+            throw IllegalArgumentException("role with name '${role.name}' was assigned to user with id '${user.uid}'")
+        }
+
+        return block()
+    }
+
+    final inline fun <R> withExistUser(uid: Int, block: (UserEntity) -> R): R {
+        val user = findUserById(uid) ?: throw IllegalArgumentException("user with id $uid doesn't exist")
+
+        return block(user)
+    }
 }

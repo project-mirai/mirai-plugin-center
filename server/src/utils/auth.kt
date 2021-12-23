@@ -9,9 +9,11 @@
 
 package net.mamoe.mirai.plugincenter.utils
 
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.server.ServerWebExchange
+import java.lang.IllegalStateException
 
 val ServerWebExchange.loginUser: UserEntity?
     get() = attributes["User"] as? UserEntity
@@ -42,4 +44,37 @@ enum class AuthFailedReason(val msg: String) {
     TOKEN_NOT_FOUND("Invalid token"),
     UNKNOWN_USER("Invalid session"),
     ;
+}
+
+class RequireBlock(private val exchange: ServerWebExchange) {
+    private var loginUser: UserEntity? = null
+
+    /**
+     * 要求用户登录
+     *
+     * @throws AccessDeniedException 由 [ServerWebExchange.loginUserOrReject] 抛出
+     */
+    fun login(): UserEntity {
+        loginUser = exchange.loginUserOrReject
+
+        return loginUser!!      // safe unless Kotlin is stupid
+                                //             ^Warning: condition always true
+    }
+
+    /**
+     * 需要在 login 后调用，否则抛出异常
+     *
+     * @throws IllegalStateException 未调用 login 时调用该方法抛出
+     */
+    fun permission(vararg permission: PermissionEntity): List<PermissionEntity> {
+        val user = loginUser
+            TODO()
+        if (user != null) {
+            //
+        } else throw IllegalStateException("login() required")
+    }
+}
+
+fun ServerWebExchange.requires(block: RequireBlock.() -> Unit) {
+
 }

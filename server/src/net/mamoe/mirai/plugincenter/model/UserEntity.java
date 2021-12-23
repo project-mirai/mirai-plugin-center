@@ -37,11 +37,12 @@ public class UserEntity {
     private String lastLoginIp;
     private boolean banned;
     private int rawRole;
-
+    private LogEntity log;
     private Collection<FileEntity> filesByUid;
     private Collection<LogEntity> logsByUid;
     private Collection<PluginEntity> pluginsByUid;
     private Collection<TokenEntity> tokensByUid;
+    private Collection<UserRoleEntity> rolesByUid;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
@@ -142,13 +143,25 @@ public class UserEntity {
      * 2 管理员
      * */
     @Basic
+    @Deprecated
     @Column(name = "role")
     public int getRawRole() {
         return rawRole;
     }
 
+    @Deprecated
     public void setRawRole(int role) {
         this.rawRole = role;
+    }
+
+    @OneToOne
+    @JoinColumn(name = "log_id")
+    public LogEntity getLog() {
+        return log;
+    }
+
+    public void setLog(LogEntity log) {
+        this.log = log;
     }
 
     @Override
@@ -199,4 +212,14 @@ public class UserEntity {
     public void setTokensByUid(Collection<TokenEntity> tokensByUid) {
         this.tokensByUid = tokensByUid;
     }
+
+    @OneToMany(mappedBy = "user")
+    public Collection<UserRoleEntity> getRolesByUid() {
+        return rolesByUid;
+    }
+
+    public void setRolesByUid(Collection<UserRoleEntity> rolesByUid) {
+        this.rolesByUid = rolesByUid;
+    }
+
 }

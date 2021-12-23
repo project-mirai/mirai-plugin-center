@@ -15,8 +15,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,6 +32,10 @@ public class LogEntity {
     private String msg;
     private Map<String,Object> otherInfo;
     private UserEntity userByOperator;
+    private Timestamp logTime;
+
+    // Note that this field is nullable
+    private LogEntity parent;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 自增
@@ -60,6 +66,30 @@ public class LogEntity {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    @Basic
+    @Column(name = "log_time")
+    public Timestamp getLogTime() {
+        return logTime;
+    }
+
+    public void setLogTime(Timestamp logTime) {
+        this.logTime = logTime;
+    }
+
+    /**
+     * (Nullable) 获取日志历史的上一个记录
+     */
+    @Nullable
+    @OneToOne()
+    @JoinColumn(name = "parent_id")
+    public LogEntity getParent() {
+        return parent;
+    }
+
+    public void setParent(LogEntity parent) {
+        this.parent = parent;
     }
 
     @Type(type ="jsonb")
@@ -94,4 +124,5 @@ public class LogEntity {
     public void setUserByOperator(UserEntity userByOperator) {
         this.userByOperator = userByOperator;
     }
+
 }
