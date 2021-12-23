@@ -21,7 +21,6 @@ import org.springframework.cache.annotation.CachePut
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import java.io.File
@@ -32,21 +31,28 @@ import java.io.OutputStream
 class PluginDescService(
     private val repo: PluginRepo
 ) {
-    fun getList(page: Int): List<PluginEntity> {
+    fun getAcceptedList(page: Int): List<PluginEntity> {
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
         return repo.findAllByRawState(PluginEntity.Status.Accepted.ordinal ,PageRequest.of(page,20)).toList()
     }
 
-    fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)
+    fun getList(page: Int): List<PluginEntity> {
+        require( page >= 0 ) {  }
+        return repo.findAll(PageRequest.of(page, 20)).toList()
+    }
+
+    fun get(pid: String): PluginEntity? = repo.findByPluginId(pid)
 
     fun count() = repo.count()
 
-    @CachePut("plugin", key = "#plugin.pluginId")
+    fun countByRawStates(rawState:Int):Long {
+        return repo.findAllByRawState(rawState ,PageRequest.of(0,20)).totalElements
+    }
+
     fun update(plugin: PluginEntity, apply: PluginEntity.() -> Unit): PluginEntity {
         return repo.save(plugin.apply(apply))
     }
 
-    @CacheEvict("plugin", key = "#pid")
     fun delete(pid: String) {
         return repo.deletePluginEntityByPluginId(pid)
     }
@@ -59,6 +65,7 @@ class PluginStorageService {
 
     fun resolveFile(pid: String, version: String, filename: String) = resolveVersionDir(pid, version).resolve(filename)
     fun resolveVersionDir(pid: String, version: String) = storage.resolve(pid).resolve(version)
+    fun resolvePluginDir(pid: String) = storage.resolve(pid)
 
     fun get(plugin: PluginEntity, version: String, filename: String) = FileSystemResource(resolveFile(plugin.pluginId, version, filename))
     fun get(pid: String, version: String, filename: String) = FileSystemResource(resolveFile(pid, version, filename))
@@ -86,10 +93,28 @@ class PluginStorageService {
         return resolveVersionDir(pid, version).exists()
     }
 
+    fun getVersionFiles(pid: String, version: String): Array<String> {
+        return resolveVersionDir(pid, version).list()?: arrayOf()
+    }
+
+    fun getVersionList(pid: String): Array<String> {
+        return resolvePluginDir(pid).list()?: arrayOf()
+    }
+
+    fun addVersion(pid: String, version: String): Boolean {
+        return resolveVersionDir(pid, version).mkdirs()
+    }
+
     fun delete(pid: String, version: String): Boolean {
         val dir = resolveVersionDir(pid, version)
         if (!dir.exists()) return false
         return dir.deleteRecursively()
+    }
+
+    fun delete(pid: String, version: String, fileName:String): Boolean {
+        val file = resolveFile(pid, version,fileName)
+        if (!file.exists()) return false
+        return file.delete()
     }
 
     private fun InputStream.copyToBuffered(out: OutputStream, buffer: ByteArray): Long {

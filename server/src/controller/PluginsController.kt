@@ -19,13 +19,16 @@ import net.mamoe.mirai.plugincenter.repo.toStringGitLike
 import net.mamoe.mirai.plugincenter.services.PluginDescService
 import net.mamoe.mirai.plugincenter.services.PluginStorageService
 import net.mamoe.mirai.plugincenter.services.updateOrDefault
+import net.mamoe.mirai.plugincenter.utils.isAdmin
 import net.mamoe.mirai.plugincenter.utils.isAvailable
 import net.mamoe.mirai.plugincenter.utils.isOwnedBy
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import org.springframework.core.annotation.Order
 import org.springframework.core.io.FileSystemResource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
@@ -47,7 +50,7 @@ class PluginsController(
     }
 
     private fun PluginEntity.checkOwnedBy(user: UserEntity) {
-        if (!isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
+        if (! isOwnedBy(user)) throw ExceptionResponse(HttpStatus.FORBIDDEN, "Plugin is not owned by you")
     }
 
     // endregion
@@ -62,11 +65,11 @@ class PluginsController(
     ): ApiResp<List<PluginDesc>> {
         val page = page0 ?: 0
         require(page >= 0) { "Page invalid: '$page'. Should be at least 0." }
-        return r.ok(desc.getList(page).map { it.toDto() })
+        return r.ok(desc.getAcceptedList(page).map { it.toDto() })
     }
     @ApiOperation("获取插件数")
     @GetMapping("/count")
-    fun count() = r.ok(PluginCount(desc.count()))
+    fun count() = r.ok(PluginCount(desc.countByRawStates(PluginEntity.Status.Accepted.ordinal)))
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -146,6 +149,7 @@ class PluginsController(
     // Versions
     ///////////////////////////////////////////////////////////////////////////
 
+
     @ApiOperation("下载一个文件")
     @GetMapping("/{id}/{version}/{filename}")
     @ApiResponses(
@@ -163,13 +167,14 @@ class PluginsController(
         @ApiParam("文件名")
         @PathVariable
         filename: String,
-    ): FileSystemResource {
+    ): ResponseEntity<FileSystemResource> {
         // This should be handled by the upstream Nginx server.
         //  Spring sed as a fallback.
-
         val resource = storage.get(id, version, filename)
         if (!resource.exists()) throw ExceptionResponse(404, "File not found")
-        return resource
+        val responseHeaders = HttpHeaders()
+        responseHeaders.set("Content-Disposition", "attachment; filename=\"${filename}\"")
+        return ResponseEntity<FileSystemResource>(resource, responseHeaders, HttpStatus.OK)
     }
 
     @ApiOperation("上传一个文件")
@@ -206,6 +211,92 @@ class PluginsController(
         r.created()
     }
 
+    @ApiOperation("删除一个文件")
+    @DeleteMapping("/{id}/{version}/{filename}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Plugin not found", response = ApiResp::class),
+        ApiResponse(code = 403, message = "Plugin is not owned by you", response = ApiResp::class),
+        ApiResponse(code = 201, message = "Uploaded", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).delFile(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+
+        @ApiParam("文件名")
+        @PathVariable
+        filename: String,
+    ): Mono<ApiResp<Void?>> = mono {
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return@mono r.notFound(null)
+
+        plugin.checkOwnedBy(user)
+        plugin.checkAvailable()
+
+        if (!storage.hasVersion(plugin.pluginId, version)) return@mono r.notFound(message = "Version not found")
+        val file = storage.get(plugin.pluginId, version, filename)
+        if (!file.exists()) return@mono r.conflict(null, message = "File doesn't exist")
+        storage.delete(id, version, filename)
+        r.ok()
+    }
+
+    @ApiOperation("创建版本")
+    @PutMapping("/{id}/{version}")
+    @ApiResponses(
+        ApiResponse(code = 503, message = "Error when creating version", response = ApiResp::class)
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).putVersion(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+
+        @ApiParam("插件版本号")
+        @PathVariable
+        version: String,
+    ): ApiResp<Void?> {
+        val user = loginUserOrReject
+        val plugin = desc.get(id) ?: return r.notFound(null)
+        plugin.checkOwnedBy(user)
+        if(!storage.addVersion(plugin.pluginId, version)) return r(503)
+        return r.ok()
+    }
+
+    @ApiOperation("查看目标版本的所有文件")
+    @GetMapping("/{id}/{version}")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Version not found", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).getVersionFiles(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String,
+        @ApiParam("插件 ID", example = PluginDesc.VERSION_EXAMPLE)
+        @PathVariable
+        version: String
+    ): ApiResp<Array<String>?> {
+        desc.get(id) ?: return r.notFound(null)
+        if(!storage.hasVersion(id,version)) return r(404)
+        return r.ok(storage.getVersionFiles(id,version))
+    }
+
+    @ApiOperation("查看版本列表")
+    @GetMapping("/{id}/versionList")
+    @ApiResponses(
+        ApiResponse(code = 404, message = "Version not found", response = ApiResp::class),
+    )
+    fun (@receiver:ApiIgnore ServerWebExchange).getVersionList(
+        @ApiParam("插件 ID", example = PluginDesc.ID_EXAMPLE)
+        @PathVariable
+        id: String
+    ): ApiResp<Array<String>?> {
+        desc.get(id) ?: return r.notFound(null)
+        return r.ok(storage.getVersionList(id))
+    }
+
     @ApiOperation("删除一个版本及该版本下的所有文件")
     @DeleteMapping("/{id}/{version}")
     @ApiResponses(
@@ -217,7 +308,7 @@ class PluginsController(
         @PathVariable
         id: String,
 
-        @ApiParam("插件版本号")
+        @ApiParam("插件版本号", example = PluginDesc.VERSION_EXAMPLE)
         @PathVariable
         version: String,
     ): ApiResp<Void?> {

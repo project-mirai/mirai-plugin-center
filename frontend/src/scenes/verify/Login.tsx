@@ -4,9 +4,10 @@ import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import axios from "axios";
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {useVerficationFormStyle} from "./VerifyLayout";
+import {useHistory} from "react-router";
+import request from "../../lib/request";
 
 export default function Login(){
     const classes = useVerficationFormStyle();
@@ -14,7 +15,7 @@ export default function Login(){
     const [message, setMessage] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    const history = useHistory()
     const handleDialogOpen = () => {
         setOpen(true);
     };
@@ -27,8 +28,9 @@ export default function Login(){
             email:username,
             password:password
         }
-        axios.post('/v1/sso/login',data).then((res)=>{
+        request.post('/v1/sso/login',data).then((res)=>{
             console.log(res)
+            history.push('/app')
         }).catch((err)=>{
             console.log(err.response)
             if(err.response.data.code === 400) {
@@ -101,12 +103,12 @@ export default function Login(){
                 </Button>
                 <Grid container>
                     <Grid item xs>
-                        <Link href="#" variant="body2">
+                        <Link variant="body2" onClick={()=>history.push("/verify/resetpassword/sendmail")}>
                             忘记密码
                         </Link>
                     </Grid>
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link variant="body2" onClick={()=>history.push("/verify/register")}>
                             {"注册"}
                         </Link>
                     </Grid>

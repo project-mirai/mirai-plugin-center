@@ -10,3 +10,9 @@ export interface PluginInfo {
     owner:UserInfo
     status:string
 }
+
+export interface BasicPluginInfo {
+    id: string
+    info: string
+    name: string
+}

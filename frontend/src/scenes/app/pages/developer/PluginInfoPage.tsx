@@ -3,11 +3,14 @@ import { Result, Button, Tag, Descriptions} from 'antd';
 import {PageContainer} from "@ant-design/pro-layout";
 import {EditOutlined} from "@ant-design/icons";
 import ProCard from "@ant-design/pro-card";
-import axios from "axios";
-import {PluginInfo} from "../../../models/Plugin";
+import {useHistory} from "react-router";
+import {PluginInfo} from "../../../../models/Plugin";
+import PluginVersionControlForm from "../../../../components/Plugin/EditForm/PluginVersionControlForm";
+import request from "../../../../lib/request";
 
 export default (props:any) => {
     const id = props.match.params.id
+    const history = useHistory()
     const [success, setSuccess] = useState(true)
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState({
@@ -19,7 +22,7 @@ export default (props:any) => {
     })
     console.log(id)
     useEffect(()=>{
-        axios.get('/v1/plugins/'+id).then((res)=>{
+        request.get('/v1/plugins/'+id).then((res)=>{
             setData(res.data.response)
             setLoading(false)
             console.log(data)
@@ -34,7 +37,7 @@ export default (props:any) => {
                 loading={loading}
                 gutter={8}
                 actions={[
-                    <EditOutlined key="edit"/>,
+                    <EditOutlined key="edit" onClick={()=>history.push('/app/edit/'+id)}/>,
                 ]}
                 colSpan={12}
                 bordered={true}
@@ -61,6 +64,18 @@ export default (props:any) => {
                 </Descriptions>
 
             </ProCard>
+
+            <ProCard
+                gutter={8}
+                colSpan={12}
+                style={{ marginTop: 8 }}
+                bordered={true}
+                layout="default"
+                direction="column"
+                title={"插件下载"}
+            >
+                <PluginVersionControlForm loading={loading} info={data}/>
+            </ProCard>
         </>
     );
     const result = (
@@ -77,7 +92,7 @@ export default (props:any) => {
                 status="warning"
                 title="错误"
                 subTitle="您查找的ID并不存在"
-                extra={<Button onClick={()=>setSuccess(false)}>返回主页</Button>}
+                extra={<Button onClick={()=>history.push('/')}>返回主页</Button>}
             />
         </div>
     )

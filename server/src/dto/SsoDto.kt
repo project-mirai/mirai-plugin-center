@@ -54,6 +54,10 @@ data class UserDto(
     @Order(1)
     @ApiModelProperty("昵称", example = "Tester")
     val nick: String,
+
+    @Order(2)
+    @ApiModelProperty("用户权限", example = "1")
+    val role: Int,
 )
 
-fun UserEntity.toDto(): UserDto = UserDto(email, nick)
+fun UserEntity.toDto(): UserDto = UserDto(email, nick, rawRole)

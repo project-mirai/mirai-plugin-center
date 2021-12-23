@@ -1,21 +1,26 @@
 import React from 'react';
-import {Avatar, Dropdown, Menu, Space} from 'antd';
+import {Avatar, Button, Dropdown, Menu, Space} from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 
 import ProLayout from '@ant-design/pro-layout';
-import defaultProps from './_defaultProps';
-import axios from "axios";
+import {useHistory} from "react-router";
+import {GuestRouter, DeveloperRouter, AdministratorRouter} from "./router/Routers";
+import request from "../../lib/request";
 
 
 
 export default (props:any) => {
     const defaultUserInfo = {
-        nick:'nickname'
+        nick:'nickname',
+        role:0
     }
     const [logon, setLogon] = React.useState(false)
     const [userInfo, setUserInfo] = React.useState(defaultUserInfo)
+    const [needReloading, setNeedReloading] = React.useState(true)
+    const history = useHistory()
     const loadingInfo = () => {
-        axios.get('/v1/sso/whoami').then((res)=>{
+        setNeedReloading(false)
+        request.get('/v1/sso/whoami').then((res)=>{
             setLogon(true)
             setUserInfo(res.data.response)
         }).catch(()=>{
@@ -23,22 +28,28 @@ export default (props:any) => {
             setUserInfo(defaultUserInfo)
         })
     }
-    React.useEffect(()=>loadingInfo(),[])
+    const logout = () =>
+        request.get('/v1/sso/logout').finally(()=>setNeedReloading(true))
+
+    React.useEffect(()=>loadingInfo(),[needReloading])
     const userControlMenu = (
         <Menu>
             {logon?
                 <>
                     <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+                        <a>
                             {userInfo.nick}
                         </a>
                     </Menu.Item>
-                    <Menu.Item danger>注销</Menu.Item>
+                    <Menu.Item onClick={()=>history.push('/verify/resetpassword/manual/')}>
+                            修改密码
+                    </Menu.Item>
+                    <Menu.Item onClick={()=>logout()} danger>注销</Menu.Item>
                 </>
                 :
                 <>
                     <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
+                        <a rel="noopener noreferrer" onClick={()=>history.push('/verify/login')}>
                             请登录
                         </a>
                     </Menu.Item>
@@ -46,6 +57,7 @@ export default (props:any) => {
             }
         </Menu>
     );
+
     return (
         <div
             id="app-layout"
@@ -54,7 +66,8 @@ export default (props:any) => {
             }}
         >
             <ProLayout
-                {...defaultProps}
+                {...(logon?
+                    (userInfo.role>1?AdministratorRouter:DeveloperRouter):GuestRouter)}
                 waterMarkProps={{
                     content: 'Mirai',
                 }}
@@ -88,9 +101,9 @@ export default (props:any) => {
                 }}
                 onMenuHeaderClick={(e) => console.log(e)}
                 menuItemRender={(item, dom) => (
-                    <a
+                    <a aria-disabled={!logon}
                         onClick={() => {
-                            //setPathname(item.path || '/welcome');
+                            history.push(item.path as string,true)
                         }}
                     >
                         {dom}
@@ -98,11 +111,17 @@ export default (props:any) => {
                 )}
                 rightContentRender={() => (
                     <Space wrap>
-                        <Dropdown overlay={userControlMenu}>
-                            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-                                <Avatar shape="square" size="small" icon={<UserOutlined/>}/>
-                            </a>
-                        </Dropdown>
+                        {
+                            logon ?
+                                (<Dropdown overlay={userControlMenu}>
+                                    <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                                        <Avatar shape="square" size="small" icon={<UserOutlined/>}/>
+                                    </a>
+                                </Dropdown>)
+                                :
+                                (<Button onClick={() => history.push("/verify/login")}>请登录</Button>)
+                        }
+
                     </Space>
                 )}
                 title={'Mirai插件中心'}

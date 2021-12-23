@@ -9,6 +9,7 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "user", schema = "public", catalog = "plugins")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserEntity {
     public enum Role {
         Undefined,
