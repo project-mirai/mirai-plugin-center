@@ -41,7 +41,7 @@ class PluginDescService(
         return repo.findAll(PageRequest.of(page, 20)).toList()
     }
 
-    fun get(pid: String): PluginEntity? = repo.findPluginEntityByPluginId(pid)
+    fun get(pid: String): PluginEntity? = repo.findByPluginId(pid)
 
     fun count() = repo.count()
 
