@@ -21,7 +21,9 @@ import javax.transaction.Transactional
 interface UserRepo : JpaRepository<UserEntity, Int> {
     @QueryHints(QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     fun findUserEntityByEmail(email: String): UserEntity?
-    fun findUserEntityByUid(uid: Int): UserEntity?
+
+    @QueryHints(QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
+    fun findByUid(uid: Int): UserEntity?
     fun existsByEmail(email: String): Boolean
 
 //    @Modifying

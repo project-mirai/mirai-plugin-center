@@ -14,11 +14,14 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.jpa.repository.QueryHints
 import org.springframework.data.repository.CrudRepository
 import org.springframework.transaction.annotation.Transactional
+import javax.persistence.QueryHint
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
-    fun findPluginEntityByPluginId(pluginId: String): PluginEntity?
+    @QueryHints(QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
+    fun findByPluginId(pluginId: String):PluginEntity?
 
     fun findAll(page: Pageable): Page<PluginEntity>
 
@@ -26,8 +29,6 @@ interface PluginRepo : CrudRepository<PluginEntity, Int> {
 
     @Transactional
     fun deletePluginEntityByPluginId(pluginId: String)
-
-    fun findByPluginId(pluginId: String):PluginEntity?
 
     fun deletePluginEntityById(id: Int)
 
