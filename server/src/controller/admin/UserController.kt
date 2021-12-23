@@ -11,9 +11,12 @@ package net.mamoe.mirai.plugincenter.controller.admin
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.ModifyRoleRequest
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.services.RoleService
 import net.mamoe.mirai.plugincenter.services.UserService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
+import net.mamoe.mirai.plugincenter.utils.validate.requires
+import net.mamoe.mirai.plugincenter.utils.withExchange
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -36,15 +39,19 @@ class UserController(
         @ApiIgnore
         exchange: ServerWebExchange
     ): ApiResp<Nothing?> {
-        // TODO: check permission
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteUserList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 
         val userById = userSvc.findUserById(request.uid)
             ?: throw IllegalArgumentException("user with id '${request.uid}' doesn't exist.")
 
-        val roleByName = roleSvc.findRoleByName(request.roleName)
-            ?: throw IllegalArgumentException("role with name '${request.roleName} doesn't exist.'")
+        val roleByName = roleSvc.findRoleById(request.roleId)
+            ?: throw IllegalArgumentException("role with name '${request.roleId} doesn't exist.'")
 
         with(userSvc) {
             userById.assignRole(user, roleByName)
@@ -66,7 +73,7 @@ class UserController(
         val user = exchange.loginUserOrReject
 
         return userSvc.withExistUser(request.uid) { targetUser ->
-            roleSvc.withExistRole(request.roleName) { role ->
+            roleSvc.withExistRole(request.roleId) { role ->
                 with (userSvc) {
                     targetUser.dropRole(user, role)
                 }

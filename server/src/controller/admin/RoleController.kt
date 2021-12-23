@@ -51,15 +51,15 @@ class RoleController(
 
         val user = exchange.loginUserOrReject
 
-        val roleByName = roleSvc.findRoleByName(request.roleName)
-            ?: throw IllegalArgumentException("role with name '${request.roleName}' doesn't exist.")
+        val roleById = roleSvc.findRoleById(request.roleId)
+            ?: throw IllegalArgumentException("role with id '${request.roleId}' doesn't exist.")
 
         val permissionByCode = permissions[request.permissionCode]
             ?: throw IllegalArgumentException("permission with code '${request.permissionCode}' doesn't exist.")
 
         // do assign
         with (roleSvc) {
-            roleByName.assignPermission(user, permissionByCode)
+            roleById.assignPermission(user, permissionByCode)
         }
 
         return ApiResp.ok()
@@ -76,7 +76,7 @@ class RoleController(
 
         val user = exchange.loginUserOrReject
 
-        return roleSvc.withExistRole(request.roleName) { role ->
+        return roleSvc.withExistRole(request.roleId) { role ->
             roleSvc.withExistPermission(request.permissionCode) { permission ->
                 with (roleSvc) {
                     role.dropPermission(user, permission)
@@ -99,7 +99,7 @@ class RoleController(
 
         val user = exchange.loginUserOrReject
 
-        roleSvc.deleteRole(user, request.roleName, request.force)
+        roleSvc.deleteRole(user, request.roleId, request.force)
 
         return ApiResp.ok()
     }

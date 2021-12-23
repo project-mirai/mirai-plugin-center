@@ -9,6 +9,8 @@
 
 package net.mamoe.mirai.plugincenter.utils.validate
 
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
+import net.mamoe.mirai.plugincenter.model.UserEntity
 import org.intellij.lang.annotations.Language
 
 private typealias Validator = () -> ValidatorBuilder.Result
@@ -37,52 +39,65 @@ open class ValidatorBuilder(val validationName: String = "Validation") {
     }
 
     class StringValidatorBuilder(val string: String) : ValidatorBuilder("String Validation") {
-        fun match(regex: Regex): Validator = {
+        fun match(regex: Regex): Validator = +{
             regex.matches(string).toResult("the string '$this' doesn't match the regex: ${regex.pattern}")
         }
 
         fun match(@Language("RegExp") regexStr: String): Validator = match(Regex(regexStr))
     }
 
-    private val requirements: MutableList<() -> Result> = mutableListOf()
+    private val requirements: MutableList<Validator> = mutableListOf()
 
     /**
      * A simple usage for `+requires(str) { match(regex) }`
      */
-    infix fun String.matches(regex: Regex) = +StringValidatorBuilder(this).match(regex)
+    infix fun String.matches(regex: Regex): Validator = +StringValidatorBuilder(this).match(regex)
 
     /**
      * A simple usage for `+requires(str) { match(regexStr) }`
      */
-    infix fun String.matches(@Language("RegExp") regexStr: String) = +StringValidatorBuilder(this).match(regexStr)
+    infix fun String.matches(@Language("RegExp") regexStr: String): Validator = +StringValidatorBuilder(this).match(regexStr)
 
     /**
      * Short Circuit OR for Validators
      */
-    infix fun Validator.or(that: Validator): Validator = {
-        when (val result = this@or.invoke()) {
-            is Result.Failed -> that.invoke()
-            Result.Success -> result
+    infix fun Validator.or(that: Validator): Validator {
+        val last1 = this@ValidatorBuilder.requirements.removeLast()  // should equals `that`
+        val last2 = this@ValidatorBuilder.requirements.removeLast()  // should equals `this`
+
+        requires {
+            assert(last1 === that)
+            assert(last2 === this@or)
+        }
+
+        return +{
+            when (val result = last2.invoke()) {
+                is Result.Failed -> last1.invoke()
+                Result.Success -> result
+            }
         }
     }
 
-    fun assert(condition: Boolean): Validator = {
+    fun assert(condition: Boolean): Validator = +{
         condition.toResult("assertion failed: $condition === true")
     }
 
     /**
      * Add a Validator to this builder
      */
-    operator fun Validator.unaryPlus() {
+    operator fun Validator.unaryPlus(): Validator {
         requirements.add(this@unaryPlus)
+
+        return this@unaryPlus
     }
+
+    infix fun UserEntity.can(permit: PermissionEntity): Validator = assert(this@can.hasPermit(permit))
 
     /**
      * Make a subrequirement for string.
-     * Note that this method returns a Validator, so you need to apply a unaryPlus on it.
      */
     inline fun requires(string: String, block: StringValidatorBuilder.() -> Unit): Validator {
-        return StringValidatorBuilder(string).apply {
+        return +StringValidatorBuilder(string).apply {
             block()
         }.build()
     }

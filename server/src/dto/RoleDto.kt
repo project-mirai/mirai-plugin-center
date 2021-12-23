@@ -35,11 +35,11 @@ data class CreateRoleRequest(
 )
 
 data class DeleteRoleRequest(
-    val roleName: String,
+    val roleId: Int,
     val force: Boolean = false
 )
 
 data class ModifyPermissionRequest(
-    val roleName: String,
+    val roleId: Int,
     val permissionCode: Int
 )

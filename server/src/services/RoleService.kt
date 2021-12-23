@@ -41,6 +41,7 @@ class RoleService(
     }
 
     fun findRoleByName(name: String): RoleEntity? = roleRepo.findByName(name)
+    fun findRoleById(id: Int): RoleEntity? = roleRepo.findById(id).takeIf { it.isPresent }?.get()
 
     fun hasRole(name: String): Boolean = roleRepo.findByName(name) != null
 
@@ -108,8 +109,8 @@ class RoleService(
         }
     }
 
-    fun deleteRole(operator: UserEntity, roleName: String, force: Boolean = false) {
-        withExistRole(roleName) { role ->
+    fun deleteRole(operator: UserEntity, roleId: Int, force: Boolean = false) {
+        withExistRole(roleId) { role ->
             val userRole = userRoleRepo.findAllByRole(role)
 
             // inspecting the user-role relationship and reject or remove those
@@ -121,7 +122,7 @@ class RoleService(
                     // reject operation
                     val userList = userRole.joinToString(", ", limit = 3) { "(uid: ${it.user.uid}) ${it.user.nick}" }
 
-                    throw IllegalArgumentException("role with name '$roleName' is already assigned to other user: $userList")
+                    throw IllegalArgumentException("role with id '$roleId' is already assigned to other user: $userList")
                 }
             }
 
@@ -141,9 +142,9 @@ class RoleService(
         }
     }
 
-    final inline fun <R> withExistRole(roleName: String, block: (RoleEntity) -> R): R {
-        val role = roleRepo.findByName(roleName)
-            ?: throw IllegalArgumentException("the role with name '${roleName}' doesn't exist")
+    final inline fun <R> withExistRole(roleId: Int, block: (RoleEntity) -> R): R {
+        val role = findRoleById(roleId)
+            ?: throw IllegalArgumentException("the role with id '${roleId}' doesn't exist")
 
         return block(role)
     }

@@ -13,9 +13,15 @@ class ValidatorBuilderTests {
         }
 
         requires {
-            +requires("123") {
-                +match("\\d+")
+            requires("123") {
+                match("\\d+")
             }
+        }
+
+        requires {
+            assert(true) or assert(true)
+            assert(true) or assert(false)
+            assert(false) or assert(true)
         }
     }
 
@@ -29,9 +35,15 @@ class ValidatorBuilderTests {
 
         assertThrows<IllegalArgumentException> {
             requires {
-                +requires("123") {
-                    +match("[a-z]")
+                requires("123") {
+                    match("[a-z]")
                 }
+            }
+        }
+
+        assertThrows<IllegalArgumentException> {
+            requires {
+                assert(false) or assert(false)
             }
         }
     }
