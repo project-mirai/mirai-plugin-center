@@ -26,8 +26,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class RoleService(
-    val userRoleRepo: UserRoleRepo,
-    val rolePermissionRepo: RolePermissionRepo
+    private val userRoleRepo: UserRoleRepo,
+    private val rolePermissionRepo: RolePermissionRepo
 ) {
     @Autowired
     lateinit var roleRepo: RoleRepo
@@ -40,10 +40,13 @@ class RoleService(
         return roleRepo.findAll()
     }
 
+    /// region CRUD Role
     fun findRoleByName(name: String): RoleEntity? = roleRepo.findByName(name)
     fun findRoleById(id: Int): RoleEntity? = roleRepo.findById(id).takeIf { it.isPresent }?.get()
 
     fun hasRole(name: String): Boolean = roleRepo.findByName(name) != null
+
+    /// endregion
 
     /**
      * 创建一个新的 role
@@ -150,7 +153,7 @@ class RoleService(
     }
 
     final inline fun <R> withoutExistRole(roleName: String, block: () -> R): R {
-        roleRepo.findByName(roleName)?.run {
+        findRoleByName(roleName)?.run {
             throw IllegalArgumentException("a role with name '$roleName' already exists")
         }
 
@@ -164,7 +167,7 @@ class RoleService(
     }
 
     final inline fun <R> withExistRolePermit(role: RoleEntity, permissionCode: Int, block: (RolePermissionEntity) -> R): R {
-        val relationship = rolePermissionRepo.findByRoleAndPermission(role, permissionCode)
+        val relationship = role.permissionSet.find { it.permission == permissionCode }
             ?: throw IllegalArgumentException("the role with name '${role.name}' doesn't obtain a permission with code '$permissionCode'")
 
         return block(relationship)
@@ -174,7 +177,7 @@ class RoleService(
         withExistRolePermit(role, permission.code, block)
 
     final inline fun <R> withoutExistRolePermit(role: RoleEntity, permissionCode: Int, block: () -> R): R {
-        rolePermissionRepo.findByRoleAndPermission(role, permissionCode)?.run {
+        role.permissionSet.find { it.permission == permissionCode }?.run {
             throw IllegalArgumentException("the role with name '${role.name}' already had the permission with code '$permissionCode'")
         }
 
