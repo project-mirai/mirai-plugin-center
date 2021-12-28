@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional
 import javax.persistence.QueryHint
 
 interface PluginRepo : CrudRepository<PluginEntity, Int> {
-    @QueryHints(QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     fun findByPluginId(pluginId: String):PluginEntity?
 
     fun findAll(page: Pageable): Page<PluginEntity>

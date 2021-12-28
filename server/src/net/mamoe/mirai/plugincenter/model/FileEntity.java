@@ -9,8 +9,6 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -18,7 +16,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "file", schema = "public", catalog = "plugins")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FileEntity {
     private int id;
     private int owner;
