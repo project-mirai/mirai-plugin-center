@@ -36,7 +36,7 @@ import kotlin.time.minutes
 
 @Service
 class UserService(
-    val userRoleRepo: UserRoleRepo,
+    private val userRoleRepo: UserRoleRepo,
 
     private val userRepo: UserRepo,
 
