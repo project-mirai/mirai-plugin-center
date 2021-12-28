@@ -16,6 +16,7 @@ import org.springframework.data.repository.CrudRepository
 
 interface UserRoleRepo : CrudRepository<UserRoleEntity, Int> {
     fun findAllByRole(role: RoleEntity): Iterable<UserRoleEntity>
+
     fun findByUserAndRole(userEntity: UserEntity, roleEntity: RoleEntity): UserRoleEntity?
 
     fun existsByRole(role: RoleEntity): Boolean

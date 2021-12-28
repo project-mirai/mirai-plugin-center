@@ -9,7 +9,6 @@
 
 package net.mamoe.mirai.plugincenter.model;
 
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +19,6 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "plugin", schema = "public", catalog = "plugins")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PluginEntity {
     public enum Status {
         Undefined,

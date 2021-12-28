@@ -11,7 +11,6 @@ package net.mamoe.mirai.plugincenter.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import kotlinx.serialization.json.JsonElement;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -25,7 +24,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "log", schema = "public", catalog = "plugins")
 @TypeDefs(@TypeDef(name="jsonb",typeClass = JsonBinaryType.class))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class LogEntity {
     private long id;
     private Integer operator;
