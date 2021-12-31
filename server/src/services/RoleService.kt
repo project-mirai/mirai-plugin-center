@@ -24,6 +24,13 @@ import net.mamoe.mirai.plugincenter.utils.permissions
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
+/**
+ * # RoleService
+ *
+ * `RoleService` provides some high-level API for manipulating [RoleEntity] and [RolePermissionEntity].
+ *
+ * You should use RoleService to retrieving and updating instead of using [RoleRepo]
+ */
 @Service
 class RoleService(
     private val userRoleRepo: UserRoleRepo,
@@ -45,6 +52,7 @@ class RoleService(
     fun findRoleById(id: Int): RoleEntity? = roleRepo.findById(id).takeIf { it.isPresent }?.get()
 
     fun hasRole(name: String): Boolean = roleRepo.findByName(name) != null
+    fun update(role: RoleEntity): RoleEntity = roleRepo.save(role)
 
     /// endregion
 
@@ -71,7 +79,7 @@ class RoleService(
     /**
      * 为 role 赋予权限
      *
-     * @receiver 目标 role
+     * @receiver 目标 role，操作结束后会更新 log 属性
      * @param operator 操作者
      * @param permission 目标权限
      */
@@ -87,6 +95,10 @@ class RoleService(
             AssignPermissionEvent(permission),
             AssignPermissionEvent::class)
 
+        // update log
+        this.log = log
+        update(this)
+
         return rolePermissionRepo.save(RolePermissionEntity().apply {
             this.role = this@assignPermission
             this.permission = permission.code
@@ -96,7 +108,7 @@ class RoleService(
     /**
      * 为 role 删除权限
      *
-     * @receiver 目标 role
+     * @receiver 目标 role，操作结束后会更新 log 属性
      * @param operator 操作者
      * @param permission 目标权限
      */
@@ -108,10 +120,20 @@ class RoleService(
                 DropPermissionEvent(permission),
                 DropPermissionEvent::class)
 
+            // update log
+            this.log = log
+            update(this)
+
             rolePermissionRepo.delete(it)
         }
     }
 
+    /**
+     * delete role by given role id
+     *
+     * @param operator the operator
+     * @param force exception was thrown if set false **AND** this role was assigned to any user; delete all relationship of this role if set true.
+     */
     fun deleteRole(operator: UserEntity, roleId: Int, force: Boolean = false) {
         withExistRole(roleId) { role ->
             val userRole = userRoleRepo.findAllByRole(role)

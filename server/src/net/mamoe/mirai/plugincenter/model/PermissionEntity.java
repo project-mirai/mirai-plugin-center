@@ -48,6 +48,10 @@ public enum PermissionEntity {
     ReadRoleList(2210),         // Role 列表的完全读取
     WriteRoleList(2220),        // Role 列表的完全写入
 
+    // 23 类权限：Role-Permission 列表
+    ReadRolePermissionList(2310),
+    WriteRolePermissionList(2320),
+
     ;
 
     private final int code;

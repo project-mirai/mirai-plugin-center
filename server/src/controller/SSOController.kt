@@ -16,6 +16,7 @@ import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.services.MailService
 import net.mamoe.mirai.plugincenter.services.UserService
+import net.mamoe.mirai.plugincenter.utils.SessionLoginUser
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.removeSessionAccount
 import net.mamoe.mirai.plugincenter.utils.setSessionAccount
@@ -43,7 +44,7 @@ class SSOController(private val userService: UserService, private val mailServic
     fun login(@Valid @RequestBody login: LoginDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
         val result = userService.login(login)
         if (result != null) {
-            req.setSessionAccount(result)
+            req.setSessionAccount(SessionLoginUser(result.uid, userService))
             return respOk(result.toDto())
         } else {
             throw AuthenticationException("登录失败")
@@ -54,7 +55,7 @@ class SSOController(private val userService: UserService, private val mailServic
     @PostMapping("/register")
     fun register(@Valid @RequestBody register: RegisterDTO, @ApiIgnore req: ServerWebExchange): ApiResp<UserDto> {
         val result = userService.registerUser(register, req.request.remoteAddress.toString())
-        req.setSessionAccount(result)
+        req.setSessionAccount(SessionLoginUser(result.uid, userService))
         return respOk(result.toDto())
     }
 

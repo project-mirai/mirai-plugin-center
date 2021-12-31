@@ -11,13 +11,8 @@ package net.mamoe.mirai.plugincenter.services
 
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.Resp
-import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.repo.TokenRepo
-import net.mamoe.mirai.plugincenter.repo.UserRepo
-import net.mamoe.mirai.plugincenter.utils.AuthFailedReason
-import net.mamoe.mirai.plugincenter.utils.authFailedReason
-import net.mamoe.mirai.plugincenter.utils.decodeBase64
-import net.mamoe.mirai.plugincenter.utils.encodeToString
+import net.mamoe.mirai.plugincenter.utils.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authorization.AuthorizationDecision
@@ -34,7 +29,7 @@ import reactor.kotlin.core.publisher.switchIfEmpty
 @Component
 class AuthService(
     val tokenRepo: TokenRepo,
-    val userRepo: UserRepo,
+    val userSvc: UserService,
 ) : ReactiveAuthorizationManager<AuthorizationContext>,
     ServerAuthenticationEntryPoint {
     private fun fastComplete(context: AuthorizationContext): Boolean {
@@ -65,8 +60,8 @@ class AuthService(
             return Mono.just(AuthorizationDecision(true))
         }
 
-        fun completeAuth(user: UserEntity): Mono<AuthorizationDecision> {
-            context.exchange.attributes["User"] = user
+        fun completeAuth(user: SessionLoginUser): Mono<AuthorizationDecision> {
+            context.exchange.attributes[SessionUserKey] = user
             val trust = AuthorizationDecision(true)
             return authentication.map {
                 it.isAuthenticated = true
@@ -80,7 +75,7 @@ class AuthService(
         }
         @Suppress("RemoveExplicitTypeArguments")
         return context.exchange.session.flatMap<AuthorizationDecision> { session ->
-            (session.attributes["User"] as? UserEntity)?.let { ue ->
+            (session.attributes["User"] as? SessionLoginUser)?.let { ue ->
                 return@flatMap completeAuth(ue)
             }
             return@flatMap Mono.empty()
@@ -97,7 +92,7 @@ class AuthService(
                         return authFailed(AuthFailedReason.TOKEN_EXPIRED)
                     }
 
-                    return completeAuth(token.userByOwner)
+                    return completeAuth(SessionLoginUser(token.owner, userSvc))
                 }
                 when (type) {
                     "token" -> {
