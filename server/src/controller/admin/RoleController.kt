@@ -10,9 +10,12 @@
 package net.mamoe.mirai.plugincenter.controller.admin
 
 import net.mamoe.mirai.plugincenter.dto.*
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.services.RoleService
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.permissions
+import net.mamoe.mirai.plugincenter.utils.validate.requires
+import net.mamoe.mirai.plugincenter.utils.withExchange
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
@@ -31,14 +34,18 @@ class RoleController(
     fun createRole(
         @RequestBody
         request: CreateRoleRequest,
-        @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
-        // TODO: check permission
+        @ApiIgnore exchange: ServerWebExchange): ApiResp<CreateRoleResponse> {
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteRoleList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 
-        roleSvc.createRole(user, request.roleName)
+        val role = roleSvc.createRole(user, request.roleName)
 
-        return ApiResp.ok()
+        return ApiResp.ok(CreateRoleResponse(role.id))
     }
 
     @PostMapping("assign")
@@ -47,7 +54,11 @@ class RoleController(
         request: ModifyPermissionRequest,
 
         @ApiIgnore exchange: ServerWebExchange): ApiResp<Nothing?> {
-        // TODO: check permission
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteRolePermissionList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 
@@ -72,7 +83,11 @@ class RoleController(
 
         @ApiIgnore
         exchange: ServerWebExchange): ApiResp<Nothing?> {
-        // TODO: check permission
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteRolePermissionList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 
@@ -95,7 +110,11 @@ class RoleController(
         @ApiIgnore
         exchange: ServerWebExchange
     ): ApiResp<Nothing?> {
-        // TODO: check permission
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteRoleList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 

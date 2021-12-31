@@ -34,6 +34,10 @@ data class CreateRoleRequest(
     val roleName: String
 )
 
+data class CreateRoleResponse(
+    val roleId: Int
+)
+
 data class DeleteRoleRequest(
     val roleId: Int,
     val force: Boolean = false

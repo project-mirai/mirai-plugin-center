@@ -56,8 +56,12 @@ data class UserDto(
     val nick: String,
 
     @Order(2)
-    @ApiModelProperty("用户权限", example = "1")
+    @ApiModelProperty("[已废弃] 用户权限", example = "1")
     val role: Int,
+
+    @Order(3)
+    @ApiModelProperty("用户角色列表", example = "[\"admin\", \"foo\"]")
+    val roles: List<String>
 )
 
-fun UserEntity.toDto(): UserDto = UserDto(email, nick, rawRole)
+fun UserEntity.toDto(): UserDto = UserDto(email, nick, rawRole, rolesByUid.map { it.role.name })

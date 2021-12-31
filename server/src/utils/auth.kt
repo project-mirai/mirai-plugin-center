@@ -11,12 +11,19 @@ package net.mamoe.mirai.plugincenter.utils
 
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.services.UserService
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.server.ServerWebExchange
 import java.lang.IllegalStateException
 
+const val SessionUserKey = "User"
+
+data class SessionLoginUser(val uid: Int, val userSvc: UserService)
+
 val ServerWebExchange.loginUser: UserEntity?
-    get() = attributes["User"] as? UserEntity
+    get() = (attributes[SessionUserKey] as? SessionLoginUser)?.let {
+        it.userSvc.findUserById(it.uid)
+    }
 
 val ServerWebExchange.loginUserOrReject: UserEntity
     get() = loginUser ?: throw AccessDeniedException(authFailedReason.msg)
@@ -24,15 +31,15 @@ val ServerWebExchange.loginUserOrReject: UserEntity
 val ServerWebExchange.authFailedReason: AuthFailedReason
     get() = attributes["AuthFailedReason"] as? AuthFailedReason ?: AuthFailedReason.UNKNOWN
 
-fun ServerWebExchange.setSessionAccount(user: UserEntity) {
+fun ServerWebExchange.setSessionAccount(user: SessionLoginUser) {
     session.subscribe { session ->
-        session.attributes["User"] = user
+        session.attributes[SessionUserKey] = user
     }
 }
 
 fun ServerWebExchange.removeSessionAccount() {
     session.subscribe { session ->
-        session.attributes.remove("User")
+        session.attributes.remove(SessionUserKey)
     }
 }
 
