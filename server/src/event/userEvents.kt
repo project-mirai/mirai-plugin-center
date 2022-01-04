@@ -9,6 +9,5 @@
 
 package net.mamoe.mirai.plugincenter.event
 
-import net.mamoe.mirai.plugincenter.model.RoleEntity
-
-data class AssignRoleEvent(val id: Int, val roleName: String)
+data class AssignRoleEvent(val id: Int)
+data class DropRoleEvent(val id: Int)
