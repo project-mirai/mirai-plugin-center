@@ -11,6 +11,7 @@ package net.mamoe.mirai.plugincenter.utils.validate
 
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.utils.auth.hasPermit
 import org.intellij.lang.annotations.Language
 
 private typealias Validator = () -> ValidatorBuilder.Result

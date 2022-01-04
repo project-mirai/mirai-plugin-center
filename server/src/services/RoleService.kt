@@ -48,10 +48,11 @@ class RoleService(
     }
 
     /// region CRUD Role
+
     fun findRoleByName(name: String): RoleEntity? = roleRepo.findByName(name)
     fun findRoleById(id: Int): RoleEntity? = roleRepo.findById(id).takeIf { it.isPresent }?.get()
 
-    fun hasRole(name: String): Boolean = roleRepo.findByName(name) != null
+    fun hasRole(id: Int): Boolean = roleRepo.existsById(id) != null
     fun update(role: RoleEntity): RoleEntity = roleRepo.save(role)
 
     /// endregion

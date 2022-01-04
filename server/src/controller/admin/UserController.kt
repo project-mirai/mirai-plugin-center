@@ -68,7 +68,11 @@ class UserController(
         @ApiIgnore
         exchange: ServerWebExchange
     ): ApiResp<Nothing?> {
-        // TODO: check permission
+        withExchange(exchange) {
+            requires {
+                loginUser can PermissionEntity.WriteUserList
+            }
+        }
 
         val user = exchange.loginUserOrReject
 

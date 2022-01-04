@@ -9,8 +9,10 @@
 
 package net.mamoe.mirai.plugincenter.utils
 
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.model.PluginEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.utils.auth.hasPermit
 
 /**
  * 检查插件状态
@@ -27,7 +29,7 @@ fun PluginEntity.isAvailable(): Boolean {
  * @see PluginEntity.userByOwner
  */
 fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
-    return this.userByOwner.uid == user.uid || user.isAdmin
+    return this.userByOwner.uid == user.uid || user.hasPermit(PermissionEntity.WritePlugin)
 }
 
 var PluginEntity.state: PluginEntity.Status

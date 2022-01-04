@@ -10,6 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import net.mamoe.mirai.plugincenter.model.interfaces.Logable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -54,6 +55,7 @@ public class RoleEntity implements Logable {
     }
 
     @OneToOne
+    @Nullable
     @JoinColumn(name = "log")
     public LogEntity getLog() {
         return log;

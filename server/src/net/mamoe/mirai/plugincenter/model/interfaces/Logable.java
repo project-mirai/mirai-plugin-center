@@ -10,9 +10,11 @@
 package net.mamoe.mirai.plugincenter.model.interfaces;
 
 import net.mamoe.mirai.plugincenter.model.LogEntity;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("SpellCheckingInspection")
 public interface Logable {
+    @Nullable
     LogEntity getLogChain();
 
     void setLogChain(LogEntity log);
