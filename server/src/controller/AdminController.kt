@@ -14,13 +14,14 @@ import io.swagger.annotations.ApiOperation
 import net.mamoe.mirai.plugincenter.advice.ExceptionResponse
 import net.mamoe.mirai.plugincenter.dto.*
 import net.mamoe.mirai.plugincenter.event.PluginModifiedEvent
-import net.mamoe.mirai.plugincenter.model.UserEntity
+import net.mamoe.mirai.plugincenter.model.PermissionEntity
 import net.mamoe.mirai.plugincenter.repo.PluginRepo
 import net.mamoe.mirai.plugincenter.services.LogService
 import net.mamoe.mirai.plugincenter.services.PluginDescService
-import net.mamoe.mirai.plugincenter.utils.isAdmin
 import net.mamoe.mirai.plugincenter.utils.loginUserOrReject
 import net.mamoe.mirai.plugincenter.utils.state
+import net.mamoe.mirai.plugincenter.utils.validate.requires
+import net.mamoe.mirai.plugincenter.utils.withExchange
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -35,20 +36,17 @@ class AdminController(
     private val desc: PluginDescService,
     private val logger: LogService,
 ) {
-    // region utils
-
-    private fun UserEntity.checkAdmin() {
-        if (! isAdmin) throw ExceptionResponse(HttpStatus.FORBIDDEN, "你不是管理员")
-    }
-
-    // endregion
-
     @Order(1)
     @ApiOperation("修改插件状态")
     @PatchMapping("/setstate")       // FIXME: setState ?
     fun setPluginState(@RequestBody setStateDto: SetStateDto, @ApiIgnore ctx: ServerWebExchange): ApiResp<*> {
+        withExchange(ctx) {
+            requires {
+                loginUser can PermissionEntity.WritePlugin
+            }
+        }
+
         val user = ctx.loginUserOrReject
-        user.checkAdmin()
 
         val plugin = pluginRepo.findByPluginId(setStateDto.pluginId) ?: throw ExceptionResponse(HttpStatus.NOT_FOUND, "插件不存在")
 
@@ -65,8 +63,13 @@ class AdminController(
     @ApiOperation("插件列表")
     @GetMapping("/plugins")
     fun listAll(@RequestParam(required = false, defaultValue = "0") page: Int, @ApiIgnore ctx: ServerWebExchange): ApiResp<List<PluginDesc>> {
+        withExchange(ctx) {
+            requires {
+                loginUser can PermissionEntity.ReadPluginList
+            }
+        }
+
         val user = ctx.loginUserOrReject
-        user.checkAdmin()
 
         return ApiResp.ok(desc.getList(page).map { it.toDto() })
     }

@@ -10,6 +10,7 @@
 package net.mamoe.mirai.plugincenter.model;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -153,6 +154,7 @@ public class UserEntity {
     }
 
     @OneToOne
+    @Nullable
     @JoinColumn(name = "log_id")
     public LogEntity getLog() {
         return log;

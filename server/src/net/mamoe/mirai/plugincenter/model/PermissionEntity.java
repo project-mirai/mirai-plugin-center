@@ -34,7 +34,7 @@ public enum PermissionEntity {
 
     // 10 类权限：插件列表权限
     ReadPluginList(1010),       // 对插件列表的完全读取权限
-    ReadAcceptedPluginList(1011),    // 对通过审核的插件列表的读取权限
+    ReadAcceptedPluginList(1011),    // 对通过审核的插件列表的读取权限，所有新用户都应该带有这个权限
 
     WritePlugin(1020),          // 对插件的完全写入权限
     WriteOwnedPlugin(1021),          // 对自己创建的插件的写入权限

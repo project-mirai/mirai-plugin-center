@@ -19,3 +19,5 @@ class ServerWebExchangeScope(val exchange: ServerWebExchange) {
 inline fun withExchange(exchange: ServerWebExchange, block: ServerWebExchangeScope.() -> Unit) {
     ServerWebExchangeScope(exchange).block()
 }
+
+inline fun ServerWebExchange.runScope(block: ServerWebExchangeScope.() -> Unit) = withExchange(this, block)
