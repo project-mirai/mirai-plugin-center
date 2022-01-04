@@ -15,6 +15,7 @@ import net.mamoe.mirai.plugincenter.dto.ResetPasswordByEmailDTO
 import net.mamoe.mirai.plugincenter.dto.ResetPasswordByPasswordDTO
 import net.mamoe.mirai.plugincenter.entity.ResetPasswordTokenAndTime
 import net.mamoe.mirai.plugincenter.event.AssignRoleEvent
+import net.mamoe.mirai.plugincenter.event.DropRoleEvent
 import net.mamoe.mirai.plugincenter.model.RoleEntity
 import net.mamoe.mirai.plugincenter.model.UserEntity
 import net.mamoe.mirai.plugincenter.model.UserRoleEntity
@@ -51,13 +52,17 @@ class UserService(
     @Value("\${mail.base.url}")
     val url: String
 ) {
+
+    /// region CRUD User
+
     fun findUserById(uid: Int): UserEntity? = userRepo.findByUid(uid)
     fun loadUserByUsername(username: String): UserEntity? {
-
-        // todo 用户角色判断
         return userRepo.findUserEntityByEmail(username)
-
     }
+
+    fun update(entity: UserEntity): UserEntity = userRepo.save(entity)
+
+    /// endregion
 
     fun updatePassword(user: UserEntity, newPassword: String): UserEntity {
         // TODO: Should we check newPassword?
@@ -82,8 +87,6 @@ class UserService(
             registerIp = ip
             rawRole = 1
         })
-
-
     }
 
     fun login(user: LoginDTO): UserEntity? {
@@ -153,7 +156,11 @@ class UserService(
         // check user-role relationship
         withoutExistUserRole(this, role) {
             // do log
-            logSvc.newLog(this.log, operator, AssignRoleEvent(role.id, role.name), AssignRoleEvent::class)
+            val newLog = logSvc.newLog(this.log, operator, AssignRoleEvent(role.id), AssignRoleEvent::class)
+
+            // update log chain
+            this.log = newLog
+            update(this@assignRole)
 
             // assignment
             return userRoleRepo.save(UserRoleEntity().apply {
@@ -165,6 +172,11 @@ class UserService(
 
     fun UserEntity.dropRole(operator: UserEntity, role: RoleEntity) {
         withExistUserRole(this, role) {
+            val newLog = logSvc.newLog(this.log, operator, DropRoleEvent(role.id), DropRoleEvent::class)
+
+            this.log = newLog
+            update(this@dropRole)
+
             userRoleRepo.delete(it)
         }
     }
