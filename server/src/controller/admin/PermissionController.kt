@@ -9,12 +9,13 @@
 
 package net.mamoe.mirai.plugincenter.controller.admin
 
+import net.mamoe.mirai.plugincenter.controller.ADMIN_BASE_URL
 import net.mamoe.mirai.plugincenter.services.UserService
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/admin/permission")
+@RequestMapping("$ADMIN_BASE_URL/permission")
 class PermissionController(
     val userSvc: UserService
 ) {

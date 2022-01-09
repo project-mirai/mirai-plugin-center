@@ -9,6 +9,7 @@
 
 package net.mamoe.mirai.plugincenter.controller.admin
 
+import net.mamoe.mirai.plugincenter.controller.ADMIN_BASE_URL
 import net.mamoe.mirai.plugincenter.dto.ApiResp
 import net.mamoe.mirai.plugincenter.dto.ModifyRoleRequest
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
@@ -25,7 +26,7 @@ import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
 
 @RestController
-@RequestMapping("/admin/user")
+@RequestMapping("$ADMIN_BASE_URL/user")
 class UserController(
     val userSvc: UserService,
     val roleSvc: RoleService
