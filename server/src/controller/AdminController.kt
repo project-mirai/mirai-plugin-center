@@ -28,8 +28,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import springfox.documentation.annotations.ApiIgnore
 
+const val ADMIN_BASE_URL = "/v1/admin"
+
 @RestController       // FIXME: /v1/admin
-@RequestMapping("/v1/admin")
+@RequestMapping(ADMIN_BASE_URL)
 @Api(tags = ["管理员服务"], position = 3)
 class AdminController(
     private val pluginRepo: PluginRepo,
