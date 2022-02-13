@@ -53,6 +53,11 @@ enum class AuthFailedReason(val msg: String) {
     ;
 }
 
+/**
+ * 针对 [ServerWebExchange] 的检查块实现
+ *
+ * **线程不安全**
+ */
 class RequireBlock(private val exchange: ServerWebExchange) {
     private var loginUser: UserEntity? = null
 

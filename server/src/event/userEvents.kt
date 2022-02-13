@@ -9,5 +9,16 @@
 
 package net.mamoe.mirai.plugincenter.event
 
+/**
+ * 为 User 赋予 Role 时的事件
+ *
+ * @property id Role Id
+ */
 data class AssignRoleEvent(val id: Int)
+
+/**
+ * 为 User 移除 Role 时的事件
+ *
+ * @property id Role Id
+ */
 data class DropRoleEvent(val id: Int)

@@ -25,11 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 /**
- * # RoleService
- *
- * `RoleService` provides some high-level API for manipulating [RoleEntity] and [RolePermissionEntity].
- *
- * You should use RoleService to retrieving and updating instead of using [RoleRepo]
+ * # Role Service
  */
 @Service
 class RoleService(

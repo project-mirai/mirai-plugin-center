@@ -34,7 +34,9 @@ import javax.persistence.QueryHint
 import kotlin.time.ExperimentalTime
 import kotlin.time.minutes
 
-
+/**
+ * # User Service
+ */
 @Service
 class UserService(
     private val userRoleRepo: UserRoleRepo,
@@ -55,11 +57,21 @@ class UserService(
 
     /// region CRUD User
 
+    /**
+     * 根据 uid 查找 [UserEntity]
+     */
     fun findUserById(uid: Int): UserEntity? = userRepo.findByUid(uid)
+
+    /**
+     * 根据 username 查找 [UserEntity]
+     */
     fun loadUserByUsername(username: String): UserEntity? {
         return userRepo.findUserEntityByEmail(username)
     }
 
+    /**
+     * 更新 [UserEntity]
+     */
     fun update(entity: UserEntity): UserEntity = userRepo.save(entity)
 
     /// endregion
@@ -152,6 +164,16 @@ class UserService(
         updatePassword(user, reset.newPassword)
     }
 
+    /**
+     * 为 [UserEntity] 赋予给定 role
+     *
+     * @param operator 操作者
+     * @param role 一个要赋予的 [RoleEntity]
+     *
+     * @return User - Role 关系对
+     *
+     * @throws IllegalArgumentException 已经存在该 role 时 由 [withoutExistUserRole] 抛出
+     */
     fun UserEntity.assignRole(operator: UserEntity, role: RoleEntity): UserRoleEntity {
         // check user-role relationship
         withoutExistUserRole(this, role) {
@@ -170,6 +192,14 @@ class UserService(
         }
     }
 
+    /**
+     * 为 [UserEntity] 移除指定 role
+     *
+     * @param operator 操作者
+     * @param role 一个将被移除的 [RoleEntity]
+     *
+     * @throws IllegalArgumentException 不存在指定 role 时 由 [withExistUserRole] 抛出
+     */
     fun UserEntity.dropRole(operator: UserEntity, role: RoleEntity) {
         withExistUserRole(this, role) {
             val newLog = logSvc.newLog(this.log, operator, DropRoleEvent(role.id), DropRoleEvent::class)
