@@ -26,12 +26,16 @@ fun PluginEntity.isAvailable(): Boolean {
 /**
  * 检查插件所有者
  *
+ * TODO: 拥有写权限不一定是所有者
  * @see PluginEntity.userByOwner
  */
 fun PluginEntity.isOwnedBy(user: UserEntity): Boolean {
     return this.userByOwner.uid == user.uid || user.hasPermit(PermissionEntity.WritePlugin)
 }
 
+/**
+ * 获得 **安全的** 插件状态
+ */
 var PluginEntity.state: PluginEntity.Status
     get() {
         return PluginEntity.Status.values()

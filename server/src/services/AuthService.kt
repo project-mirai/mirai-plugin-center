@@ -26,6 +26,11 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 
+/**
+ * # Authentication Service
+ *
+ * 在 [net.mamoe.mirai.plugincenter.config.SecurityConfig] 中被用于配置
+ */
 @Component
 class AuthService(
     val tokenRepo: TokenRepo,
@@ -60,6 +65,7 @@ class AuthService(
             return Mono.just(AuthorizationDecision(true))
         }
 
+        // 完成 Authentication
         fun completeAuth(user: SessionLoginUser): Mono<AuthorizationDecision> {
             context.exchange.attributes[SessionUserKey] = user
             val trust = AuthorizationDecision(true)
@@ -73,14 +79,19 @@ class AuthService(
             context.exchange.attributes["AuthFailedReason"] = reason
             return Mono.just(AuthorizationDecision(!needAuthed(context.exchange)))
         }
+
         @Suppress("RemoveExplicitTypeArguments")
         return context.exchange.session.flatMap<AuthorizationDecision> { session ->
             (session.attributes["User"] as? SessionLoginUser)?.let { ue ->
+                // 如果已经登录
                 return@flatMap completeAuth(ue)
             }
+
             return@flatMap Mono.empty()
         }.switchIfEmpty {
             context.exchange.request.headers["Authorization"]?.firstOrNull()?.let { authorization ->
+                // 使用 token 登录
+
                 val type = authorization.substringBefore(' ')
                 val value = authorization.substringAfter(' ')
                 fun resolveToken(tok: String): Mono<AuthorizationDecision> {

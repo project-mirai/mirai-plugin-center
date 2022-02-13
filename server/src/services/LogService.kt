@@ -19,6 +19,9 @@ import java.lang.reflect.Type
 import java.sql.Timestamp
 import kotlin.reflect.KClass
 
+/**
+ * # Log Service
+ */
 @Component
 class LogService(
     val repo: LogRepo

@@ -11,6 +11,9 @@ package net.mamoe.mirai.plugincenter.utils
 
 import net.mamoe.mirai.plugincenter.model.PermissionEntity
 
+/**
+ * 所有 [PermissionEntity] 枚举值的 [PermissionEntity.code] -> [PermissionEntity] 键值对
+ */
 val permissions: Map<Int, PermissionEntity> by lazy {
     PermissionEntity.values().associateBy {
         it.code
